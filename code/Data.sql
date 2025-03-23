@@ -1,0 +1,1 @@
+INSERT INTO kati VALUES(1,"Vasilis","vas@gamil.com")
