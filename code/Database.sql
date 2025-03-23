@@ -2,8 +2,10 @@
 -- Active: 1742738056874@@127.0.0.1@3306
 
 -- SUPER DUPER IMPORTANT
--- Check if the foreighn keys are in the corret tables
--- One - to many relationships/ The many have the FOREIGN KEY
+-- Check if the foreign keys are in the correct tables
+-- One - to many relationships (The many have the FOREIGN KEY)
+-- Check ON DELETE CASCADE for the foreign keys
+
 
 -- READ FIRST
 -- Naming convention: 1) use lowercase 2) use _ (underscore) for space
@@ -18,13 +20,13 @@ CREATE TABLE festival(
     duration int NOT NULL CHECK (duration > 0),  -- Duration of the festival in days
     location_id int NOT NULL,
     PRIMARY KEY(festival_year),
-    FOREIGN KEY(location_id) REFERENCES location(location_id)
+    FOREIGN KEY(location_id) REFERENCES festival_location(location_id)
 )
 
 CREATE TABLE event(
     event_id int AUTO_INCREMENT,
     event_name varchar(255) NOT NULL,
-    festival_year int,
+    festival_year int NOT NULL CHECK (festival_year > 0),
     stage_id int,
     -- Duration of the event in minutes duration of performances + break_duration
     -- Instead of storing duration in 1 field, we broke it into 2 attributes (event_start, event_end) 
@@ -33,8 +35,8 @@ CREATE TABLE event(
     event_end int,
     break_duration_id int,
     PRIMARY KEY(event_id),
-    FOREIGN KEY(festival_year) REFERENCES festival(festival_year),
-    FOREIGN KEY(stage_id) REFERENCES stage(stage_id),
+    FOREIGN KEY(festival_year) REFERENCES festival(festival_year), ON DELETE CASCADE
+    FOREIGN KEY(stage_id) REFERENCES stage(stage_id), ON DELETE CASCADE
     FOREIGN KEY(break_duration_id) REFERENCES break_duration(break_duration_id)
 )
 
@@ -48,10 +50,10 @@ CREATE TABLE break_duration(
 CREATE TABLE festival_location(
     location_id int AUTO_INCREMENT,
     location_address varchar(255) NOT NULL,
-    city varchar(255),
-    country varchar(255),
-    continent varchar(255),
-    coordinate_id int,
+    city varchar(255) NOT NULL,
+    country varchar(255) NOT NULL,
+    continent varchar(255) NOT NULL,
+    coordinate_id int NOT NULL,
     PRIMARY KEY(location_id),
     FOREIGN KEY(coordinate_id) REFERENCES coordinates(coordinate_id)
 )
@@ -68,13 +70,11 @@ CREATE TABLE performance(
     performance_type_id int,
     -- performance_start and performance_end are stored in minutes after 00:00
     performance_start int CHECK (performance_start >= 0 AND performance_start <= 1440),  -- 0 to 24 hours
-    performance_end int CHECK(performance_start >= 0 AND performance_start <= 1440),
-    CHECK (performance_start - performance_end > 0 AND performance_start - performance_end <= 180),  -- 0 to 3 hours
-    stage_id int,
+    performance_end int CHECK(performance_end >= 0),
+    CHECK (performance_start < performance_end AND performance_start - performance_end <= 180),  -- 0 to 3 hours
     event_id int,
     PRIMARY KEY(performance_id),
     FOREIGN KEY(performance_type_id) REFERENCES performance_type(performance_type_id),
-    FOREIGN KEY(stage_id) REFERENCES stage(stage_id),
     FOREIGN KEY(event_id) REFERENCES event(event_id)
 )
 
@@ -84,15 +84,21 @@ CREATE TABLE performance_type(
     PRIMARY KEY(performance_type_id)
 )
 
-INSERT INTO performance_type(performance_type_name) VALUES('Warm up'), ('headline'), ('Special guest'), ('Closing act');
+INSERT INTO performance_type(performance_type_name) VALUES ('Warm up'), ('Headline'), ('Special guest'), ('Closing act');
 
 CREATE TABLE stage(
     stage_id int AUTO_INCREMENT,
     stage_name varchar(255) NOT NULL,
     stage_capacity int NOT NULL CHECK (stage_capacity > 0),
+    PRIMARY KEY(stage_id)
+)
+
+CREATE TABLE stage_technical_equipment(
+    stage_id int,
     technical_equipment_id int,
-    PRIMARY KEY(stage_id),
-    FOREIGN KEY(technical_equipment_id) REFERENCES technical_equipment(technical_equipment_id)
+    PRIMARY KEY(stage_id, technical_equipment_id),
+    FOREIGN KEY(stage_id) REFERENCES stage(stage_id),
+    FOREIGN KEY(technical_equipment_id) REFERENCES technical_equipment(technical_equipment_id) ON DELETE CASCADE
 )
 
 CREATE TABLE technical_equipment(
@@ -108,7 +114,8 @@ CREATE TABLE staff(
     staff_role_id int NOT NULL,
     staff_phone varchar(255),
     staff_email varchar(255),
-    level_of_experience int NOT NULL CHECK (level_of_experience >= 0 AND level_of_experience <= 5),
+    staff_age int NOT NULL CHECK (staff_age > 0),
+    level_of_experience int NOT NULL CHECK (level_of_experience >= 0 AND level_of_experience < 5),
     PRIMARY KEY(staff_id),
     FOREIGN KEY(staff_role_id) REFERENCES staff_role(staff_role_id)
 )
@@ -127,7 +134,23 @@ CREATE TABLE staff_role(
     PRIMARY KEY(staff_role_id)
 )
 
-INSERT INTO staff_role(staff_role_name) VALUES('SOUND ENGINEER'), ('LIGHT ENGINEER'), ('STAGE MANAGER');
+INSERT INTO staff_role(staff_role_name) VALUES('Technician'),('Security'),('Secondary');
+
+CREATE TABLE role_specialization(
+    role_specialization_id int AUTO_INCREMENT,
+    role_specialization_name varchar(255) NOT NULL,
+    staff_role_id int,
+    PRIMARY KEY(role_specialization_id), 
+    FOREIGN KEY(staff_role_id) REFERENCES staff_role(staff_role_id) ON DELETE CASCADE
+)
+
+CREATE TABLE staff_specialization(
+    staff_id int,
+    role_specialization_id int,
+    PRIMARY KEY(staff_id, role_specialization_id),
+    FOREIGN KEY(staff_id) REFERENCES staff(staff_id) ON DELETE CASCADE,
+    FOREIGN KEY(role_specialization_id) REFERENCES role_specialization(role_specialization_id) ON DELETE CASCADE
+)
 
 CREATE TABLE band(
     band_id int AUTO_INCREMENT,
