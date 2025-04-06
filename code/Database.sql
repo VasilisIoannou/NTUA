@@ -155,11 +155,20 @@ CREATE TABLE staff_specialization(
 CREATE TABLE band(
     band_id int AUTO_INCREMENT,
     band_name varchar(255) NOT NULL,
-    band_genre_id int,
     band_country varchar(255),
     band_members int NOT NULL CHECK (band_members > 0),
+    band_website varchar(255),
+    band_date_of_formation_id int,
     PRIMARY KEY(band_id),
-    FOREIGN KEY(band_genre_id) REFERENCES band_genre(band_genre_id)
+    FOREIGN KEY(band_date_of_formation_id) REFERENCES band_date_of_formation(band_date_of_formation_id) ON DELETE CASCADE
+)
+
+CREATE TABLE band_date_of_formation(
+    band_date_of_formation_id int AUTO_INCREMENT,
+    band_year_of_formation int CHECK (band_year_of_formation > 0),
+    band_month_of_formation int CHECK (band_month_of_formation >= 1 AND band_month_of_formation <= 12),
+    band_day_of_formation int CHECK (band_day_of_formation >= 1 AND band_day_of_formation <= 31),
+    PRIMARY KEY(band_date_of_formation_id)
 )
 
 CREATE TABLE genre(
@@ -168,21 +177,22 @@ CREATE TABLE genre(
     PRIMARY KEY(genre_id)
 )
 
---Many to many relationship between band and genre
-CREATE TABLE band_genre(
-    band_id int AUTO_INCREMENT,
-    genre_id int,
-    PRIMARY KEY(band_id, genre_id),
-    FOREIGN KEY(band_id) REFERENCES band(band_id),
-    FOREIGN KEY(genre_id) REFERENCES genre(genre_id)
+-- Many to many relationship between band and subgenre
+-- A band is connected to its subgenres and a subgenre and from there we can find the genre
+CREATE TABLE band_subgenre(
+    band_id int ,
+    subgenre_id int,
+    PRIMARY KEY(band_id, subgenre_id),
+    FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE,
+    FOREIGN KEY(subgenre_id) REFERENCES subgenre(subgenre_id) ON DELETE CASCADE
 )
 
 CREATE TABLE subgenre(
     subgenre_id int AUTO_INCREMENT,
     subgenre_name varchar(255) NOT NULL,
-    band_genre_id int,
+    genre_id int,
     PRIMARY KEY(subgenre_id),
-    FOREIGN KEY(band_genre_id) REFERENCES band_genre(band_genre_id)
+    FOREIGN KEY(genre_id) REFERENCES genre(genre_id) ON DELETE CASCADE
 )
 
 CREATE TABLE artist(
@@ -190,29 +200,34 @@ CREATE TABLE artist(
     artist_name varchar(255) NOT NULL,
     artist_stage_name varchar(255),
     band_id int,
+    artist_website varchar(255),
     PRIMARY KEY(artist_id),
     FOREIGN KEY(band_id) REFERENCES band(band_id)
 )
 -- Store in a string the url of the social media and the name of the site
 -- For example, "https://www.facebook.com/artist_name" and "Facebook"
 -- We have 2 tables for social media, one for artists and one for bands
+
+-- Na to ksanadoume giati exoume to band_id sto artist
+-- kai to artist_id sto band
 CREATE TABLE social_media_artist(
     social_media_artist_id int AUTO_INCREMENT,
     artist_id int,
-    social_media_name varchar(255) NOT NULL,
-    social_media_url varchar(255) NOT NULL,
+    social_media_name varchar(255),
+    social_media_url varchar(255),
     PRIMARY KEY(social_media_artist_id),
-    FOREIGN KEY(artist_id) REFERENCES artist(artist_id),
+    FOREIGN KEY(artist_id) REFERENCES artist(artist_id) ON DELETE CASCADE
 )
 
 CREATE TABLE social_media_band(
     social_media_band_id int AUTO_INCREMENT,
     band_id int,
-    social_media_name varchar(255) NOT NULL,
-    social_media_url varchar(255) NOT NULL,
+    social_media_url varchar(255),
+    social_media_name varchar(255),
     PRIMARY KEY(social_media_band_id),
-    FOREIGN KEY(band_id) REFERENCES band(band_id),
+    FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE
 )
+
 CREATE TABLE ticket(
     EAN_13 int,
     ticket_type_id int,
@@ -221,11 +236,11 @@ CREATE TABLE ticket(
     ticket_price float NOT NULL CHECK (ticket_price > 0),
     payment_method varchar(255) NOT NULL,
     validated boolean NOT NULL,
-    PRIMARY KEY(ticket_id),
+    PRIMARY KEY(EAN_13),
     FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id),
-    FOREIGN KEY(event_id) REFERENCES event(event_id),
-    FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id),
-    FOREIGN KEY(payment_method) REFERENCES payment_method(payment_method),
+    FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
+    FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE,
+    FOREIGN KEY(payment_method) REFERENCES payment_method(payment_method)
 )
 
 CREATE TABLE payment_method(
@@ -249,7 +264,7 @@ CREATE TABLE visitor(
     visitor_name varchar(255) NOT NULL,
     visitor_surname varchar(255) NOT NULL,
     visitor_age int NOT NULL CHECK (visitor_age > 0),
-    PRIMARY KEY(visitor_id),
+    PRIMARY KEY(visitor_id)
 )
 
 CREATE TABLE visitor_contact(
