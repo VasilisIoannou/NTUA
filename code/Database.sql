@@ -331,32 +331,32 @@ CREATE TABLE likert_scale(
     FOREIGN KEY(reviews_id) REFERENCES reviews(reviews_id) ON DELETE CASCADE
 )
 
-CREATE TABLE festival_image{
+CREATE TABLE festival_image(
     festival_image_id int AUTO_INCREMENT,
     festival_id int NOT NULL,
     festival_image_description varchar(255),
     festival_image_path varchar(255) NOT NULL,
     PRIMARY KEY(festival_image_id),
-    FOREIGN KEY(festival_id) REFERENCE festival(festival_id)
-}
+    FOREIGN KEY(festival_id) REFERENCE festival(festival_id) ON DELETE CASCADE
+)
 
-CREATE TABLE artist_image{
+CREATE TABLE artist_image(
     artist_image_id int AUTO_INCREMENT,
     artist_id int NOT NULL,
     artist_image_description varchar(255),
     artist_image_path varchar(255) NOT NULL,
     PRIMARY KEY(artist_image_id),
-    FOREIGN KEY(artist_id) REFERENCE artist(artist_id)
-}
+    FOREIGN KEY(artist_id) REFERENCE artist(artist_id) ON DELETE CASCADE
+)
 
-CREATE TABLE location_image{
+CREATE TABLE location_image(
     location_image_id int AUTO_INCREMENT,
     location_id int NOT NULL,
     location_image_description varchar(255),
     location_image_path varchar(255) NOT NULL,
     PRIMARY KEY(location_image_id),
-    FOREIGN KEY(location_id) REFERENCE location(location_id)
-}
+    FOREIGN KEY(location_id) REFERENCE location(location_id) ON DELETE CASCADE
+)
 
 CREATE TABLE post_performance_image(
     post_performance_image_id int AUTO_INCREMENT,
@@ -364,7 +364,7 @@ CREATE TABLE post_performance_image(
     post_performance_image_description varchar(255),
     post_performance_image_path varchar(255) NOT NULL
     PRIMARY KEY(post_performance_image_id),
-    FOREIGN KEY(performance_id) REFERENCE performace(performance_id)
+    FOREIGN KEY(performance_id) REFERENCE performace(performance_id) ON DELETE CASCADE
 )
 
 CREATE TABLE band_image(
@@ -373,7 +373,7 @@ CREATE TABLE band_image(
     band_image_description varchar(255),
     band_image_path varchar(255) NOT NULL
     PRIMARY KEY(band_image_id),
-    FOREIGN KEY(band_id) REFERENCE band(band_id)
+    FOREIGN KEY(band_id) REFERENCE band(band_id) ON DELETE CASCADE
 )
 
 CREATE TABLE staff_image(
@@ -382,7 +382,7 @@ CREATE TABLE staff_image(
     staff_image_description varchar(255),
     staff_image_path varchar(255) NOT NULL
     PRIMARY KEY(staff_image_id),
-    FOREIGN KEY(staff_id) REFERENCE staff(staff_id)
+    FOREIGN KEY(staff_id) REFERENCE staff(staff_id) ON DELETE CASCADE
 )
 
 
@@ -392,6 +392,6 @@ CREATE TABLE event_image(
     event_image_description varchar(255),
     event_image_path varchar(255) NOT NULL
     PRIMARY KEY(event_image_id),
-    FOREIGN KEY(event_id) REFERENCE event(event_id)
+    FOREIGN KEY(event_id) REFERENCE event(event_id) ON DELETE CASCADE
 )
 
