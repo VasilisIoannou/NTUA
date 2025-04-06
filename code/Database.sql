@@ -261,3 +261,58 @@ CREATE TABLE visitor_contact(
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id)
 )
 
+CREATE TABLE buyer{
+    buyer_id int AUTO_INCREMENT,
+    visitor_id int NOT NULL,
+    date_issued int NOT NULL, 
+    PRIMARY KEY(buyer_id),
+    FOREIGN KEY(visitor_id)
+}
+
+CREATE TABLE reseling_tickets{
+     reseling_ticket_id int AUTO_INCREMENT,
+     EAN_13 int NOT NULL,
+     PRIMARY KEY(reseling_ticket_id),
+     FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13)
+}
+
+CREATE TABLE desired_by_id{
+    buyer_id int NOT NULL,
+    reseling_ticket_id int,
+    PRIMARY KEY(buyer_id,reseling_ticket) 
+}
+
+CREATE TABLE desired_ticket_by_event{
+    buyer_id int NOT NULL,
+    ticket_type_id int NOT NULL,
+    event_id int NOT NULL,
+    PRIMARY KEY(buyer_id,ticket_type_id,event_id) 
+    FOREIGN KEY(event_id) REFERENCES event(event_id)
+    FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id)
+}
+
+CREATE TABLE reviews{
+    reviews_id int AUTO_INCREMENT,
+    visitor_id int,
+    performance_id int
+}
+
+CREATE TABLE likert_scale{
+    likert_scale_id int,
+    review_id int,
+    performance_score int CHECK(performance_score >= 1 && performance_score <= 5),
+    sound_light_quality_score int CHECK(sound_light_quality_score >= 1 && sound_light_quality_score <= 5),
+    stage_presence_score int CHECK(stage_presence_score >= 1 && stage_presence_score <= 5),
+    organization_score int CHECK(organization_score >= 1 && organization_score <= 5)
+    total_impression_score int CHECK(total_impression_score >= 1 && total_impression_score <= 5)
+}
+
+CREATE TABLE festival_poster{
+    festival_poster_id int AUTO_INCREMENT,
+    festival_id int NOT NULL,
+    picture 
+}
+
+
+
+
