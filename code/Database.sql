@@ -331,12 +331,67 @@ CREATE TABLE likert_scale(
     FOREIGN KEY(reviews_id) REFERENCES reviews(reviews_id) ON DELETE CASCADE
 )
 
-CREATE TABLE festival_poster(
-    festival_poster_id int AUTO_INCREMENT,
+CREATE TABLE festival_image{
+    festival_image_id int AUTO_INCREMENT,
     festival_id int NOT NULL,
-    picture 
+    festival_image_description varchar(255),
+    festival_image_path varchar(255) NOT NULL,
+    PRIMARY KEY(festival_image_id),
+    FOREIGN KEY(festival_id) REFERENCE festival(festival_id)
+}
+
+CREATE TABLE artist_image{
+    artist_image_id int AUTO_INCREMENT,
+    artist_id int NOT NULL,
+    artist_image_description varchar(255),
+    artist_image_path varchar(255) NOT NULL,
+    PRIMARY KEY(artist_image_id),
+    FOREIGN KEY(artist_id) REFERENCE artist(artist_id)
+}
+
+CREATE TABLE location_image{
+    location_image_id int AUTO_INCREMENT,
+    location_id int NOT NULL,
+    location_image_description varchar(255),
+    location_image_path varchar(255) NOT NULL,
+    PRIMARY KEY(location_image_id),
+    FOREIGN KEY(location_id) REFERENCE location(location_id)
+}
+
+CREATE TABLE post_performance_image(
+    post_performance_image_id int AUTO_INCREMENT,
+    performance_id int NOT NULL,
+    post_performance_image_description varchar(255),
+    post_performance_image_path varchar(255) NOT NULL
+    PRIMARY KEY(post_performance_image_id),
+    FOREIGN KEY(performance_id) REFERENCE performace(performance_id)
+)
+
+CREATE TABLE band_image(
+    band_image_id int AUTO_INCREMENT,
+    band_id int NOT NULL,
+    band_image_description varchar(255),
+    band_image_path varchar(255) NOT NULL
+    PRIMARY KEY(band_image_id),
+    FOREIGN KEY(band_id) REFERENCE band(band_id)
+)
+
+CREATE TABLE staff_image(
+    staff_image_id int AUTO_INCREMENT,
+    staff_id int NOT NULL,
+    staff_image_description varchar(255),
+    staff_image_path varchar(255) NOT NULL
+    PRIMARY KEY(staff_image_id),
+    FOREIGN KEY(staff_id) REFERENCE staff(staff_id)
 )
 
 
-
+CREATE TABLE event_image(
+    event_image_id int AUTO_INCREMENT,
+    event_id int NOT NULL,
+    event_image_description varchar(255),
+    event_image_path varchar(255) NOT NULL
+    PRIMARY KEY(event_image_id),
+    FOREIGN KEY(event_id) REFERENCE event(event_id)
+)
 
