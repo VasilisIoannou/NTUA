@@ -273,60 +273,69 @@ CREATE TABLE visitor_contact(
     visitor_email varchar(255) NOT NULL,
     visitor_phone varchar(255) NOT NULL,
     PRIMARY KEY(visitor_contact_id),
-    FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id)
+    FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE
 )
 
-CREATE TABLE buyer{
+CREATE TABLE buyer(
     buyer_id int AUTO_INCREMENT,
     visitor_id int NOT NULL,
     date_issued int NOT NULL, 
     PRIMARY KEY(buyer_id),
-    FOREIGN KEY(visitor_id)
-}
+    FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE
+)
 
-CREATE TABLE reseling_tickets{
-     reseling_ticket_id int AUTO_INCREMENT,
+CREATE TABLE reselling_tickets(
+     reselling_ticket_id int AUTO_INCREMENT,
      EAN_13 int NOT NULL,
-     PRIMARY KEY(reseling_ticket_id),
+     PRIMARY KEY(reselling_ticket_id),
      FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13)
-}
+)
 
-CREATE TABLE desired_by_id{
+CREATE TABLE desired_by_id(
     buyer_id int NOT NULL,
-    reseling_ticket_id int,
-    PRIMARY KEY(buyer_id,reseling_ticket) 
-}
+    reselling_ticket_id int,
+    PRIMARY KEY(buyer_id,reselling_ticket), --sto er diagram en eshei PK
+    FOREIGN KEY(buyer_id) REFERENCES buyer(buyer_id) ON DELETE CASCADE,
+    FOREIGN KEY(reselling_ticket_id) REFERENCES reselling_tickets(reselling_ticket_id) ON DELETE CASCADE
+)
 
-CREATE TABLE desired_ticket_by_event{
+CREATE TABLE desired_ticket_by_event(
     buyer_id int NOT NULL,
     ticket_type_id int NOT NULL,
     event_id int NOT NULL,
-    PRIMARY KEY(buyer_id,ticket_type_id,event_id) 
-    FOREIGN KEY(event_id) REFERENCES event(event_id)
-    FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id)
-}
+    PRIMARY KEY(buyer_id,ticket_type_id,event_id),  --sto er diagram en eshei PK
+    FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
+    FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id), --mporei na xreiazetai ON DELETE CASCADE
+    FOREIGN KEY(buyer_id) REFERENCES buyer(buyer_id) ON DELETE CASCADE
+)
 
-CREATE TABLE reviews{
+CREATE TABLE reviews(
     reviews_id int AUTO_INCREMENT,
-    visitor_id int,
-    performance_id int
-}
+    visitor_id int NOT NULL,
+    performance_id int NOT NULL,
+    PRIMARY KEY(reviews_id),
+    FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE,
+    FOREIGN KEY(performance_id) REFERENCES performance(performance_id) ON DELETE CASCADE
 
-CREATE TABLE likert_scale{
-    likert_scale_id int,
-    review_id int,
+)
+
+CREATE TABLE likert_scale(
+    likert_scale_id int AUTO_INCREMENT,
+    reviews_id int NOT NULL,
     performance_score int CHECK(performance_score >= 1 && performance_score <= 5),
     sound_light_quality_score int CHECK(sound_light_quality_score >= 1 && sound_light_quality_score <= 5),
     stage_presence_score int CHECK(stage_presence_score >= 1 && stage_presence_score <= 5),
-    organization_score int CHECK(organization_score >= 1 && organization_score <= 5)
-    total_impression_score int CHECK(total_impression_score >= 1 && total_impression_score <= 5)
-}
+    organization_score int CHECK(organization_score >= 1 && organization_score <= 5),
+    total_impression_score int CHECK(total_impression_score >= 1 && total_impression_score <= 5),
+    PRIMARY KEY(likert_scale_id),
+    FOREIGN KEY(reviews_id) REFERENCES reviews(reviews_id) ON DELETE CASCADE
+)
 
-CREATE TABLE festival_poster{
+CREATE TABLE festival_poster(
     festival_poster_id int AUTO_INCREMENT,
     festival_id int NOT NULL,
     picture 
-}
+)
 
 
 
