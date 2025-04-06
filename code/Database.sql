@@ -68,7 +68,7 @@ CREATE TABLE event(
     event_id int AUTO_INCREMENT,
     event_name varchar(255) NOT NULL,
     festival_year int NOT NULL CHECK (festival_year > 0),
-    stage_id int,
+    stage_id int NOT NULL,
     -- Duration of the event in minutes duration of performances + break_duration
     -- Instead of storing duration in 1 field, we broke it into 2 attributes (event_start, event_end) 
     -- for better query performance
@@ -78,13 +78,13 @@ CREATE TABLE event(
     PRIMARY KEY(event_id),
     FOREIGN KEY(festival_year) REFERENCES festival(festival_year) ON DELETE CASCADE,
     FOREIGN KEY(stage_id) REFERENCES stage(stage_id) ON DELETE CASCADE,
-    FOREIGN KEY(break_duration_id) REFERENCES break_duration(break_duration_id)
+    FOREIGN KEY(break_duration_id) REFERENCES break_duration(break_duration_id) ON DELETE CASCADE
 )
 
 
 CREATE TABLE performance(
     performance_id int AUTO_INCREMENT,
-    performance_type_id int,
+    performance_type_id int NOT NULL,
     -- performance_start and performance_end are stored in minutes after 00:00
     performance_start int CHECK (performance_start >= 0 AND performance_start <= 1440),  -- 0 to 24 hours
     performance_end int CHECK(performance_end >= 0),
@@ -101,8 +101,9 @@ CREATE TABLE technical_equipment(
     equipment_quantity int NOT NULL CHECK (equipment_quantity > 0),
     PRIMARY KEY(technical_equipment_id)
 )
-
-CREATE TABLE stage_technical_equipment(
+--sta dummy data ena stage mporei na eshei panw pou ena technical equipment enw ston kodika parapanw
+--sta data en je ta thkio unique enw ston kodika prepei nan mazi unique
+CREATE TABLE stage_technical_equipment( 
     stage_id int,
     technical_equipment_id int,
     PRIMARY KEY(stage_id, technical_equipment_id),
@@ -144,11 +145,12 @@ CREATE TABLE staff(
     level_of_experience int NOT NULL CHECK (level_of_experience >= 0 AND level_of_experience < 5),
     PRIMARY KEY(staff_id),
     FOREIGN KEY(staff_role_id) REFERENCES staff_role(staff_role_id)
+    FOREIGN KEY(level_of_experience) REFERENCES level_of_experience(level_of_experience_id)
 )
 
 CREATE TABLE staff_specialization(
-    staff_id int,
-    role_specialization_id int,
+    staff_id int NOT NULL,
+    role_specialization_id int NOT NULL,
     PRIMARY KEY(staff_id, role_specialization_id),
     FOREIGN KEY(staff_id) REFERENCES staff(staff_id) ON DELETE CASCADE,
     FOREIGN KEY(role_specialization_id) REFERENCES role_specialization(role_specialization_id) ON DELETE CASCADE
@@ -191,6 +193,8 @@ CREATE TABLE subgenre(
     FOREIGN KEY(genre_id) REFERENCES genre(genre_id) ON DELETE CASCADE
 )
 
+
+--kammei cap sta 100 sorry :(
 CREATE TABLE band_subgenre(
     band_id int ,
     subgenre_id int,
@@ -246,7 +250,7 @@ CREATE TABLE ticket_type(
     PRIMARY KEY(ticket_type_id)
 )
 
-INSERT INTO ticket_type(ticket_type_name) VALUES('VIP'), ('Regular'), ('Student'), ('Senior citizen'),('backstage');
+INSERT INTO ticket_type(ticket_type_name) VALUES('VIP'), ('Regular'), ('Student'), ('Senior citizen'),('Backstage');
 
 CREATE TABLE visitor(
     visitor_id int AUTO_INCREMENT,
@@ -264,9 +268,9 @@ CREATE TABLE visitor_contact(
     PRIMARY KEY(visitor_contact_id),
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE
 )
-
+--prepei na kamoume tin timi tou eisitiriou na terkazei me to type tou
 CREATE TABLE ticket(
-    EAN_13 int NOT NULL CHECK (EAN_13 > 0),
+    EAN_13 bigint NOT NULL CHECK (EAN_13 > 0),
     ticket_type_id int,
     visitor_id int,
     event_id int,
@@ -283,16 +287,24 @@ CREATE TABLE ticket(
 CREATE TABLE buyer(
     buyer_id int AUTO_INCREMENT,
     visitor_id int NOT NULL,
-    date_issued int NOT NULL, 
     PRIMARY KEY(buyer_id),
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE
 )
 
+-- opos to ekamame iparxei periptosi na exoume presale 40 xronia prin
+CREATE TABLE date_issued(
+    date_issued_id int AUTO_INCREMENT,
+    year_issued int NOT NULL CHECK (year_issued > 0),
+    month_issued int NOT NULL CHECK (month_issued >= 1 AND month_issued <= 12),
+    day_issued int NOT NULL CHECK (day_issued >= 1 AND day_issued <= 31),
+    PRIMARY KEY(date_issued_id)
+)
+
 CREATE TABLE reselling_tickets(
     reselling_ticket_id int AUTO_INCREMENT,
-    EAN_13 int NOT NULL,
+    EAN_13 bigint NOT NULL,
     PRIMARY KEY(reselling_ticket_id),
-    FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13)
+    FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13) ON DELETE CASCADE
 )
 
 --sto er diagram en eshei PK
@@ -314,10 +326,12 @@ CREATE TABLE desired_ticket_by_event(
     buyer_id int NOT NULL,
     ticket_type_id int NOT NULL,
     event_id int NOT NULL,
+    date_issued_id int NOT NULL,
     PRIMARY KEY(buyer_id,ticket_type_id,event_id),  
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
     FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id), 
-    FOREIGN KEY(buyer_id) REFERENCES buyer(buyer_id) ON DELETE CASCADE
+    FOREIGN KEY(buyer_id) REFERENCES buyer(buyer_id) ON DELETE CASCADE,
+    FOREIGN KEY(date_issued_id) REFERENCES date_issued(date_issued_id) ON DELETE CASCADE
 )
 
 CREATE TABLE reviews(
@@ -327,9 +341,9 @@ CREATE TABLE reviews(
     PRIMARY KEY(reviews_id),
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE,
     FOREIGN KEY(performance_id) REFERENCES performance(performance_id) ON DELETE CASCADE
-
 )
 
+-- otan en one-on-one en kamnei generate one-on-one
 CREATE TABLE likert_scale(
     likert_scale_id int AUTO_INCREMENT,
     reviews_id int NOT NULL,
