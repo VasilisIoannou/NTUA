@@ -35,8 +35,8 @@ CREATE TABLE event(
     event_end int,
     break_duration_id int,
     PRIMARY KEY(event_id),
-    FOREIGN KEY(festival_year) REFERENCES festival(festival_year), ON DELETE CASCADE
-    FOREIGN KEY(stage_id) REFERENCES stage(stage_id), ON DELETE CASCADE
+    FOREIGN KEY(festival_year) REFERENCES festival(festival_year) ON DELETE CASCADE,
+    FOREIGN KEY(stage_id) REFERENCES stage(stage_id) ON DELETE CASCADE,
     FOREIGN KEY(break_duration_id) REFERENCES break_duration(break_duration_id)
 )
 
@@ -229,18 +229,18 @@ CREATE TABLE social_media_band(
 )
 
 CREATE TABLE ticket(
-    EAN_13 int,
+    EAN_13 int NOT NULL CHECK (EAN_13 > 0),
     ticket_type_id int,
     visitor_id int,
     event_id int,
     ticket_price float NOT NULL CHECK (ticket_price > 0),
-    payment_method varchar(255) NOT NULL,
+    payment_method_id int NOT NULL,
     validated boolean NOT NULL,
     PRIMARY KEY(EAN_13),
     FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id),
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE,
-    FOREIGN KEY(payment_method) REFERENCES payment_method(payment_method)
+    FOREIGN KEY(payment_method_id) REFERENCES payment_method(payment_method_id)
 )
 
 CREATE TABLE payment_method(
@@ -285,27 +285,34 @@ CREATE TABLE buyer(
 )
 
 CREATE TABLE reselling_tickets(
-     reselling_ticket_id int AUTO_INCREMENT,
-     EAN_13 int NOT NULL,
-     PRIMARY KEY(reselling_ticket_id),
-     FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13)
+    reselling_ticket_id int AUTO_INCREMENT,
+    EAN_13 int NOT NULL,
+    PRIMARY KEY(reselling_ticket_id),
+    FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13)
 )
+
+--sto er diagram en eshei PK
+
 
 CREATE TABLE desired_by_id(
     buyer_id int NOT NULL,
     reselling_ticket_id int,
-    PRIMARY KEY(buyer_id,reselling_ticket), --sto er diagram en eshei PK
+    PRIMARY KEY(buyer_id,reselling_ticket_id),
     FOREIGN KEY(buyer_id) REFERENCES buyer(buyer_id) ON DELETE CASCADE,
     FOREIGN KEY(reselling_ticket_id) REFERENCES reselling_tickets(reselling_ticket_id) ON DELETE CASCADE
 )
+
+
+--mporei na xreiazetai ON DELETE CASCADE
+--sto er diagram en eshei PK
 
 CREATE TABLE desired_ticket_by_event(
     buyer_id int NOT NULL,
     ticket_type_id int NOT NULL,
     event_id int NOT NULL,
-    PRIMARY KEY(buyer_id,ticket_type_id,event_id),  --sto er diagram en eshei PK
+    PRIMARY KEY(buyer_id,ticket_type_id,event_id),  
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
-    FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id), --mporei na xreiazetai ON DELETE CASCADE
+    FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id), 
     FOREIGN KEY(buyer_id) REFERENCES buyer(buyer_id) ON DELETE CASCADE
 )
 
@@ -333,11 +340,11 @@ CREATE TABLE likert_scale(
 
 CREATE TABLE festival_image(
     festival_image_id int AUTO_INCREMENT,
-    festival_id int NOT NULL,
+    festival_year int NOT NULL,
     festival_image_description varchar(255),
     festival_image_path varchar(255) NOT NULL,
     PRIMARY KEY(festival_image_id),
-    FOREIGN KEY(festival_id) REFERENCE festival(festival_id) ON DELETE CASCADE
+    FOREIGN KEY(festival_year) REFERENCES festival(festival_year) ON DELETE CASCADE
 )
 
 CREATE TABLE artist_image(
@@ -346,7 +353,7 @@ CREATE TABLE artist_image(
     artist_image_description varchar(255),
     artist_image_path varchar(255) NOT NULL,
     PRIMARY KEY(artist_image_id),
-    FOREIGN KEY(artist_id) REFERENCE artist(artist_id) ON DELETE CASCADE
+    FOREIGN KEY(artist_id) REFERENCES artist(artist_id) ON DELETE CASCADE
 )
 
 CREATE TABLE location_image(
@@ -355,34 +362,34 @@ CREATE TABLE location_image(
     location_image_description varchar(255),
     location_image_path varchar(255) NOT NULL,
     PRIMARY KEY(location_image_id),
-    FOREIGN KEY(location_id) REFERENCE location(location_id) ON DELETE CASCADE
+    FOREIGN KEY(location_id) REFERENCES festival_location(location_id) ON DELETE CASCADE
 )
 
 CREATE TABLE post_performance_image(
     post_performance_image_id int AUTO_INCREMENT,
     performance_id int NOT NULL,
     post_performance_image_description varchar(255),
-    post_performance_image_path varchar(255) NOT NULL
+    post_performance_image_path varchar(255) NOT NULL,
     PRIMARY KEY(post_performance_image_id),
-    FOREIGN KEY(performance_id) REFERENCE performace(performance_id) ON DELETE CASCADE
+    FOREIGN KEY(performance_id) REFERENCES performance(performance_id) ON DELETE CASCADE
 )
 
 CREATE TABLE band_image(
     band_image_id int AUTO_INCREMENT,
     band_id int NOT NULL,
     band_image_description varchar(255),
-    band_image_path varchar(255) NOT NULL
+    band_image_path varchar(255) NOT NULL,
     PRIMARY KEY(band_image_id),
-    FOREIGN KEY(band_id) REFERENCE band(band_id) ON DELETE CASCADE
+    FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE
 )
 
 CREATE TABLE staff_image(
     staff_image_id int AUTO_INCREMENT,
     staff_id int NOT NULL,
     staff_image_description varchar(255),
-    staff_image_path varchar(255) NOT NULL
+    staff_image_path varchar(255) NOT NULL,
     PRIMARY KEY(staff_image_id),
-    FOREIGN KEY(staff_id) REFERENCE staff(staff_id) ON DELETE CASCADE
+    FOREIGN KEY(staff_id) REFERENCES staff(staff_id) ON DELETE CASCADE
 )
 
 
@@ -390,8 +397,8 @@ CREATE TABLE event_image(
     event_image_id int AUTO_INCREMENT,
     event_id int NOT NULL,
     event_image_description varchar(255),
-    event_image_path varchar(255) NOT NULL
+    event_image_path varchar(255) NOT NULL,
     PRIMARY KEY(event_image_id),
-    FOREIGN KEY(event_id) REFERENCE event(event_id) ON DELETE CASCADE
+    FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE
 )
 
