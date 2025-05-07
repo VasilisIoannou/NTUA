@@ -16,7 +16,9 @@ BEGIN
     DECLARE v_ticket_type_id INT;
     DECLARE v_ticket_price FLOAT;
     DECLARE v_price_exists INT;
-    
+    DECLARE v_stage_capacity INT;	
+    DECLARE v_sould_count INT; 
+
     -- Start transaction
     START TRANSACTION;
     
@@ -41,7 +43,62 @@ BEGIN
         SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'No price defined for this ticket type at the specified event';
     END IF;
-    
+
+    -- VIP capacity check (only if ticket type is VIP)
+    IF p_ticket_type_name = 'VIP' THEN
+        -- Get stage capacity for this event
+        SELECT s.stage_capacity INTO v_stage_capacity
+        FROM event e
+        JOIN stage s ON e.stage_id = s.stage_id
+        WHERE e.event_id = p_event_id;
+        
+        -- Calculate 10% of capacity
+        SET v_max_vip_tickets = FLOOR(v_stage_capacity * 0.1);
+        
+        -- Count existing VIP tickets for this event
+        SELECT COUNT(*) INTO v_vip_tickets_sold
+        FROM ticket t
+        JOIN ticket_type tt ON t.ticket_type_id = tt.ticket_type_id
+        WHERE t.event_id = p_event_id
+        AND tt.ticket_type_name = 'VIP';
+        
+        -- Check if adding one more would exceed limit
+        IF v_vip_tickets_sold >= v_max_vip_tickets THEN
+            ROLLBACK;
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = CONCAT('VIP ticket limit reached (max ', v_max_vip_tickets, ' tickets)');
+        END IF;
+    END IF;
+
+    --Number of Tickets <= stage capacity
+
+  -- A) Look up the stage’s capacity for this event:
+  SELECT s.stage_capacity
+    INTO v_stage_capacity
+    FROM event e
+    JOIN stage s 
+      ON e.stage_id = s.stage_id
+   WHERE e.event_id = NEW.event_id;
+
+  -- B) Count existing tickets for that same stage:
+  SELECT COUNT(*) 
+    INTO v_sold_count
+    FROM ticket t
+    JOIN event ev 
+      ON t.event_id = ev.event_id
+   WHERE ev.stage_id = (
+           SELECT stage_id 
+             FROM event 
+            WHERE event_id = NEW.event_id
+         );
+
+  -- C) If this new ticket would exceed capacity, abort the insert:
+  IF v_sold_count + 1 > v_stage_capacity THEN
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Cannot buy ticket: stage is sold out.';
+  END IF;
+END; //
+
     -- Insert visitor data
     INSERT INTO visitor (visitor_name, visitor_surname, visitor_age)
     VALUES (p_visitor_name, p_visitor_surname, p_visitor_age);
@@ -66,3 +123,8 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- Reselling tickets is only available if all tickets are sold per stage
+
+
+
