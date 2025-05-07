@@ -101,6 +101,7 @@ CREATE TABLE technical_equipment(
     equipment_quantity int NOT NULL CHECK (equipment_quantity > 0),
     PRIMARY KEY(technical_equipment_id)
 )
+
 --sta dummy data ena stage mporei na eshei panw pou ena technical equipment enw ston kodika parapanw
 --sta data en je ta thkio unique enw ston kodika prepei nan mazi unique
 CREATE TABLE stage_technical_equipment( 
@@ -146,6 +147,14 @@ CREATE TABLE staff(
     PRIMARY KEY(staff_id),
     FOREIGN KEY(staff_role_id) REFERENCES staff_role(staff_role_id)
     FOREIGN KEY(level_of_experience) REFERENCES level_of_experience(level_of_experience_id)
+)
+
+CREATE TABLE stage_staff(
+    stage_id int,
+    staff_id int,
+    PRIMARY KEY(stage_id, staff_id),
+    FOREIGN KEY(stage_id) REFERENCES stage(stage_id) ON DELETE CASCADE,
+    FOREIGN KEY(staff_id) REFERENCES staff(staff_id) ON DELETE CASCADE
 )
 
 CREATE TABLE staff_specialization(
