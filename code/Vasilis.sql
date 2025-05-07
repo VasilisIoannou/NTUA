@@ -125,6 +125,49 @@ END //
 DELIMITER ;
 
 -- Reselling tickets is only available if all tickets are sold per stage
+-- I will create a procedure to allow inserting records to resseling_tickets only if the number of tickets == stage capacity 
+
+CREATE FUNCTION insert_reseling_ticket(
+   p_EAN BIGINT
+)
+RETURN VARCHAR
+AS
+BEGIN
+  -- Find the Number of Tickets with event_id = event_id of the ticket with the EAN given
+  -- Find the stage capacity of the stage which the event == ticket.stage_id has
+
+  DECLARE v_event_id INT;
+
+  DELCARE v_number_of_ticket INT;
+  DECLARE v_stage_capacity INT;
+
+  -- Find the event_id
+  SELECT event_id INTO v_event_id FROM tickets WHERE EAN_13 = p_EAN;
+  
+  -- Count the tickets
+  SELECT COUNT(*)
+  INTO v_number_of_tickets
+  FROM tickets
+  WHERE event_id = v_event_id;
+
+  --Find the Stage Capacity
+  SELECT s.stage_capacity
+  INTO v_stage_capacity
+  FROM events e
+  JOIN stage s ON e.stage_id = s.stage_id
+  WHERE e.event_id = v_event_id;
+
+  -- Check if the stage is sold out 
+  IF v_number_of_tickets < v_stage_capacity THEN
+	SET result_message = 'Cannot resell - tickets still available for purchase';
+  ELSE
+	INSERT INTO reseling_tickets (EAN_13) VALUES (P_EAN);
+  ENDIF
+END
+
+
+
+
 
 
 
