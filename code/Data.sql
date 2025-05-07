@@ -62,6 +62,29 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
 IGNORE 1 ROWS;
 
+LOAD DATA LOCAL INFILE 'D:/DATA/Uni/6th Semester/Databases/Festival/DatabaseNTUA/CSV Files/band_date_of_formation.csv'
+INTO TABLE `band_date_of_formation`
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"' 
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+LOAD DATA LOCAL INFILE 'D:/DATA/Uni/6th Semester/Databases/Festival/DatabaseNTUA/CSV Files/band.csv'
+INTO TABLE `band`
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"' 
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+LOAD DATA LOCAL INFILE 'D:/DATA/Uni/6th Semester/Databases/Festival/DatabaseNTUA/CSV Files/performance.csv'
+INTO TABLE `performance`
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"' 
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+SHOW WARNINGS;
+
 
 
 
