@@ -90,9 +90,11 @@ CREATE TABLE performance(
     performance_end int CHECK(performance_end >= 0),
     CHECK (performance_start < performance_end AND performance_start - performance_end <= 180),  -- 0 to 3 hours
     event_id int,
+    band_id int NOT NULL,
     PRIMARY KEY(performance_id),
     FOREIGN KEY(performance_type_id) REFERENCES performance_type(performance_type_id),
-    FOREIGN KEY(event_id) REFERENCES event(event_id)
+    FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
+    FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE
 )
 
 CREATE TABLE technical_equipment(
