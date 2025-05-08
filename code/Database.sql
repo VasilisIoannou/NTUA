@@ -29,7 +29,7 @@ CREATE TABLE festival_location(
     city varchar(255) NOT NULL,
     country varchar(255) NOT NULL,
     continent varchar(255) NOT NULL,
-    coordinate_id int NOT NULL,
+    coordinate_id int NOT NULL UNIQUE,
     PRIMARY KEY(location_id),
     FOREIGN KEY(coordinate_id) REFERENCES coordinates(coordinate_id)
 )
@@ -44,7 +44,7 @@ CREATE TABLE break_duration(
 CREATE TABLE festival(
     festival_year int NOT NULL CHECK (festival_year > 0),
     duration int NOT NULL CHECK (duration > 0),  -- Duration of the festival in days
-    location_id int NOT NULL,
+    location_id int NOT NULL UNIQUE,
     PRIMARY KEY(festival_year),
     FOREIGN KEY(location_id) REFERENCES festival_location(location_id)
 )
@@ -199,11 +199,8 @@ CREATE TABLE band(
 CREATE TABLE subgenre(
     subgenre_id int AUTO_INCREMENT,
     subgenre_name varchar(255) NOT NULL,
-    genre_id int,
-    PRIMARY KEY(subgenre_id),
-    FOREIGN KEY(genre_id) REFERENCES genre(genre_id) ON DELETE CASCADE
+    PRIMARY KEY(subgenre_id)
 )
-
 
 --kammei cap sta 100 sorry :(
 CREATE TABLE band_subgenre(
@@ -218,11 +215,18 @@ CREATE TABLE artist(
     artist_id int AUTO_INCREMENT,
     artist_name varchar(255) NOT NULL,
     artist_stage_name varchar(255),
-    band_id int,
     artist_website varchar(255),
-    PRIMARY KEY(artist_id),
-    FOREIGN KEY(band_id) REFERENCES band(band_id)
+    PRIMARY KEY(artist_id)
 )
+
+CREATE TABLE artist_band(
+    artist_id int NOT NULL,
+    band_id int NOT NULL,
+    PRIMARY KEY(artist_id, band_id),
+    FOREIGN KEY(artist_id) REFERENCES artist(artist_id) ON DELETE CASCADE,
+    FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE
+)
+
 -- Store in a string the url of the social media and the name of the site
 -- For example, "https://www.facebook.com/artist_name" and "Facebook"
 -- We have 2 tables for social media, one for artists and one for bands
@@ -231,7 +235,7 @@ CREATE TABLE artist(
 -- kai to artist_id sto band
 CREATE TABLE social_media_artist(
     social_media_artist_id int AUTO_INCREMENT,
-    artist_id int,
+    artist_id int UNIQUE,
     social_media_name varchar(255),
     social_media_url varchar(255),
     PRIMARY KEY(social_media_artist_id),
@@ -240,7 +244,7 @@ CREATE TABLE social_media_artist(
 
 CREATE TABLE social_media_band(
     social_media_band_id int AUTO_INCREMENT,
-    band_id int,
+    band_id int UNIQUE,
     social_media_url varchar(255),
     social_media_name varchar(255),
     PRIMARY KEY(social_media_band_id),
@@ -273,7 +277,7 @@ CREATE TABLE visitor(
 
 CREATE TABLE visitor_contact(
     visitor_contact_id int AUTO_INCREMENT,
-    visitor_id int NOT NULL,
+    visitor_id int UNIQUE NOT NULL,
     visitor_email varchar(255) NOT NULL,
     visitor_phone varchar(255) NOT NULL,
     PRIMARY KEY(visitor_contact_id),
@@ -308,7 +312,7 @@ CREATE TABLE ticket_price(
 
 CREATE TABLE buyer(
     buyer_id int AUTO_INCREMENT,
-    visitor_id int NOT NULL,
+    visitor_id int UNIQUE NOT NULL,
     PRIMARY KEY(buyer_id),
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE
 )
@@ -324,7 +328,7 @@ CREATE TABLE date_issued(
 
 CREATE TABLE reselling_tickets(
     reselling_ticket_id int AUTO_INCREMENT,
-    EAN_13 bigint NOT NULL,
+    EAN_13 bigint NOT NULL UNIQUE CHECK (EAN_13 > 0),
     PRIMARY KEY(reselling_ticket_id),
     FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13) ON DELETE CASCADE
 )
