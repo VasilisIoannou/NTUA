@@ -95,6 +95,121 @@ END; //
 DELIMITER ;
 
 
+DELIMITER //
+
+-- This trigger prevents bands from being assigned to multiple stages at the same time
+DELIMITER //
+
+CREATE TRIGGER prevent_artist_stage_conflict
+BEFORE INSERT ON performance
+FOR EACH ROW
+BEGIN
+    DECLARE conflict_count INT;
+
+    SELECT COUNT(*) INTO conflict_count
+    FROM performance p
+    JOIN event e1 ON p.event_id = e1.event_id
+    JOIN event e2 ON NEW.event_id = e2.event_id
+    JOIN artist_band ab1 ON ab1.band_id = p.band_id
+    JOIN artist_band ab2 ON ab2.band_id = NEW.band_id
+    WHERE ab1.artist_id = ab2.artist_id
+      AND e1.stage_id != e2.stage_id
+      AND (
+        NEW.performance_start < p.performance_end AND
+        NEW.performance_end > p.performance_start
+      );
+
+    IF conflict_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Artist is scheduled to perform on another stage at this time.';
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+DELIMITER ;
+
+-- This trigger prevents overlaping performances
+CREATE TRIGGER prevent_performance_overlapping
+BEFORE INSERT ON performance
+FOR EACH ROW
+BEGIN
+    DECLARE conflicts INT;
+
+    SELECT COUNT(*) INTO conflicts
+    FROM performance p
+    JOIN event e1 ON p.event_id = e1.event_id
+    JOIN event e2 ON NEW.event_id = e2.event_id
+    WHERE e1.event_id = e2.event_id
+    AND (
+        NEW.performance_start BETWEEN p.performance_start AND p.performance_end
+    );
+    
+    IF conflicts > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'There is already a performance asssigned to this stage during this time.';
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+-- Trigger to check staffing requirements after a ticket is sold
+CREATE TRIGGER check_staffing_requirements
+AFTER INSERT ON ticket
+FOR EACH ROW
+BEGIN
+    DECLARE v_stage_id INT;
+    DECLARE v_total_tickets INT;
+    DECLARE v_security_staff INT;
+    DECLARE v_secondary_staff INT;
+
+    -- Retrieve the stage_id associated with the event
+    SELECT e.stage_id INTO v_stage_id
+    FROM event e
+    WHERE e.event_id = NEW.event_id;
+
+    -- Count total tickets sold for the event
+    SELECT COUNT(*) INTO v_total_tickets
+    FROM ticket
+    WHERE event_id = NEW.event_id;
+
+    -- Count security staff assigned to the stage
+    SELECT COUNT(*) INTO v_security_staff
+    FROM stage_staff ss
+    JOIN staff s ON ss.staff_id = s.staff_id
+    JOIN staff_role sr ON s.staff_role_id = sr.staff_role_id
+    WHERE ss.stage_id = v_stage_id AND sr.staff_role_name = 'Security';
+
+    -- Count secondary staff assigned to the stage
+    SELECT COUNT(*) INTO v_secondary_staff
+    FROM stage_staff ss
+    JOIN staff s ON ss.staff_id = s.staff_id
+    JOIN staff_role sr ON s.staff_role_id = sr.staff_role_id
+    WHERE ss.stage_id = v_stage_id AND sr.staff_role_name = 'Secondary';
+
+    -- Check if security staff is less than 5% of total tickets
+    IF v_security_staff < CEIL(v_total_tickets * 0.05) THEN
+        SIGNAL SQLSTATE '01000'
+        SET MESSAGE_TEXT = 'Warning: Add more security staff for this stage.';
+    END IF;
+
+    -- Check if secondary staff is less than 2% of total tickets
+    IF v_secondary_staff < CEIL(v_total_tickets * 0.02) THEN
+        SIGNAL SQLSTATE '01000'
+        SET MESSAGE_TEXT = 'Warning: Add more secondary staff for this stage.';
+    END IF;
+END$$
+
+DELIMITER ;
+
+
+
+
 
 
 
