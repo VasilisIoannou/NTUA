@@ -93,11 +93,10 @@ BEGIN
          );
 
   -- C) If this new ticket would exceed capacity, abort the insert:
-  IF v_sold_count + 1 > v_stage_capacity THEN
+  IF (v_sold_count + 1) > (v_stage_capacity / 1.07) THEN
     SIGNAL SQLSTATE '45000'
       SET MESSAGE_TEXT = 'Cannot buy ticket: stage is sold out.';
   END IF;
-END; //
 
     -- Insert visitor data
     INSERT INTO visitor (visitor_name, visitor_surname, visitor_age)
@@ -164,6 +163,11 @@ BEGIN
 	INSERT INTO reseling_tickets (EAN_13) VALUES (P_EAN);
   ENDIF
 END
+
+-- An Artist can not be in the festiuval 3 years in a row
+-- Artist -> Band -> Performance -> Event -> festival years
+-- Find all the Bands the Artist is in, then find all the Performances the Bands previously found are in and then find all the events the Performances(p)
+-- Check the current year (Max(festival_years)) and then search for the 2 previous years if they are in the query
 
 
 
