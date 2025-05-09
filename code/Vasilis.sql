@@ -229,7 +229,7 @@ BEGIN
     DECLARE done INT DEFAULT FALSE;
 
     DECLARE artist_cursor CURSOR FOR 
-        SELECT artist_id FROM artist WHERE band_id = p_band_id;
+        SELECT artist_id FROM artist_band WHERE band_id = p_band_id;
     
     -- Handler for when no more rows in cursor
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -274,14 +274,13 @@ BEGIN
 
         -- Count how many of the previous two years this artist performed
         SELECT COUNT(DISTINCT e.festival_year) INTO v_artist_count
-        FROM artist a
-        JOIN band b ON a.band_id = b.band_id
-        JOIN performance p ON b.band_id = p.band_id
+        FROM performance p
         JOIN event e ON p.event_id = e.event_id
-        WHERE a.artist_id = v_artist_id
+        JOIN artist_band ab ON p.band_id = ab.band_id  -- Link to artist via artist_band
+        WHERE ab.artist_id = v_artist_id
         AND e.festival_year IN (v_previous_year_1, v_previous_year_2);
-
-        -- If artist performed in both previous years, set violation flag
+        
+	-- If artist performed in both previous years, set violation flag
         IF v_artist_count >= 2 THEN
             SET v_artist_violation_found = TRUE;
             LEAVE artist_loop; -- No need to check other artists
