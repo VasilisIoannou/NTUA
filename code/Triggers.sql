@@ -181,4 +181,16 @@ BEGIN
     END IF;
 END//
 
+/* Trigger to delete break after performance deletion */
+CREATE TRIGGER delete_break_after_performance
+AFTER DELETE ON performance
+FOR EACH ROW
+BEGIN
+    DELETE FROM break_duration
+    WHERE event_id = OLD.event_id
+      AND break_start = OLD.performance_end;
+END //
+
 DELIMITER ;
+
+
