@@ -158,6 +158,42 @@ DELIMITER ;
 
 DELIMITER $$
 
+
+
+
+
+-- Trigger to set band_members to 0 before inserting a band
+DELIMITER //
+
+CREATE TRIGGER set_band_members_to_zero
+BEFORE INSERT ON band
+FOR EACH ROW
+BEGIN
+    SET NEW.band_members = 0;
+END;
+
+DELIMITER;
+
+-- Trigger to automatically increment band_members when a new artist is added to a band
+DELIMITER //
+
+CREATE TRIGGER increment_band_members
+AFTER INSERT ON artist_band
+FOR EACH ROW
+BEGIN
+    UPDATE band
+    SET band_members = band_members + 1
+    WHERE band_id = NEW.band_id;
+END//
+
+DELIMITER;
+
+
+
+
+
+
+
 -- Trigger to check staffing requirements after a ticket is sold
 CREATE TRIGGER check_staffing_requirements
 AFTER INSERT ON ticket

@@ -38,7 +38,9 @@ CREATE TABLE break_duration(
     break_duration_id int AUTO_INCREMENT,
     -- break_duration is stored in seconds
     break_duration int NOT NULL CHECK (break_duration >= 300 AND break_duration <= 1800),  -- 5 to 30 minutes
-    PRIMARY KEY(break_duration_id)
+    event_id int NOT NULL,
+    PRIMARY KEY(break_duration_id),
+    FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE
 )
 
 CREATE TABLE festival(
@@ -74,11 +76,9 @@ CREATE TABLE event(
     -- for better query performance
     event_start int,
     event_end int,
-    break_duration_id int,
     PRIMARY KEY(event_id),
     FOREIGN KEY(festival_year) REFERENCES festival(festival_year) ON DELETE CASCADE,
-    FOREIGN KEY(stage_id) REFERENCES stage(stage_id) ON DELETE CASCADE,
-    FOREIGN KEY(break_duration_id) REFERENCES break_duration(break_duration_id) ON DELETE CASCADE
+    FOREIGN KEY(stage_id) REFERENCES stage(stage_id) ON DELETE CASCADE
 )
 
 
@@ -185,7 +185,7 @@ CREATE TABLE band(
     band_id int AUTO_INCREMENT,
     band_name varchar(255) NOT NULL,
     band_country varchar(255),
-    band_members int NOT NULL CHECK (band_members > 0),
+    band_members int NOT NULL CHECK (band_members >= 0),
     band_website varchar(255),
     band_date_of_formation_id int,
     PRIMARY KEY(band_id),
@@ -327,7 +327,7 @@ CREATE TABLE date_issued(
 )
 
 CREATE TABLE reselling_tickets(
-    reselling_ticket_id int AUTO_INCREMENT,
+    reselling_ticket_id int AUTO_INCREMENT UNIQUE,
     EAN_13 bigint NOT NULL UNIQUE CHECK (EAN_13 > 0),
     PRIMARY KEY(reselling_ticket_id),
     FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13) ON DELETE CASCADE
