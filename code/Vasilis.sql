@@ -9,7 +9,8 @@ CREATE PROCEDURE insert_visitor_with_ticket(
     IN p_EAN_13 BIGINT,
     IN p_ticket_type_name VARCHAR(255),
     IN p_event_id INT,
-    IN p_payment_method_id INT
+    IN p_payment_method_id INT,
+    OUT result_message VARCHAR(255)
 )
 BEGIN
     DECLARE v_visitor_id INT;
@@ -17,7 +18,12 @@ BEGIN
     DECLARE v_ticket_price FLOAT;
     DECLARE v_price_exists INT;
     DECLARE v_stage_capacity INT;	
-    DECLARE v_sould_count INT; 
+    DECLARE v_sold_count INT; 
+    DECLARE v_max_stage_capacity INT;
+    DECLARE v_max_vip_tickets INT;
+    DECLARE v_vip_tickets_sold INT;
+
+    DECLARE v_pass_checks BOOLEAN DEFAULT TRUE;
 
     -- Start transaction
     START TRANSACTION;
@@ -28,9 +34,8 @@ BEGIN
     WHERE ticket_type_name = p_ticket_type_name;
     
     IF v_ticket_type_id IS NULL THEN
-        ROLLBACK;
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Invalid ticket type specified';
+        SET result_message = 'Invalid ticket type specified';
+    	v_pass_checks = FALSE;
     END IF;
     
     -- Validate ticket price exists
@@ -39,9 +44,8 @@ BEGIN
     WHERE ticket_type_id = v_ticket_type_id AND event_id = p_event_id;
     
     IF v_price_exists = 0 THEN
-        ROLLBACK;
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'No price defined for this ticket type at the specified event';
+        SET result_message = 'No price defined for this ticket type at the specified event';
+    	v_pass_checks = FALSE;
     END IF;
 
     -- VIP capacity check (only if ticket type is VIP)
@@ -64,13 +68,12 @@ BEGIN
         
         -- Check if adding one more would exceed limit
         IF v_vip_tickets_sold >= v_max_vip_tickets THEN
-            ROLLBACK;
-            SIGNAL SQLSTATE '45000' 
-            SET MESSAGE_TEXT = CONCAT('VIP ticket limit reached (max ', v_max_vip_tickets, ' tickets)');
-        END IF;
+            SET result_message = CONCAT('Vip Tickets reach max capacity, current tickets: ', v_vip_tickets_sold, ' - max vip tickets: ', v_max_vip_tickets);
+	    v_pass_checks = FALSE;        
+	END IF;
     END IF;
 
-    --Number of Tickets <= stage capacity
+
 
   -- A) Look up the stage’s capacity for this event:
   SELECT stage_capacity
@@ -94,32 +97,75 @@ BEGIN
 
   -- C) If this new ticket would exceed capacity, abort the insert:
   IF (v_sold_count + 1) > FLOOR(v_stage_capacity * 0.93) THEN
-    SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'Cannot buy ticket: stage is sold out.';
+        SET result_message = CONCAT('Tickets sold out, v_sold_count: ', v_sold_count, ' - v_stage_capacity: ', v_stage_capacity);
+  	v_pass_checks = FALSE;
   END IF;
 
-    -- Insert visitor data
-    INSERT INTO visitor (visitor_name, visitor_surname, visitor_age)
-    VALUES (p_visitor_name, p_visitor_surname, p_visitor_age);
-    
-    -- Get the auto-generated visitor_id
-    SET v_visitor_id = LAST_INSERT_ID();
-    
-    
-    -- Insert visitor contact information
-    INSERT INTO visitor_contact (visitor_id, visitor_email, visitor_phone)
-    VALUES (v_visitor_id, p_visitor_email, p_visitor_phone);
+  IF NOT v_pass_checks THEN
+	ROLLBACK;
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = result_message;
+  END IF
 
-    -- Insert ticket data
-    INSERT INTO ticket (EAN_13, ticket_type_id, visitor_id, event_id, ticket_price, payment_method_id, validated)
-    VALUES (p_EAN_13, v_ticket_type_id, v_visitor_id, p_event_id, v_ticket_price, p_payment_method_id, FALSE);
-    
-    -- Commit the transaction
-    COMMIT;
-    
-    -- Return the new visitor_id and EAN_13 for reference
-    SELECT v_visitor_id AS new_visitor_id, p_EAN_13 AS ticket_EAN;
+  -- Insert visitor data
+  INSERT INTO visitor (visitor_name, visitor_surname, visitor_age)
+  VALUES (p_visitor_name, p_visitor_surname, p_visitor_age);
+  
+  -- Get the auto-generated visitor_id
+  SET v_visitor_id = LAST_INSERT_ID();
+  
+  
+  -- Insert visitor contact information
+  INSERT INTO visitor_contact (visitor_id, visitor_email, visitor_phone)
+  VALUES (v_visitor_id, p_visitor_email, p_visitor_phone);
+
+  -- Insert ticket data
+  INSERT INTO ticket (EAN_13, ticket_type_id, visitor_id, event_id, ticket_price, payment_method_id, validated)
+  VALUES (p_EAN_13, v_ticket_type_id, v_visitor_id, p_event_id, v_ticket_price, p_payment_method_id, FALSE);
+  
+  -- Commit the transaction
+  COMMIT;
+  
+  -- Return the new visitor_id and EAN_13 for reference
+  SELECT v_visitor_id AS new_visitor_id, p_EAN_13 AS ticket_EAN;
 END //
+
+DELIMITER ;
+
+-- Reselling tickets is only available if all tickets are sold per stage
+-- I will create a procedure to allow inserting records to resseling_tickets only if the number of tickets == stage capacity 
+
+DELIMITER //
+
+CREATE PROCEDURE insert_reseling_ticket_proc(
+   IN p_EAN BIGINT,
+   OUT result_message VARCHAR(255)
+)
+BEGIN
+  DECLARE v_event_id INT;
+  DECLARE v_number_of_tickets INT;
+  DECLARE v_stage_capacity INT;
+
+  -- Find the event_id
+  SELECT event_id INTO v_event_id FROM tickets WHERE EAN_13 = p_EAN;
+  
+  -- Count the tickets
+  SELECT COUNT(*) INTO v_number_of_tickets FROM tickets WHERE event_id = v_event_id;
+
+  -- Find the Stage Capacity
+  SELECT s.stage_capacity INTO v_stage_capacity
+  FROM events e
+  JOIN stage s ON e.stage_id = s.stage_id
+  WHERE e.event_id = v_event_id;
+
+  -- Check if the stage is sold out 
+  IF v_number_of_tickets < v_stage_capacity THEN
+    SET result_message = 'Cannot resell - tickets still available for purchase';
+  ELSE
+    INSERT INTO reseling_tickets (EAN_13) VALUES (p_EAN);
+    SET result_message = 'Ticket added to reselling platform';
+  END IF;
+END //
+
 
 DELIMITER ;
 
