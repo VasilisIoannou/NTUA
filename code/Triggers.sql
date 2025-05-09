@@ -1,6 +1,6 @@
-DELIMITER //
 
 -- Trigger to prevent deletion of festivals
+DELIMITER //
 CREATE TRIGGER prevent_festival_deletion
 BEFORE DELETE ON festival
 FOR EACH ROW
@@ -9,10 +9,9 @@ BEGIN
     SET MESSAGE_TEXT = 'Festivals cannot be deleted from the system';
 END//
 
-DELIMITER //
-
 
 -- Trigger to prevent deletion of events
+DELIMITER //
 CREATE TRIGGER prevent_event_deletion
 BEFORE DELETE ON event
 FOR EACH ROW
@@ -55,9 +54,9 @@ END;
 
 DELIMITER ;
 
+
 -- Trigger to prevent exceeding stage capacity
 DELIMITER //
-
 CREATE TRIGGER check_stage_capacity
 BEFORE INSERT ON ticket
 FOR EACH ROW
@@ -95,7 +94,6 @@ END; //
 DELIMITER ;
 
 
-DELIMITER //
 
 -- This trigger prevents bands from being assigned to multiple stages at the same time
 DELIMITER //
@@ -128,9 +126,9 @@ END;
 
 DELIMITER ;
 
-DELIMITER ;
 
--- This trigger prevents overlaping performances
+-- Trigger to prevent overlaping performances
+DELIMITER ;
 CREATE TRIGGER prevent_performance_overlapping
 BEFORE INSERT ON performance
 FOR EACH ROW
@@ -153,16 +151,31 @@ BEGIN
 END;
 //
 
+-- Trigger to prevent overlaping events
+DELIMITER ;
+CREATE TRIGGER prevent_event_overlapping
+BEFORE INSERT ON event
+FOR EACH ROW
+BEGIN
+    DECLARE conflicts INT;
+
+    SELECT COUNT(*) INTO conflicts
+    FROM event e
+    WHERE (
+        NEW.event_start BETWEEN e.event_start AND e.event_end
+    );
+    
+    IF conflicts > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'There is already an event asssigned to this stage during this time.';
+    END IF;
+END;
+//
 DELIMITER ;
 
+-- Two triggers to manage band_members count
 
-DELIMITER $$
-
-
-
-
-
--- Trigger to set band_members to 0 before inserting a band
+-- 1.Trigger to set band_members to 0 before inserting a band
 DELIMITER //
 
 CREATE TRIGGER set_band_members_to_zero
@@ -174,7 +187,7 @@ END;
 
 DELIMITER;
 
--- Trigger to automatically increment band_members when a new artist is added to a band
+-- 2.Trigger to automatically increment band_members when a new artist is added to a band
 DELIMITER //
 
 CREATE TRIGGER increment_band_members
