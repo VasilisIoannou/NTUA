@@ -37,6 +37,7 @@ CREATE TABLE festival_location(
 CREATE TABLE break_duration(
     break_duration_id int AUTO_INCREMENT,
     -- break_duration is stored in seconds
+    break_start int NOT NULL CHECK (break_start >= 0 AND break_start <= 1440),  -- 0 to 24 hours
     break_duration int NOT NULL CHECK (break_duration >= 300 AND break_duration <= 1800),  -- 5 to 30 minutes
     event_id int NOT NULL,
     PRIMARY KEY(break_duration_id),
@@ -74,8 +75,8 @@ CREATE TABLE event(
     -- Duration of the event in minutes duration of performances + break_duration
     -- Instead of storing duration in 1 field, we broke it into 2 attributes (event_start, event_end) 
     -- for better query performance
-    event_start int,
-    event_end int,
+    event_start int NOT NULL,
+    event_end int NOT NULL,
     PRIMARY KEY(event_id),
     FOREIGN KEY(festival_year) REFERENCES festival(festival_year) ON DELETE CASCADE,
     FOREIGN KEY(stage_id) REFERENCES stage(stage_id) ON DELETE CASCADE
