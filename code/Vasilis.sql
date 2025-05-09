@@ -165,12 +165,13 @@ DELIMITER ;
 -- Artist -> Band -> Performance -> Event -> festival years
 -- Find all the Bands the Artist is in, then find all the Performances the Bands previously found are in and then find all the events the Performances(p)
 -- Check the current year (Max(festival_years)) and then search for the 2 previous years if they are in the query
-CREATE FUNCTION insert_performance(
+CREATE FUNCTION insert_performance_break(
     p_performance_type_id INT,
     p_performance_start INT,
     p_performance_end INT,
     p_event_id INT,
-    p_band_id INT
+    p_band_id INT,
+    p_break_duration INT
 ) RETURNS BOOLEAN
 BEGIN
     DECLARE v_current_year INT;
@@ -250,6 +251,11 @@ BEGIN
         SET MESSAGE_TEXT = 'Artist cannot perform in the festival for 3 consecutive years';
     END IF;
 
+    -- Check the break duration
+    IF p_break_duration < 300 OR p_break_duration > 1800 THEN
+	SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'The break should be between 300 and 1800 seconds';
+    END IF;
 
     -- If all checks passed, insert the performance
     INSERT INTO performance (
@@ -266,6 +272,12 @@ BEGIN
         p_band_id
     );
 
+    -- Insert the break
+    INSERT INTO break_duration(
+	break_duration,event_id
+    ) VALUES (
+	p_break_duration,p_event_id
+    );
 RETURN TRUE;
 END//
 
