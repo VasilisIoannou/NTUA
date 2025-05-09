@@ -1,4 +1,4 @@
--- Active: 1742738056874@@127.0.0.1@3306@festivaldb
+-- Active: 1746819443116@@127.0.0.1@3309@festivaldb
 -- Active: 1742738056874@@127.0.0.1@3306
 
 -- SUPER DUPER IMPORTANT
@@ -202,7 +202,9 @@ CREATE TABLE staff_specialization(
 CREATE TABLE subgenre(
     subgenre_id int AUTO_INCREMENT,
     subgenre_name varchar(255) NOT NULL,
-    PRIMARY KEY(subgenre_id)
+    genre_id int NOT NULL,
+    PRIMARY KEY(subgenre_id),
+    FOREIGN KEY(genre_id) REFERENCES genre(genre_id) ON DELETE CASCADE
 );
 
 --kammei cap sta 100 sorry :(
