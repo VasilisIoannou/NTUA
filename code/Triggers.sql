@@ -55,46 +55,6 @@ END;
 DELIMITER ;
 
 
--- Trigger to prevent exceeding stage capacity
-DELIMITER //
-CREATE TRIGGER check_stage_capacity
-BEFORE INSERT ON ticket
-FOR EACH ROW
-BEGIN
-  DECLARE sold_count  INT;
-  DECLARE max_capacity INT;
-
-  -- A) Look up the stage’s capacity for this event:
-  SELECT s.stage_capacity
-    INTO max_capacity
-    FROM event e
-    JOIN stage s 
-      ON e.stage_id = s.stage_id
-   WHERE e.event_id = NEW.event_id;
-
-  -- B) Count existing tickets for that same stage:
-  SELECT COUNT(*) 
-    INTO sold_count
-    FROM ticket t
-    JOIN event ev 
-      ON t.event_id = ev.event_id
-   WHERE ev.stage_id = (
-           SELECT stage_id 
-             FROM event 
-            WHERE event_id = NEW.event_id
-         );
-
-  -- C) If this new ticket would exceed capacity, abort the insert:
-  IF sold_count + 1 > max_capacity THEN
-    SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'Cannot buy ticket: stage is sold out.';
-  END IF;
-END; //
-
-DELIMITER ;
-
-
-
 -- This trigger prevents bands from being assigned to multiple stages at the same time
 DELIMITER //
 
@@ -200,10 +160,6 @@ BEGIN
 END//
 
 DELIMITER;
-
-
-
-
 
 
 
