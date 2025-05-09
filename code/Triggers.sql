@@ -129,7 +129,7 @@ BEGIN
     AND(
         NEW.event_start BETWEEN e.event_start AND e.event_end
     );
-    
+
     IF conflicts > 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'There is already an event asssigned to this stage during this time.';
@@ -216,11 +216,3 @@ BEGIN
 END$$
 
 DELIMITER ;
-
-
-
-
-
-
-
-
