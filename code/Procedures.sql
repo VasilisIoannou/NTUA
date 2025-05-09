@@ -1,4 +1,3 @@
--- Active: 1746819443116@@127.0.0.1@3309@festivaldb
 DELIMITER //
 
 CREATE PROCEDURE insert_reselling_ticket_proc(
@@ -132,7 +131,7 @@ BEGIN
         WHERE e.event_id = p_event_id;
         
         -- Calculate 10% of capacity
-        SET v_max_vip_tickets = FLOOR(v_stage_capacity * 0.1);
+        SET v_max_vip_tickets = FLOOR(v_stage_capacity * 0.1 * 0.93);
         
         -- Count existing VIP tickets for this event
         SELECT COUNT(*) INTO v_vip_tickets_sold
@@ -201,18 +200,14 @@ BEGIN
     SELECT v_visitor_id AS new_visitor_id, p_EAN_13 AS ticket_EAN;
 END //
 
-<<<<<<< HEAD
+/*
+ When Inserting a Performance it must check if the Artist in that performance are valid
+ An Artist can not be in the festiuval 3 years in a row
+ Artist -> Band -> Performance -> Event -> festival years
+ Find all the Bands the Artist is in, then find all the Performances the Bands previously found are in and then find all the events the Performances(p)
+ Check the current year (Max(festival_years)) and then search for the 2 previous years if they are in the query
+*/
 
--- Procedure to perform checks before inserting a performance
--- When Inserting a Performance it must check if the Artist in that performance are valid
--- An Artist can not be in the festiuval 3 years in a row
--- Artist -> Band -> Performance -> Event -> festival years
--- Find all the Bands the Artist is in, then find all the Performances the Bands previously found are in and then find all the events the Performances(p)
--- Check the current year (Max(festival_years)) and then search for the 2 previous years if they are in the query
-
-DELIMITER //
-=======
->>>>>>> 382128cc91e72ec3fe8f34e157087a6c4f39eda1
 CREATE PROCEDURE insert_performance_break(
     p_performance_type_id INT,
     p_performance_start INT,
@@ -230,18 +225,17 @@ BEGIN
     DECLARE v_artist_violation_found BOOLEAN DEFAULT FALSE;
     DECLARE done INT DEFAULT FALSE;
 
-    DECLARE artist_cursor CURSOR FOR 
-        SELECT artist_id FROM artist_band WHERE band_id = p_band_id;
-    
-    -- Handler for when no more rows in cursor
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
     DECLARE conflicts INT;
     DECLARE event_conflicts INT;
     DECLARE v_event_start INT;
     DECLARE v_event_end INT;
  
+    DECLARE artist_cursor CURSOR FOR 
+        SELECT artist_id FROM artist_band WHERE band_id = p_band_id;
 
+    -- Handler for when no more rows in cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+   
     -- Basic Checks
     -- First validate performance time constraints
     IF p_performance_start >= p_performance_end THEN
@@ -254,16 +248,15 @@ BEGIN
         SET MESSAGE_TEXT = 'Performance duration cannot exceed 3 hours';
     END IF;
 
-<<<<<<< HEAD
     -- Find Event starnt and end
-    SELECT event_start INTO v_event_start FROM event WHERE event_id = p_event_id
-    SELECT event_end INTO v_event_end FROM event WHERE event_id = p_event_id
+    SELECT event_start INTO v_event_start FROM event WHERE event_id = p_event_id;
+    SELECT event_end INTO v_event_end FROM event WHERE event_id = p_event_id;
 
     --Check Overlapping Performances
     SELECT COUNT(*) INTO conflicts
     FROM performance p
-    JOIN event e1 ON p.event_id = e1.event_id
-    JOIN event e2 ON NEW.event_id = e2.event_id
+    JOIN event e1 ON p_event_id = e1.event_id
+    JOIN event e2 ON p_event_id = e2.event_id
     WHERE e1.event_id = e2.event_id
     AND (
         p_performance_start BETWEEN p_performance_start AND (p_performance_end + p_break_duration / 60) OR
@@ -276,7 +269,7 @@ BEGIN
     END IF;
 
     --Check if the Performances are within Event duration
-    IF (p_performance_start < v_event start) THEN
+    IF (p_performance_start < v_event_start) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'The Performance start can not be before the event start';
     END IF;
@@ -286,8 +279,6 @@ BEGIN
         SET MESSAGE_TEXT = 'The performance + break can not exceed the event duration';
     END IF;
 
-=======
->>>>>>> 382128cc91e72ec3fe8f34e157087a6c4f39eda1
     -- Get the current festival year from the event
     SELECT festival_year INTO v_current_year
     FROM event
@@ -297,35 +288,39 @@ BEGIN
     SET v_previous_year_1 = v_current_year - 1;
     SET v_previous_year_2 = v_current_year - 2;
 
-    -- Open cursor
-    OPEN artist_cursor;
+   -- Must Find all the Artist associated with this performance
+   -- An artist can not play 3 years in a row ...
 
-    -- Loop through artists
-    artist_loop: LOOP
+   -- Open cursor
+   OPEN artist_cursor;
+
+   -- Loop through artists
+   artist_loop: LOOP
         FETCH artist_cursor INTO v_artist_id;
         IF done THEN
-            LEAVE artist_loop;
+        	 LEAVE artist_loop;
         END IF;
+
 
         -- Count how many of the previous two years this artist performed
         SELECT COUNT(DISTINCT e.festival_year) INTO v_artist_count
         FROM performance p
         JOIN event e ON p.event_id = e.event_id
-        JOIN artist_band ab ON p.band_id = ab.band_id
+        JOIN artist_band ab ON p.band_id = ab.band_id  -- Link to artist via artist_band
         WHERE ab.artist_id = v_artist_id
         AND e.festival_year IN (v_previous_year_1, v_previous_year_2);
         
-        -- If artist performed in both previous years, set violation flag
+	-- If artist performed in both previous years, set violation flag
         IF v_artist_count >= 2 THEN
             SET v_artist_violation_found = TRUE;
-            LEAVE artist_loop;
+            LEAVE artist_loop; -- No need to check other artists
         END IF;
     END LOOP artist_loop;
     
     -- Close cursor
     CLOSE artist_cursor;
 
-    -- If any artist violates the constraint, return false
+     -- If any artist violates the constraint, return false
     IF v_artist_violation_found THEN
         SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'Artist cannot perform in the festival for 3 consecutive years';
@@ -333,7 +328,7 @@ BEGIN
 
     -- Check the break duration
     IF p_break_duration < 300 OR p_break_duration > 1800 THEN
-        SIGNAL SQLSTATE '45000' 
+	SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'The break should be between 300 and 1800 seconds';
     END IF;
 
@@ -353,12 +348,8 @@ BEGIN
     );
 
     -- Insert the break
-    INSERT INTO break_duration(break_start, break_duration, event_id)
-    VALUES (p_performance_end, p_break_duration, p_event_id);
-END //
+    INSERT INTO break_duration(break_start,break_duration,event_id)
+    VALUES (p_performance_end,p_break_duration,p_event_id);
+END//
 
-<<<<<<< HEAD
 DELIMITER ;
-=======
-DELIMITER ;
->>>>>>> 382128cc91e72ec3fe8f34e157087a6c4f39eda1

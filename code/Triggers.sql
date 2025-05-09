@@ -1,7 +1,6 @@
--- Active: 1746819443116@@127.0.0.1@3309@festivaldb
-
--- Trigger to prevent deletion of festivals
+/* Trigger to prevent deletion of festivals*/
 DELIMITER //
+
 CREATE TRIGGER prevent_festival_deletion
 BEFORE DELETE ON festival
 FOR EACH ROW
@@ -10,9 +9,7 @@ BEGIN
     SET MESSAGE_TEXT = 'Festivals cannot be deleted from the system';
 END//
 
-
 -- Trigger to prevent deletion of events
-DELIMITER //
 CREATE TRIGGER prevent_event_deletion
 BEFORE DELETE ON event
 FOR EACH ROW
@@ -21,11 +18,7 @@ BEGIN
     SET MESSAGE_TEXT = 'Events cannot be deleted from the system';
 END//
 
-DELIMITER //
-
--- Trigger to prevent invalid reviews
-DELIMITER //
-
+/* Trigger to prevent invalid reviews */
 CREATE TRIGGER prevent_invalid_review
 BEFORE INSERT ON reviews
 FOR EACH ROW
@@ -50,15 +43,9 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Visitor cannot review performance. Ticket not validated.';
     END IF;
-END;
-//
+END//
 
-DELIMITER ;
-
-
--- This trigger prevents artists from being assigned to multiple stages at the same time
-DELIMITER //
-
+-- This trigger prevents bands from being assigned to multiple stages at the same time
 CREATE TRIGGER prevent_artist_stage_conflict
 BEFORE INSERT ON performance
 FOR EACH ROW
@@ -82,14 +69,9 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Artist is scheduled to perform on another stage at this time.';
     END IF;
-END;
-//
+END//
 
-DELIMITER ;
-
-
--- Trigger to prevent overlaping performances
-DELIMITER ;
+-- Trigger to prevent overlapping performances
 CREATE TRIGGER prevent_performance_overlapping
 BEFORE INSERT ON performance
 FOR EACH ROW
@@ -107,15 +89,11 @@ BEGIN
     
     IF conflicts > 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'There is already a performance asssigned to this stage during this time.';
+        SET MESSAGE_TEXT = 'There is already a performance assigned to this stage during this time.';
     END IF;
-END;
-//
+END//
 
--- Trigger to prevent overlaping events
-DELIMITER ;
-
-DELIMITER //
+-- Trigger to prevent overlapping events
 CREATE TRIGGER prevent_event_overlapping
 BEFORE INSERT ON event
 FOR EACH ROW
@@ -136,25 +114,17 @@ BEGIN
     END IF;
 END;
 //
-DELIMITER ;
+/* Two triggers to manage band_members count */
 
--- Two triggers to manage band_members count
-
--- 1.Trigger to set band_members to 0 before inserting a band
-DELIMITER //
-
+/* 1.Trigger to set band_members to 0 before inserting a band */
 CREATE TRIGGER set_band_members_to_zero
 BEFORE INSERT ON band
 FOR EACH ROW
 BEGIN
     SET NEW.band_members = 0;
-END;
+END//
 
-DELIMITER;
-
--- 2.Trigger to automatically increment band_members when a new artist is added to a band
-DELIMITER //
-
+/* 2.Trigger to automatically increment band_members when a new artist is added to a band */
 CREATE TRIGGER increment_band_members
 AFTER INSERT ON artist_band
 FOR EACH ROW
@@ -164,11 +134,7 @@ BEGIN
     WHERE band_id = NEW.band_id;
 END//
 
-DELIMITER;
-
-
-
--- Trigger to check staffing requirements after a ticket is sold
+/* Trigger to check staffing requirements after a ticket is sold */
 CREATE TRIGGER check_staffing_requirements
 AFTER INSERT ON ticket
 FOR EACH ROW
@@ -204,15 +170,15 @@ BEGIN
 
     -- Check if security staff is less than 5% of total tickets
     IF v_security_staff < CEIL(v_total_tickets * 0.05) THEN
-        SIGNAL SQLSTATE '01000'
+        SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Warning: Add more security staff for this stage.';
     END IF;
 
     -- Check if secondary staff is less than 2% of total tickets
     IF v_secondary_staff < CEIL(v_total_tickets * 0.02) THEN
-        SIGNAL SQLSTATE '01000'
+        SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Warning: Add more secondary staff for this stage.';
     END IF;
-END$$
+END//
 
 DELIMITER ;
