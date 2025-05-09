@@ -1,3 +1,4 @@
+-- Active: 1746819443116@@127.0.0.1@3309@festivaldb
 DELIMITER //
 
 CREATE PROCEDURE insert_reselling_ticket_proc(
@@ -208,6 +209,8 @@ END //
  Check the current year (Max(festival_years)) and then search for the 2 previous years if they are in the query
 */
 
+DELIMITER //
+/* This procedure performs various checks before inserting a performance*/
 CREATE PROCEDURE insert_performance_break(
     p_performance_type_id INT,
     p_performance_start INT,
@@ -252,23 +255,7 @@ BEGIN
     SELECT event_start INTO v_event_start FROM event WHERE event_id = p_event_id;
     SELECT event_end INTO v_event_end FROM event WHERE event_id = p_event_id;
 
-    --Check Overlapping Performances
-    SELECT COUNT(*) INTO conflicts
-    FROM performance p
-    JOIN event e1 ON p_event_id = e1.event_id
-    JOIN event e2 ON p_event_id = e2.event_id
-    WHERE e1.event_id = e2.event_id
-    AND (
-        p_performance_start BETWEEN p_performance_start AND (p_performance_end + p_break_duration / 60) OR
-        (p_performance_end + p_break_duration / 60) BETWEEN p_performance_start AND p_performance_end
-    );
-
-    IF conflicts > 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'There is already a performance asssigned to this stage during this time.';
-    END IF;
-
-    --Check if the Performances are within Event duration
+    /*Check if the Performances are within Event duration*/
     IF (p_performance_start < v_event_start) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'The Performance start can not be before the event start';
@@ -277,6 +264,22 @@ BEGIN
     IF (p_performance_end + p_break_duration / 60) > v_event_end THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'The performance + break can not exceed the event duration';
+    END IF;
+
+
+-- Check for overlapping with other performances and their breaks
+    SELECT COUNT(*) INTO conflicts
+    FROM performance p
+    JOIN event e ON p.event_id = e.event_id
+    LEFT JOIN break_duration bd ON bd.event_id = e.event_id AND bd.break_start = p.performance_end
+    WHERE e.event_id = p_event_id
+    AND (
+        p_performance_start < (p.performance_end + IFNULL(bd.break_duration, 0)/60.0)
+        AND (p_performance_end + (p_break_duration / 60.0)) > p.performance_start
+    );
+
+    IF conflicts > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'There is a conflict with an existing performance or break.';
     END IF;
 
     -- Get the current festival year from the event
