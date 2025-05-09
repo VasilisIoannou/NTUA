@@ -1,3 +1,4 @@
+-- Active: 1746819443116@@127.0.0.1@3309@festivaldb
 
 -- Trigger to prevent deletion of festivals
 DELIMITER //
@@ -55,7 +56,7 @@ END;
 DELIMITER ;
 
 
--- This trigger prevents bands from being assigned to multiple stages at the same time
+-- This trigger prevents artists from being assigned to multiple stages at the same time
 DELIMITER //
 
 CREATE TRIGGER prevent_artist_stage_conflict
@@ -113,6 +114,8 @@ END;
 
 -- Trigger to prevent overlaping events
 DELIMITER ;
+
+DELIMITER //
 CREATE TRIGGER prevent_event_overlapping
 BEFORE INSERT ON event
 FOR EACH ROW
@@ -121,7 +124,9 @@ BEGIN
 
     SELECT COUNT(*) INTO conflicts
     FROM event e
-    WHERE (
+    WHERE e.stage_id = NEW.stage_id 
+    AND e.festival_year = NEW.festival_year
+    AND(
         NEW.event_start BETWEEN e.event_start AND e.event_end
     );
     
