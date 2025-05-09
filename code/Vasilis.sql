@@ -25,6 +25,17 @@ BEGIN
 
     DECLARE v_pass_checks BOOLEAN DEFAULT TRUE;
 
+    -- Variables for EAN-13 check
+    DECLARE ean13_str CHAR(13);
+    DECLARE ean12_str CHAR(12);
+    DECLARE i INT DEFAULT 1;
+    DECLARE sum_odd INT DEFAULT 0;
+    DECLARE sum_even INT DEFAULT 0;
+    DECLARE digit INT;
+    DECLARE calculated_check_digit INT;
+    DECLARE provided_check_digit INT;
+
+
     -- Start transaction
     START TRANSACTION;
     
@@ -46,6 +57,40 @@ BEGIN
     IF v_price_exists = 0 THEN
         SET result_message = 'No price defined for this ticket type at the specified event';
     	v_pass_checks = FALSE;
+    END IF;
+
+    -- EAN-13 Validation check
+    -- Convert input to string and ensure it has exactly 13 digits
+    SET ean13_str = LPAD(p_EAN_13, 13, '0');
+    IF CHAR_LENGTH(ean13_str) != 13 THEN
+        SET result_message = 'EAN-13 code must be exactly 13 digits long.';
+    	v_pass_checks = FALSE;
+    END IF;
+
+    -- Extract the first 12 digits
+    SET ean12_str = LEFT(ean13_str, 12);
+
+    -- Calculate the sum of digits in odd and even positions
+    WHILE i <= 12 DO
+        SET digit = CAST(SUBSTRING(ean12_str, i, 1) AS UNSIGNED);
+        IF MOD(i, 2) = 1 THEN
+            SET sum_odd = sum_odd + digit;
+        ELSE
+            SET sum_even = sum_even + digit;
+        END IF;
+        SET i = i + 1;
+    END WHILE;
+
+    -- Calculate the check digit
+    SET calculated_check_digit = (10 - ((sum_odd + sum_even * 3) MOD 10)) MOD 10;
+
+    -- Extract the provided check digit
+    SET provided_check_digit = CAST(RIGHT(ean13_str, 1) AS UNSIGNED);
+
+    -- Compare the calculated check digit with the provided one
+    IF calculated_check_digit != provided_check_digit THEN
+            SET result_message = 'Invalid EAN-13 check digit.';
+    	    v_pass_checks = FALSE;
     END IF;
 
     -- VIP capacity check (only if ticket type is VIP)
@@ -211,7 +256,7 @@ DELIMITER ;
 -- Artist -> Band -> Performance -> Event -> festival years
 -- Find all the Bands the Artist is in, then find all the Performances the Bands previously found are in and then find all the events the Performances(p)
 -- Check the current year (Max(festival_years)) and then search for the 2 previous years if they are in the query
-CREATE FUNCTION insert_performance_break(
+CREATE Procedure insert_performance_break(
     p_performance_type_id INT,
     p_performance_start INT,
     p_performance_end INT,
