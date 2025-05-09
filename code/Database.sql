@@ -218,6 +218,7 @@ CREATE TABLE artist(
     artist_id int AUTO_INCREMENT,
     artist_name varchar(255) NOT NULL,
     artist_stage_name varchar(255),
+    artist_year_of_birth int NOT NULL,
     artist_website varchar(255),
     PRIMARY KEY(artist_id)
 );

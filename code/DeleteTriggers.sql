@@ -1,0 +1,9 @@
+DROP TRIGGER IF EXISTS prevent_festival_deletion;
+DROP TRIGGER IF EXISTS prevent_invalid_review;
+DROP TRIGGER IF EXISTS prevent_artist_stage_conflict;
+DROP TRIGGER IF EXISTS prevent_performance_overlapping;
+DROP TRIGGER IF EXISTS prevent_event_overlapping;
+DROP TRIGGER IF EXISTS prevent_event_deletion;
+DROP TRIGGER IF EXISTS set_band_members_to_zero;
+DROP TRIGGER IF EXISTS increment_band_members;
+DROP TRIGGER IF EXISTS check_staffing_requirements
