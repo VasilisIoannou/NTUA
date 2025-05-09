@@ -327,7 +327,7 @@ CREATE TABLE date_issued(
 )
 
 CREATE TABLE reselling_tickets(
-    reselling_ticket_id int AUTO_INCREMENT,
+    reselling_ticket_id int AUTO_INCREMENT UNIQUE,
     EAN_13 bigint NOT NULL UNIQUE CHECK (EAN_13 > 0),
     PRIMARY KEY(reselling_ticket_id),
     FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13) ON DELETE CASCADE
