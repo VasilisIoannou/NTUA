@@ -73,12 +73,12 @@ BEGIN
     --Number of Tickets <= stage capacity
 
   -- A) Look up the stage’s capacity for this event:
-  SELECT s.stage_capacity
+  SELECT stage_capacity
     INTO v_stage_capacity
     FROM event e
     JOIN stage s 
       ON e.stage_id = s.stage_id
-   WHERE e.event_id = NEW.event_id;
+   WHERE e.event_id = p_event_id;
 
   -- B) Count existing tickets for that same stage:
   SELECT COUNT(*) 
@@ -89,11 +89,11 @@ BEGIN
    WHERE ev.stage_id = (
            SELECT stage_id 
              FROM event 
-            WHERE event_id = NEW.event_id
+            WHERE event_id = p_event_id
          );
 
   -- C) If this new ticket would exceed capacity, abort the insert:
-  IF (v_sold_count + 1) > (v_stage_capacity / 1.07) THEN
+  IF (v_sold_count + 1) > FLOOR(v_stage_capacity * 0.93) THEN
     SIGNAL SQLSTATE '45000'
       SET MESSAGE_TEXT = 'Cannot buy ticket: stage is sold out.';
   END IF;
@@ -126,43 +126,39 @@ DELIMITER ;
 -- Reselling tickets is only available if all tickets are sold per stage
 -- I will create a procedure to allow inserting records to resseling_tickets only if the number of tickets == stage capacity 
 
-CREATE FUNCTION insert_reseling_ticket(
-   p_EAN BIGINT
+DELIMITER //
+
+CREATE PROCEDURE insert_reseling_ticket_proc(
+   IN p_EAN BIGINT,
+   OUT result_message VARCHAR(255)
 )
-RETURN VARCHAR
-AS
 BEGIN
-  -- Find the Number of Tickets with event_id = event_id of the ticket with the EAN given
-  -- Find the stage capacity of the stage which the event == ticket.stage_id has
-
   DECLARE v_event_id INT;
-
-  DELCARE v_number_of_ticket INT;
+  DECLARE v_number_of_tickets INT;
   DECLARE v_stage_capacity INT;
 
   -- Find the event_id
   SELECT event_id INTO v_event_id FROM tickets WHERE EAN_13 = p_EAN;
   
   -- Count the tickets
-  SELECT COUNT(*)
-  INTO v_number_of_tickets
-  FROM tickets
-  WHERE event_id = v_event_id;
+  SELECT COUNT(*) INTO v_number_of_tickets FROM tickets WHERE event_id = v_event_id;
 
-  --Find the Stage Capacity
-  SELECT s.stage_capacity
-  INTO v_stage_capacity
+  -- Find the Stage Capacity
+  SELECT s.stage_capacity INTO v_stage_capacity
   FROM events e
   JOIN stage s ON e.stage_id = s.stage_id
   WHERE e.event_id = v_event_id;
 
   -- Check if the stage is sold out 
   IF v_number_of_tickets < v_stage_capacity THEN
-	SET result_message = 'Cannot resell - tickets still available for purchase';
+    SET result_message = 'Cannot resell - tickets still available for purchase';
   ELSE
-	INSERT INTO reseling_tickets (EAN_13) VALUES (P_EAN);
-  ENDIF
-END
+    INSERT INTO reseling_tickets (EAN_13) VALUES (p_EAN);
+    SET result_message = 'Ticket added to reselling platform';
+  END IF;
+END //
+
+DELIMITER ;
 
 -- When Inserting a Performance it must check if the Artist in that performance are valid
 -- An Artist can not be in the festiuval 3 years in a row
