@@ -12,7 +12,7 @@
 -- Times are stored in minutes after 00:00
 -- For example, 12:30 is stored as 12*60 + 30 = 750
 
-CREATE DATABASE festivalDB;
+CREATE DATABASE IF NOT EXISTS festivalDB;
 USE festivalDB;
 
 CREATE TABLE coordinates(
@@ -20,7 +20,7 @@ CREATE TABLE coordinates(
     latitude float,
     longitude float,
     PRIMARY KEY(coordinate_id)
-)
+);
 
 
 CREATE TABLE festival_location(
@@ -32,17 +32,8 @@ CREATE TABLE festival_location(
     coordinate_id int NOT NULL UNIQUE,
     PRIMARY KEY(location_id),
     FOREIGN KEY(coordinate_id) REFERENCES coordinates(coordinate_id)
-)
+);
 
-CREATE TABLE break_duration(
-    break_duration_id int AUTO_INCREMENT,
-    -- break_duration is stored in seconds
-    break_start int NOT NULL CHECK (break_start >= 0 AND break_start <= 1440),  -- 0 to 24 hours
-    break_duration int NOT NULL CHECK (break_duration >= 300 AND break_duration <= 1800),  -- 5 to 30 minutes
-    event_id int NOT NULL,
-    PRIMARY KEY(break_duration_id),
-    FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE
-)
 
 CREATE TABLE festival(
     festival_year int NOT NULL CHECK (festival_year > 0),
@@ -50,13 +41,13 @@ CREATE TABLE festival(
     location_id int NOT NULL UNIQUE,
     PRIMARY KEY(festival_year),
     FOREIGN KEY(location_id) REFERENCES festival_location(location_id)
-)
+);
 
 CREATE TABLE performance_type(
     performance_type_id int AUTO_INCREMENT,
     performance_type_name varchar(255),
     PRIMARY KEY(performance_type_id)
-)
+);
 
 INSERT INTO performance_type(performance_type_name) VALUES ('Warm up'), ('Headline'), ('Special guest'), ('Closing act');
 
@@ -65,7 +56,7 @@ CREATE TABLE stage(
     stage_name varchar(255) NOT NULL,
     stage_capacity int NOT NULL CHECK (stage_capacity > 0),
     PRIMARY KEY(stage_id)
-)
+);
 
 CREATE TABLE event(
     event_id int AUTO_INCREMENT,
@@ -80,7 +71,43 @@ CREATE TABLE event(
     PRIMARY KEY(event_id),
     FOREIGN KEY(festival_year) REFERENCES festival(festival_year) ON DELETE CASCADE,
     FOREIGN KEY(stage_id) REFERENCES stage(stage_id) ON DELETE CASCADE
-)
+);
+
+
+CREATE TABLE break_duration(
+    break_duration_id int AUTO_INCREMENT,
+    -- break_duration is stored in seconds
+    break_start int NOT NULL CHECK (break_start >= 0 AND break_start <= 1440),  -- 0 to 24 hours
+    break_duration int NOT NULL CHECK (break_duration >= 300 AND break_duration <= 1800),  -- 5 to 30 minutes
+    event_id int NOT NULL,
+    PRIMARY KEY(break_duration_id),
+    FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE
+);
+
+CREATE TABLE band_date_of_formation(
+    band_date_of_formation_id int AUTO_INCREMENT,
+    band_year_of_formation int CHECK (band_year_of_formation > 0),
+    band_month_of_formation int CHECK (band_month_of_formation >= 1 AND band_month_of_formation <= 12),
+    band_day_of_formation int CHECK (band_day_of_formation >= 1 AND band_day_of_formation <= 31),
+    PRIMARY KEY(band_date_of_formation_id)
+);
+
+CREATE TABLE genre(
+    genre_id int AUTO_INCREMENT,
+    genre_name varchar(255) NOT NULL,
+    PRIMARY KEY(genre_id)
+);
+
+CREATE TABLE band(
+    band_id int AUTO_INCREMENT,
+    band_name varchar(255) NOT NULL,
+    band_country varchar(255),
+    band_members int NOT NULL CHECK (band_members >= 0),
+    band_website varchar(255),
+    band_date_of_formation_id int,
+    PRIMARY KEY(band_id),
+    FOREIGN KEY(band_date_of_formation_id) REFERENCES band_date_of_formation(band_date_of_formation_id) ON DELETE CASCADE
+);
 
 
 CREATE TABLE performance(
@@ -96,14 +123,14 @@ CREATE TABLE performance(
     FOREIGN KEY(performance_type_id) REFERENCES performance_type(performance_type_id),
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
     FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE technical_equipment(
     technical_equipment_id int AUTO_INCREMENT,
     equipment_name varchar(255) NOT NULL,
     equipment_quantity int NOT NULL CHECK (equipment_quantity > 0),
     PRIMARY KEY(technical_equipment_id)
-)
+);
 
 --sta dummy data ena stage mporei na eshei panw pou ena technical equipment enw ston kodika parapanw
 --sta data en je ta thkio unique enw ston kodika prepei nan mazi unique
@@ -113,13 +140,13 @@ CREATE TABLE stage_technical_equipment(
     PRIMARY KEY(stage_id, technical_equipment_id),
     FOREIGN KEY(stage_id) REFERENCES stage(stage_id),
     FOREIGN KEY(technical_equipment_id) REFERENCES technical_equipment(technical_equipment_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE level_of_experience(
     level_of_experience_id int AUTO_INCREMENT,
     level_of_experience_name varchar(255) NOT NULL,
     PRIMARY KEY(level_of_experience_id)
-)
+);
 
 INSERT INTO level_of_experience(level_of_experience_name) VALUES('Beginner'), ('Intermediate'), ('Advanced'), ('Expert'), ('Master');
 
@@ -127,7 +154,7 @@ CREATE TABLE staff_role(
     staff_role_id int AUTO_INCREMENT,
     staff_role_name varchar(255) NOT NULL,
     PRIMARY KEY(staff_role_id)
-)
+);
 
 INSERT INTO staff_role(staff_role_name) VALUES('Technician'),('Security'),('Secondary');
 
@@ -137,7 +164,7 @@ CREATE TABLE role_specialization(
     staff_role_id int,
     PRIMARY KEY(role_specialization_id), 
     FOREIGN KEY(staff_role_id) REFERENCES staff_role(staff_role_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE staff(
     staff_id int AUTO_INCREMENT,
@@ -148,9 +175,9 @@ CREATE TABLE staff(
     staff_age int NOT NULL CHECK (staff_age > 0),
     level_of_experience int NOT NULL CHECK (level_of_experience >= 0 AND level_of_experience < 5),
     PRIMARY KEY(staff_id),
-    FOREIGN KEY(staff_role_id) REFERENCES staff_role(staff_role_id)
+    FOREIGN KEY(staff_role_id) REFERENCES staff_role(staff_role_id),
     FOREIGN KEY(level_of_experience) REFERENCES level_of_experience(level_of_experience_id)
-)
+);
 
 CREATE TABLE stage_staff(
     stage_id int,
@@ -158,7 +185,7 @@ CREATE TABLE stage_staff(
     PRIMARY KEY(stage_id, staff_id),
     FOREIGN KEY(stage_id) REFERENCES stage(stage_id) ON DELETE CASCADE,
     FOREIGN KEY(staff_id) REFERENCES staff(staff_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE staff_specialization(
     staff_id int NOT NULL,
@@ -166,32 +193,7 @@ CREATE TABLE staff_specialization(
     PRIMARY KEY(staff_id, role_specialization_id),
     FOREIGN KEY(staff_id) REFERENCES staff(staff_id) ON DELETE CASCADE,
     FOREIGN KEY(role_specialization_id) REFERENCES role_specialization(role_specialization_id) ON DELETE CASCADE
-)
-
-CREATE TABLE band_date_of_formation(
-    band_date_of_formation_id int AUTO_INCREMENT,
-    band_year_of_formation int CHECK (band_year_of_formation > 0),
-    band_month_of_formation int CHECK (band_month_of_formation >= 1 AND band_month_of_formation <= 12),
-    band_day_of_formation int CHECK (band_day_of_formation >= 1 AND band_day_of_formation <= 31),
-    PRIMARY KEY(band_date_of_formation_id)
-)
-
-CREATE TABLE genre(
-    genre_id int AUTO_INCREMENT,
-    genre_name varchar(255) NOT NULL,
-    PRIMARY KEY(genre_id)
-)
-
-CREATE TABLE band(
-    band_id int AUTO_INCREMENT,
-    band_name varchar(255) NOT NULL,
-    band_country varchar(255),
-    band_members int NOT NULL CHECK (band_members >= 0),
-    band_website varchar(255),
-    band_date_of_formation_id int,
-    PRIMARY KEY(band_id),
-    FOREIGN KEY(band_date_of_formation_id) REFERENCES band_date_of_formation(band_date_of_formation_id) ON DELETE CASCADE
-)
+);
 
 
 -- Many to many relationship between band and subgenre
@@ -201,7 +203,7 @@ CREATE TABLE subgenre(
     subgenre_id int AUTO_INCREMENT,
     subgenre_name varchar(255) NOT NULL,
     PRIMARY KEY(subgenre_id)
-)
+);
 
 --kammei cap sta 100 sorry :(
 CREATE TABLE band_subgenre(
@@ -210,7 +212,7 @@ CREATE TABLE band_subgenre(
     PRIMARY KEY(band_id, subgenre_id),
     FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE,
     FOREIGN KEY(subgenre_id) REFERENCES subgenre(subgenre_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE artist(
     artist_id int AUTO_INCREMENT,
@@ -218,7 +220,7 @@ CREATE TABLE artist(
     artist_stage_name varchar(255),
     artist_website varchar(255),
     PRIMARY KEY(artist_id)
-)
+);
 
 CREATE TABLE artist_band(
     artist_id int NOT NULL,
@@ -226,7 +228,7 @@ CREATE TABLE artist_band(
     PRIMARY KEY(artist_id, band_id),
     FOREIGN KEY(artist_id) REFERENCES artist(artist_id) ON DELETE CASCADE,
     FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE
-)
+);
 
 -- Store in a string the url of the social media and the name of the site
 -- For example, "https://www.facebook.com/artist_name" and "Facebook"
@@ -241,7 +243,7 @@ CREATE TABLE social_media_artist(
     social_media_url varchar(255),
     PRIMARY KEY(social_media_artist_id),
     FOREIGN KEY(artist_id) REFERENCES artist(artist_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE social_media_band(
     social_media_band_id int AUTO_INCREMENT,
@@ -250,13 +252,13 @@ CREATE TABLE social_media_band(
     social_media_name varchar(255),
     PRIMARY KEY(social_media_band_id),
     FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE payment_method(
     payment_method_id int AUTO_INCREMENT,
     payment_method_name varchar(255) NOT NULL,
     PRIMARY KEY(payment_method_id)
-)
+);
 
 INSERT INTO payment_method(payment_method_name) VALUES('Credit card'), ('Debit card'), ('Paypal'), ('Cash');
 
@@ -264,7 +266,7 @@ CREATE TABLE ticket_type(
     ticket_type_id int AUTO_INCREMENT,
     ticket_type_name varchar(255) NOT NULL,
     PRIMARY KEY(ticket_type_id)
-)
+);
 
 INSERT INTO ticket_type(ticket_type_name) VALUES('VIP'), ('Regular'), ('Student'), ('Senior citizen'),('Backstage');
 
@@ -274,7 +276,7 @@ CREATE TABLE visitor(
     visitor_surname varchar(255) NOT NULL,
     visitor_age int NOT NULL CHECK (visitor_age > 0),
     PRIMARY KEY(visitor_id)
-)
+);
 
 CREATE TABLE visitor_contact(
     visitor_contact_id int AUTO_INCREMENT,
@@ -283,7 +285,7 @@ CREATE TABLE visitor_contact(
     visitor_phone varchar(255) NOT NULL,
     PRIMARY KEY(visitor_contact_id),
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE
-)
+);
 
 --prepei na kamoume tin timi tou eisitiriou na terkazei me to type tou
 CREATE TABLE ticket(
@@ -299,7 +301,7 @@ CREATE TABLE ticket(
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE,
     FOREIGN KEY(payment_method_id) REFERENCES payment_method(payment_method_id)
-)
+);
 
 CREATE TABLE ticket_price(
     ticket_price_id int,
@@ -316,7 +318,7 @@ CREATE TABLE buyer(
     visitor_id int UNIQUE NOT NULL,
     PRIMARY KEY(buyer_id),
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE
-)
+);
 
 -- opos to ekamame iparxei periptosi na exoume presale 40 xronia prin
 CREATE TABLE date_issued(
@@ -325,14 +327,14 @@ CREATE TABLE date_issued(
     month_issued int NOT NULL CHECK (month_issued >= 1 AND month_issued <= 12),
     day_issued int NOT NULL CHECK (day_issued >= 1 AND day_issued <= 31),
     PRIMARY KEY(date_issued_id)
-)
+);
 
 CREATE TABLE reselling_tickets(
     reselling_ticket_id int AUTO_INCREMENT UNIQUE,
     EAN_13 bigint NOT NULL UNIQUE CHECK (EAN_13 > 0),
     PRIMARY KEY(reselling_ticket_id),
     FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13) ON DELETE CASCADE
-)
+);
 
 --sto er diagram en eshei PK
 
@@ -343,7 +345,7 @@ CREATE TABLE desired_by_id(
     PRIMARY KEY(buyer_id,reselling_ticket_id),
     FOREIGN KEY(buyer_id) REFERENCES buyer(buyer_id) ON DELETE CASCADE,
     FOREIGN KEY(reselling_ticket_id) REFERENCES reselling_tickets(reselling_ticket_id) ON DELETE CASCADE
-)
+);
 
 
 --mporei na xreiazetai ON DELETE CASCADE
@@ -359,7 +361,7 @@ CREATE TABLE desired_ticket_by_event(
     FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id), 
     FOREIGN KEY(buyer_id) REFERENCES buyer(buyer_id) ON DELETE CASCADE,
     FOREIGN KEY(date_issued_id) REFERENCES date_issued(date_issued_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE reviews(
     reviews_id int AUTO_INCREMENT,
@@ -368,7 +370,7 @@ CREATE TABLE reviews(
     PRIMARY KEY(reviews_id),
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE,
     FOREIGN KEY(performance_id) REFERENCES performance(performance_id) ON DELETE CASCADE
-)
+);
 
 -- otan en one-on-one en kamnei generate one-on-one
 CREATE TABLE likert_scale(
@@ -381,7 +383,7 @@ CREATE TABLE likert_scale(
     total_impression_score int CHECK(total_impression_score >= 1 && total_impression_score <= 5),
     PRIMARY KEY(likert_scale_id),
     FOREIGN KEY(reviews_id) REFERENCES reviews(reviews_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE festival_image(
     festival_image_id int AUTO_INCREMENT,
@@ -390,7 +392,7 @@ CREATE TABLE festival_image(
     festival_image_path varchar(255) NOT NULL,
     PRIMARY KEY(festival_image_id),
     FOREIGN KEY(festival_year) REFERENCES festival(festival_year) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE artist_image(
     artist_image_id int AUTO_INCREMENT,
@@ -399,7 +401,7 @@ CREATE TABLE artist_image(
     artist_image_path varchar(255) NOT NULL,
     PRIMARY KEY(artist_image_id),
     FOREIGN KEY(artist_id) REFERENCES artist(artist_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE location_image(
     location_image_id int AUTO_INCREMENT,
@@ -408,7 +410,7 @@ CREATE TABLE location_image(
     location_image_path varchar(255) NOT NULL,
     PRIMARY KEY(location_image_id),
     FOREIGN KEY(location_id) REFERENCES festival_location(location_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE post_performance_image(
     post_performance_image_id int AUTO_INCREMENT,
@@ -417,7 +419,7 @@ CREATE TABLE post_performance_image(
     post_performance_image_path varchar(255) NOT NULL,
     PRIMARY KEY(post_performance_image_id),
     FOREIGN KEY(performance_id) REFERENCES performance(performance_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE band_image(
     band_image_id int AUTO_INCREMENT,
@@ -426,7 +428,7 @@ CREATE TABLE band_image(
     band_image_path varchar(255) NOT NULL,
     PRIMARY KEY(band_image_id),
     FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE staff_image(
     staff_image_id int AUTO_INCREMENT,
@@ -435,7 +437,7 @@ CREATE TABLE staff_image(
     staff_image_path varchar(255) NOT NULL,
     PRIMARY KEY(staff_image_id),
     FOREIGN KEY(staff_id) REFERENCES staff(staff_id) ON DELETE CASCADE
-)
+);
 
 
 CREATE TABLE event_image(
@@ -445,5 +447,5 @@ CREATE TABLE event_image(
     event_image_path varchar(255) NOT NULL,
     PRIMARY KEY(event_image_id),
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE
-)
+);
 

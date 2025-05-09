@@ -256,14 +256,16 @@ DELIMITER ;
 -- Artist -> Band -> Performance -> Event -> festival years
 -- Find all the Bands the Artist is in, then find all the Performances the Bands previously found are in and then find all the events the Performances(p)
 -- Check the current year (Max(festival_years)) and then search for the 2 previous years if they are in the query
-CREATE Procedure insert_performance_break(
+
+DELIMITER //
+CREATE PROCEDURE insert_performance_break(
     p_performance_type_id INT,
     p_performance_start INT,
     p_performance_end INT,
     p_event_id INT,
     p_band_id INT,
     p_break_duration INT
-) RETURNS BOOLEAN
+)
 BEGIN
     DECLARE v_current_year INT;
     DECLARE v_previous_year_1 INT;
@@ -278,7 +280,13 @@ BEGIN
     
     -- Handler for when no more rows in cursor
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-   
+
+    DECLARE conflicts INT;
+    DECLARE event_conflicts INT;
+    DECLARE v_event_start INT;
+    DECLARE v_event_end INT;
+ 
+
     -- Basic Checks
     -- First validate performance time constraints
     IF p_performance_start >= p_performance_end THEN
@@ -291,8 +299,36 @@ BEGIN
         SET MESSAGE_TEXT = 'Performance duration cannot exceed 3 hours';
     END IF;
 
+    -- Find Event starnt and end
+    SELECT event_start INTO v_event_start FROM event WHERE event_id = p_event_id
+    SELECT event_end INTO v_event_end FROM event WHERE event_id = p_event_id
+
     --Check Overlapping Performances
-    /* Markidis */
+    SELECT COUNT(*) INTO conflicts
+    FROM performance p
+    JOIN event e1 ON p.event_id = e1.event_id
+    JOIN event e2 ON NEW.event_id = e2.event_id
+    WHERE e1.event_id = e2.event_id
+    AND (
+        p_performance_start BETWEEN p_performance_start AND (p_performance_end + p_break_duration / 60) OR
+        (p_performance_end + p_break_duration / 60) BETWEEN p_performance_start AND p_performance_end
+    );
+
+    IF conflicts > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'There is already a performance asssigned to this stage during this time.';
+    END IF;
+
+    --Check if the Performances are within Event duration
+    IF (p_performance_start < v_event start) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'The Performance start can not be before the event start';
+    END IF;
+
+    IF (p_performance_end + p_break_duration / 60) > v_event_end THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'The performance + break can not exceed the event duration';
+    END IF;
 
     -- Get the current festival year from the event
     SELECT festival_year INTO v_current_year
@@ -363,11 +399,8 @@ BEGIN
     );
 
     -- Insert the break
-    INSERT INTO break_duration(
-	break_duration,event_id
-    ) VALUES (
-	p_break_duration,p_event_id
-    );
-RETURN TRUE;
+    INSERT INTO break_duration(break_start,break_duration,event_id)
+    VALUES (p_performance_end,p_break_duration,p_event_id);
 END//
 
+DELIMITER ;
