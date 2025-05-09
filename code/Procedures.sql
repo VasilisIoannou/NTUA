@@ -23,7 +23,8 @@ BEGIN
 
   -- Check if the stage is sold out 
   IF v_number_of_tickets < v_stage_capacity THEN
-    SET result_message = 'Stage is not sold out. Cannot resell ticket.';
+    SET result_message = 'Cannot resell - tickets still available for purchase';
+  ELSE
     INSERT INTO reselling_tickets (EAN_13) VALUES (p_EAN);
     SET result_message = CONCAT('Ticket added to reselling platform. Number of Tickets: ', v_number_of_tickets, ' - stage capacity: ', v_stage_capacity);
   END IF;
