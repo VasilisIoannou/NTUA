@@ -165,3 +165,118 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- Procedure to perform checks before inserting a performance
+DELIMITER //
+CREATE PROCEDURE insert_performance_break(
+    p_performance_type_id INT,
+    p_performance_start INT,
+    p_performance_end INT,
+    p_event_id INT,
+    p_band_id INT,
+    p_break_duration INT
+)
+BEGIN
+    DECLARE v_current_year INT;
+    DECLARE v_previous_year_1 INT;
+    DECLARE v_previous_year_2 INT;
+    DECLARE v_artist_id INT;
+    DECLARE v_artist_count INT;
+    DECLARE v_artist_violation_found BOOLEAN DEFAULT FALSE;
+    DECLARE done INT DEFAULT FALSE;
+
+    DECLARE artist_cursor CURSOR FOR 
+        SELECT artist_id FROM artist_band WHERE band_id = p_band_id;
+    
+    -- Handler for when no more rows in cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+   
+    -- Basic Checks
+    -- First validate performance time constraints
+    IF p_performance_start >= p_performance_end THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Performance start time must be before end time';
+    END IF;
+
+    IF (p_performance_end - p_performance_start) > 180 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Performance duration cannot exceed 3 hours';
+    END IF;
+
+    --Check Overlapping Performances
+    /* Markidis */
+
+    -- Get the current festival year from the event
+    SELECT festival_year INTO v_current_year
+    FROM event
+    WHERE event_id = p_event_id;
+
+    -- Calculate previous years
+    SET v_previous_year_1 = v_current_year - 1;
+    SET v_previous_year_2 = v_current_year - 2;
+
+   -- Must Find all the Artist associated with this performance
+   -- An artist can not play 3 years in a row ...
+
+   -- Open cursor
+   OPEN artist_cursor;
+
+   -- Loop through artists
+   artist_loop: LOOP
+        FETCH artist_cursor INTO v_artist_id;
+        IF done THEN
+        	 LEAVE artist_loop;
+        END IF;
+
+
+        -- Count how many of the previous two years this artist performed
+        SELECT COUNT(DISTINCT e.festival_year) INTO v_artist_count
+        FROM performance p
+        JOIN event e ON p.event_id = e.event_id
+        JOIN artist_band ab ON p.band_id = ab.band_id  -- Link to artist via artist_band
+        WHERE ab.artist_id = v_artist_id
+        AND e.festival_year IN (v_previous_year_1, v_previous_year_2);
+        
+	-- If artist performed in both previous years, set violation flag
+        IF v_artist_count >= 2 THEN
+            SET v_artist_violation_found = TRUE;
+            LEAVE artist_loop; -- No need to check other artists
+        END IF;
+    END LOOP artist_loop;
+    
+    -- Close cursor
+    CLOSE artist_cursor;
+
+     -- If any artist violates the constraint, return false
+    IF v_artist_violation_found THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Artist cannot perform in the festival for 3 consecutive years';
+    END IF;
+
+    -- Check the break duration
+    IF p_break_duration < 300 OR p_break_duration > 1800 THEN
+	SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'The break should be between 300 and 1800 seconds';
+    END IF;
+
+    -- If all checks passed, insert the performance
+    INSERT INTO performance (
+        performance_type_id,
+        performance_start,
+        performance_end,
+        event_id,
+        band_id
+    ) VALUES (
+        p_performance_type_id,
+        p_performance_start,
+        p_performance_end,
+        p_event_id,
+        p_band_id
+    );
+
+    -- Insert the break
+    INSERT INTO break_duration(break_start,break_duration,event_id)
+    VALUES (p_performance_end,p_break_duration,p_event_id);
+END//
+
+DELIMITER ;
