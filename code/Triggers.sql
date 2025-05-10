@@ -192,6 +192,46 @@ BEGIN
 END;
 //
 
+CREATE TRIGGER check_event_day_insert
+BEFORE INSERT ON event
+FOR EACH ROW
+BEGIN
+    
+    DECLARE conflicts INT;
+    
+    SELECT COUNT(*) INTO conflicts
+    FROM festival f
+    WHERE f.duration < NEW.festival_day
+    AND f.festival_year = NEW.festival_year;
+
+    IF conflicts > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot assign an event to a day outside the festival duration.';
+    END IF;
+END;
+//
+
+CREATE TRIGGER check_event_day_update
+BEFORE UPDATE ON event
+FOR EACH ROW
+BEGIN
+    
+    DECLARE conflicts INT;
+    
+    SELECT COUNT(*) INTO conflicts
+    FROM festival f
+    WHERE f.duration < NEW.festival_day
+    AND f.festival_year = NEW.festival_year;
+
+    IF conflicts > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot assign an event to a day outside the festival duration.';
+    END IF;
+END;
+//
+
+
+
 /* Two triggers to manage band_members count */
 
 /* 1.Trigger to set band_members to 0 before inserting a band */

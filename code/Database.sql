@@ -63,7 +63,7 @@ CREATE TABLE event(
     event_name varchar(255) NOT NULL,
     festival_year int NOT NULL CHECK (festival_year > 0),
     stage_id int NOT NULL,
-    festival_day int NOT NULL,
+    festival_day int NOT NULL CHECK (festival_day > 0),
     -- Duration of the event in minutes duration of performances + break_duration
     -- Instead of storing duration in 1 field, we broke it into 2 attributes (event_start, event_end) 
     -- for better query performance
