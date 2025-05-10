@@ -174,7 +174,7 @@ CREATE TABLE staff(
     staff_phone varchar(255),
     staff_email varchar(255),
     staff_age int NOT NULL CHECK (staff_age > 0),
-    level_of_experience int NOT NULL CHECK (level_of_experience >= 0 AND level_of_experience < 5),
+    level_of_experience int NOT NULL CHECK (level_of_experience >= 1 AND level_of_experience <= 5),
     PRIMARY KEY(staff_id),
     FOREIGN KEY(staff_role_id) REFERENCES staff_role(staff_role_id),
     FOREIGN KEY(level_of_experience) REFERENCES level_of_experience(level_of_experience_id)
