@@ -437,6 +437,21 @@ BEGIN
 END;
 //
 
+
+CREATE TRIGGER check_matches_reselling_tickets
+AFTER INSERT ON reselling_tickets FOR EACH ROW
+BEGIN
+	CALL process_ticket_matches();
+END//
+
+
+CREATE TRIGGER check_matches_desired_ticket_by_event
+AFTER INSERT ON desired_ticket_by_event FOR EACH ROW
+BEGIN
+	CALL process_ticket_matches();
+END//
+
 DELIMITER ;
+
 
 

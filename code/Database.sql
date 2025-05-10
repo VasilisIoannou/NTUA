@@ -345,10 +345,10 @@ CREATE TABLE reselling_tickets(
 
 CREATE TABLE ticket_transfers(
     buyer_id int NOT NULL,
-    EAN_13 ginint NOT NULL,
+    EAN_13 BIGINT NOT NULL,
     PRIMARY KEY(buyer_id,EAN_13),
     FOREIGN KEY(buyer_id) REFERENCES buyer(buyer_id) ON DELETE CASCADE,
-    FOREIGN KEY(EAN_13) REFERENCES ticket(ticket) ON DELETE CASCADE
+    FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13) ON DELETE CASCADE
 );
 
 

@@ -207,6 +207,7 @@ ORDER BY
 
 
 --13--
+/* View to find all artists who have performed in 3 or more continents */
 CREATE OR REPLACE VIEW artists_in_3_or_more_continents AS
 SELECT 
     a.artist_id,
@@ -229,6 +230,7 @@ ORDER BY
 
 
 --14--
+
 
 
 
