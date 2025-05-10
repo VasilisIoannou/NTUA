@@ -403,6 +403,39 @@ BEGIN
 END;
 //
 
+CREATE TRIGGER check_band_members_before_performance_insert
+BEFORE INSERT ON performance
+FOR EACH ROW
+BEGIN
+    DECLARE no_band_members INT;
+
+    SELECT band_members INTO no_band_members
+    FROM band
+    WHERE band_id = NEW.band_id;
+
+    IF no_band_members = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Band does not have any members';
+    END IF; 
+END;
+//
+
+CREATE TRIGGER check_band_members_before_performance_update
+BEFORE UPDATE ON performance
+FOR EACH ROW
+BEGIN
+    DECLARE no_band_members INT;
+
+    SELECT band_members INTO no_band_members
+    FROM band
+    WHERE band_id = NEW.band_id;
+
+    IF no_band_members = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Band does not have any members';
+    END IF; 
+END;
+//
 
 DELIMITER ;
 
