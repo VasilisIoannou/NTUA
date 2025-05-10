@@ -559,6 +559,139 @@ BEGIN
     END IF;
 END//
 
+/* Trigger to call staff assignment procedure */
+CREATE TRIGGER assign_security_staff
+BEFORE INSERT ON ticket
+FOR EACH ROW
+BEGIN
+    CALL assign_security_staff();
+END//
+
+CREATE TRIGGER assign_secondary_staff
+BEFORE INSERT ON ticket
+FOR EACH ROW
+BEGIN
+    CALL assign_secondary_staff();
+END//
+
+/* This trigger assigns security staff to stages based on ticket sales. If */
+CREATE TRIGGER assign_security_if_needed
+BEFORE INSERT ON ticket
+FOR EACH ROW
+BEGIN
+    DECLARE ticket_count INT;
+    DECLARE security_count INT;
+    DECLARE stage_id_val INT;
+    DECLARE staff_to_assign INT;
+    DECLARE available_staff_count INT;
+
+    -- Get stage_id from the event
+    SELECT e.stage_id INTO stage_id_val
+    FROM event e WHERE e.event_id = NEW.event_id;
+
+    -- Count existing tickets for this stage
+    SELECT COUNT(*) INTO ticket_count
+    FROM ticket t
+    JOIN event e ON e.event_id = t.event_id
+    WHERE e.stage_id = stage_id_val;
+
+    -- Count current security staff on the stage
+    SELECT COUNT(*) INTO security_count
+    FROM stage_staff ss
+    JOIN staff s ON s.staff_id = ss.staff_id
+    WHERE ss.stage_id = stage_id_val AND s.staff_role_id = 2;
+
+    -- Count available security staff not assigned to the stage
+    SELECT COUNT(*) INTO available_staff_count
+    FROM staff s
+    WHERE s.staff_role_id = 2
+      AND s.staff_id NOT IN (
+          SELECT staff_id FROM stage_staff WHERE stage_id = stage_id_val
+      );
+
+    -- Check if more security is needed
+    IF ticket_count + 1 > security_count * 20 THEN
+        -- Find one available security staff not yet on this stage
+        SELECT s.staff_id INTO staff_to_assign
+        FROM staff s
+        WHERE s.staff_role_id = 2
+          AND s.staff_id NOT IN (
+              SELECT staff_id FROM stage_staff WHERE stage_id = stage_id_val
+          )
+        LIMIT 1;
+
+        -- If we found one, assign them
+        IF staff_to_assign IS NOT NULL THEN
+            INSERT INTO stage_staff(stage_id, staff_id)
+            VALUES (stage_id_val, staff_to_assign);
+        ELSE
+            -- If no staff available, issue a warning
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Cannot add ticket: This stage needs more security staff. Not enough security staff available to assign to the stage.';
+        END IF;
+    END IF;
+END;
+//
+
+/* This trigger assigns secondary staff to stages based on ticket sales */
+CREATE TRIGGER assign_secondary_if_needed
+BEFORE INSERT ON ticket
+FOR EACH ROW
+BEGIN
+    DECLARE ticket_count INT;
+    DECLARE secondary_count INT;
+    DECLARE stage_id_val INT;
+    DECLARE staff_to_assign INT;
+    DECLARE available_staff_count INT;
+
+    -- Get stage_id from the event
+    SELECT e.stage_id INTO stage_id_val
+    FROM event e WHERE e.event_id = NEW.event_id;
+
+    -- Count existing tickets for this stage
+    SELECT COUNT(*) INTO ticket_count
+    FROM ticket t
+    JOIN event e ON e.event_id = t.event_id
+    WHERE e.stage_id = stage_id_val;
+
+    -- Count current secondary staff on the stage
+    SELECT COUNT(*) INTO secondary_count
+    FROM stage_staff ss
+    JOIN staff s ON s.staff_id = ss.staff_id
+    WHERE ss.stage_id = stage_id_val AND s.staff_role_id = 3;  -- Role ID for Secondary staff
+
+    -- Count available secondary staff not assigned to the stage
+    SELECT COUNT(*) INTO available_staff_count
+    FROM staff s
+    WHERE s.staff_role_id = 3  -- Secondary staff role ID
+      AND s.staff_id NOT IN (
+          SELECT staff_id FROM stage_staff WHERE stage_id = stage_id_val
+      );
+
+    -- Check if more secondary staff is needed (2% of tickets sold)
+    IF ticket_count + 1 > secondary_count * 50 THEN  -- 2% corresponds to 1 staff per 50 tickets
+        -- Find one available secondary staff not yet on this stage
+        SELECT s.staff_id INTO staff_to_assign
+        FROM staff s
+        WHERE s.staff_role_id = 3  -- Secondary staff role ID
+          AND s.staff_id NOT IN (
+              SELECT staff_id FROM stage_staff WHERE stage_id = stage_id_val
+          )
+        LIMIT 1;
+
+        -- If we found one, assign them
+        IF staff_to_assign IS NOT NULL THEN
+            INSERT INTO stage_staff(stage_id, staff_id)
+            VALUES (stage_id_val, staff_to_assign);
+        ELSE
+            -- If no staff available, issue a warning
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Cannot add ticket: This stage needs more secondary staff. Not enough secondary staff available to assign to the stage.';
+        END IF;
+    END IF;
+END;
+//
+
 DELIMITER ;
 
 
