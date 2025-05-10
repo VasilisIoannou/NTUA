@@ -241,7 +241,13 @@ BEGIN
     DECLARE event_conflicts INT;
     DECLARE v_event_start INT;
     DECLARE v_event_end INT;
- 
+
+    DECLARE v_warm_up_id INT;
+    DECLARE v_closing_act_id INT;
+    DECLARE existing_closing INT;
+    DECLARE warm_up_conflict INT;
+    DECLARE closing_conflict INT;
+
     DECLARE artist_cursor CURSOR FOR 
         SELECT artist_id FROM artist_band WHERE band_id = p_band_id;
 
@@ -276,7 +282,7 @@ BEGIN
     END IF;
 
 
--- Check for overlapping with other performances and their breaks
+    -- Check for overlapping with other performances and their breaks
     SELECT COUNT(*) INTO conflicts
     FROM performance p
     JOIN event e ON p.event_id = e.event_id
@@ -289,6 +295,47 @@ BEGIN
 
     IF conflicts > 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'There is a conflict with an existing performance or break.';
+    END IF;
+
+    -- Check Performance type
+    SELECT performance_type_id INTO v_warm_up_id FROM performance_type WHERE performance_type_name = 'Warm up';
+    SELECT performance_type_id INTO v_closing_act_id FROM performance_type WHERE performance_type_name = 'Closing act';
+
+    -- Warm up check: Must be the first performance
+    IF p_performance_type_id = v_warm_up_id THEN
+        SELECT COUNT(*) INTO warm_up_conflict
+        FROM performance
+        WHERE event_id = p_event_id
+          AND performance_start < p_performance_start;
+
+        IF warm_up_conflict > 0 THEN
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Warm up must be the first performance in the event';
+        END IF;
+    END IF;
+
+    -- Closing act checks
+    IF p_performance_type_id = v_closing_act_id THEN
+        -- Check existing Closing act
+        SELECT COUNT(*) INTO existing_closing
+        FROM performance
+        WHERE event_id = p_event_id
+          AND performance_type_id = v_closing_act_id;
+	IF existing_closing > 0 THEN
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Only one Closing act allowed per event';
+        END IF;
+
+        -- Check performances after Closing act
+        SELECT COUNT(*) INTO closing_conflict
+        FROM performance
+        WHERE event_id = p_event_id
+          AND performance_start > p_performance_start;
+
+        IF closing_conflict > 0 THEN
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Closing act must be the last performance in the event';
+        END IF;
     END IF;
 
     -- Get the current festival year from the event
