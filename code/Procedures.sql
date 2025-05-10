@@ -9,6 +9,7 @@ BEGIN
   DECLARE v_event_id INT;
   DECLARE v_number_of_tickets INT;
   DECLARE v_stage_capacity INT;
+  DECLARE v_validated BOOLEAN;
 
   -- Find the event_id
   SELECT event_id INTO v_event_id FROM ticket WHERE EAN_13 = p_EAN;
@@ -21,6 +22,14 @@ BEGIN
   FROM event e
   JOIN stage s ON e.stage_id = s.stage_id
   WHERE e.event_id = v_event_id;
+
+  -- Find if the ticket is NOT VALIDED
+  SELECT validated INTO v_validated FROM ticket WHERE EAN_13 = p_EAN; 
+
+  IF v_validated THEN
+        signal sqlstate '45000' 
+        set message_text = 'You Cant sell a validated ticket'; 
+  END IF;
 
   -- Check if the stage is sold out 
   IF v_number_of_tickets < FLOOR(v_stage_capacity*0.93) THEN
@@ -389,9 +398,9 @@ BEGIN
    END IF;   
    
    IF v_valid = FALSE THEN	
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = result_message; 
-END IF;
+        signal sqlstate '45000' 
+        set message_text = result_message; 
+   END IF;
 
    -- Find the ticket EAN 13
    SELECT EAN_13 INTO v_EAN_13 FROM reselling_tickets WHERE reselling_ticket_id = p_reselling_ticket_id; 
@@ -405,7 +414,23 @@ END IF;
    -- Remove the ticket from the Reselling_ticket
    DELETE FROM reselling_tickets WHERE reselling_ticket_id = p_reselling_ticket_id;
   
-   SET result_message = 'The ticket bought successfully!'; 
+   SET result_message = 'The ticket was bought successfully!'; 
 END//
+
+CREATE PROCEDURE insert_buyer_visitor(
+     p_name VARCHAR(255),
+     p_surname VARCHAR(255),
+     p_age INT
+)
+BEGIN
+     DECLARE v_visitor_id INT;
+
+     INSERT INTO visitor(visitor_name,visitor_surname,visitor_age) VALUES (p_name,p_surname,p_age);
+     
+     SET v_visitor_id = LAST_INSERT_ID();
+
+     INSERT INTO buyer(visitor_id) VALUES (v_visitor_id);
+END//
+
 
 DELIMITER ;
