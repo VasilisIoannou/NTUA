@@ -1,5 +1,8 @@
 -- Active: 1746819443116@@127.0.0.1@3309@festivaldb
 
+
+--1--
+
 /* View to get the total earnings per festival year */
 CREATE OR REPLACE VIEW total_festival_earnings_per_year AS
 SELECT
@@ -50,4 +53,27 @@ GROUP BY
 ORDER BY
     f.festival_year,
     tt.ticket_type_name;
+
+
+--2--
+
+/* View to find all the bands that belong to 'Rock' genre per year */
+CREATE OR REPLACE VIEW rock_bands_per_year AS
+SELECT DISTINCT
+    f.festival_year,
+    b.band_name
+FROM
+    band b
+JOIN band_subgenre bs ON b.band_id = bs.band_id
+JOIN subgenre sg ON sg.subgenre_id = bs.subgenre_id
+JOIN genre g ON g.genre_id = sg.genre_id
+JOIN performance p ON p.band_id = b.band_id
+JOIN event e ON e.event_id = p.event_id
+JOIN festival f ON f.festival_year = e.festival_year
+WHERE
+    g.genre_name = 'Rock'
+ORDER BY
+    f.festival_year,
+    b.band_name;
+
 
