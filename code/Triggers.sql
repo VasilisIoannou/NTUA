@@ -93,6 +93,18 @@ BEGIN
 END;
 //
 
+-- Trigger to check event start and end times
+CREATE TRIGGER check_event_start_end
+BEFORE INSERT ON event
+FOR EACH ROW
+BEGIN
+    IF NEW.event_start >= NEW.event_end THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Event start time must be before end time.';
+    END IF;
+END;
+//
+
 /* Two triggers to manage band_members count */
 
 /* 1.Trigger to set band_members to 0 before inserting a band */
