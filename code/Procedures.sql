@@ -355,4 +355,57 @@ BEGIN
     VALUES (p_performance_end,p_break_duration,p_event_id);
 END//
 
+/* The Below Procedure should Check if the resseling ticket id is valid and if it is ... */
+/* ... it should remove the ticket from reselling_ticket TABLE and update the tickets data */
+
+CREATE PROCEDURE reselling_desired_by_id(
+    IN p_buyer_id INT,
+    IN p_reselling_ticket_id INT,
+    OUT result_message VARCHAR(255)
+)
+BEGIN
+   DECLARE v_check_buyer INT;
+   DECLARE v_check_reselling_ticket INT;
+   
+   DECLARE v_EAN_13 BIGINT;
+   DECLARE v_visitor_id INT;  
+
+   DECLARE v_valid BOOLEAN DEFAULT TRUE;
+
+   -- Check if Valid buyer id
+   SELECT COUNT(*) INTO v_check_buyer FROM buyer WHERE buyer_id = p_buyer_id;
+   
+   IF v_check_buyer = 0 THEN 
+	SET result_message = 'The buyer Id does not exists';
+	SET v_valid = FALSE;
+   END IF;
+   
+   -- Check if Valid reselling_ticket_id
+   SELECT COUNT(*) INTO v_check_reselling_ticket FROM reselling_tickets WHERE reselling_ticket_id = p_reselling_ticket_id;
+   
+   IF v_check_reselling_ticket = 0 THEN 
+	SET result_message = 'The buyer Id does not exists';
+	SET v_valid = FALSE;
+   END IF;   
+   
+   IF v_valid = FALSE THEN	
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = result_message; 
+END IF;
+
+   -- Find the ticket EAN 13
+   SELECT EAN_13 INTO v_EAN_13 FROM reselling_tickets WHERE reselling_ticket_id = p_reselling_ticket_id; 
+ 
+   -- Find the visitor id
+   SELECT visitor_id INTO v_visitor_id FROM buyer WHERE buyer_id = p_buyer_id; 
+
+   -- Replace the visitor id in the ticket
+   UPDATE ticket SET visitor_id = v_visitor_id WHERE EAN_13 = v_EAN_13;
+
+   -- Remove the ticket from the Reselling_ticket
+   DELETE FROM reselling_tickets WHERE reselling_ticket_id = p_reselling_ticket_id;
+  
+   SET result_message = 'The ticket bought successfully!'; 
+END//
+
 DELIMITER ;

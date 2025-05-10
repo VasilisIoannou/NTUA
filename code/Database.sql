@@ -117,7 +117,7 @@ CREATE TABLE performance(
     -- performance_start and performance_end are stored in minutes after 00:00
     performance_start int CHECK (performance_start >= 0 AND performance_start <= 1440),  -- 0 to 24 hours
     performance_end int CHECK(performance_end >= 0),
-    CHECK (performance_start < performance_end AND performance_start - performance_end <= 180),  -- 0 to 3 hours
+    CHECK (performance_start < performance_end AND performance_end - performance_start <= 180),  -- 0 to 3 hours
     event_id int,
     band_id int NOT NULL,
     PRIMARY KEY(performance_id),
@@ -361,7 +361,7 @@ CREATE TABLE desired_ticket_by_event(
     ticket_type_id int NOT NULL,
     event_id int NOT NULL,
     date_issued_id int NOT NULL,
-    PRIMARY KEY(buyer_id,ticket_type_id,event_id),  
+    PRIMARY KEY(buyer_id,event_id),  
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
     FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id), 
     FOREIGN KEY(buyer_id) REFERENCES buyer(buyer_id) ON DELETE CASCADE,
