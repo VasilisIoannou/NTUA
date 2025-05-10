@@ -159,11 +159,11 @@ CREATE TABLE staff_role(
 
 INSERT INTO staff_role(staff_role_name) VALUES('Technician'),('Security'),('Secondary');
 
-CREATE TABLE role_specialization(
-    role_specialization_id int AUTO_INCREMENT,
-    role_specialization_name varchar(255) NOT NULL,
+CREATE TABLE technician_specialization(
+    technician_specialization_id int AUTO_INCREMENT,
+    technician_specialization_name varchar(255) NOT NULL,
     staff_role_id int,
-    PRIMARY KEY(role_specialization_id), 
+    PRIMARY KEY(technician_specialization_id), 
     FOREIGN KEY(staff_role_id) REFERENCES staff_role(staff_role_id) ON DELETE CASCADE
 );
 
@@ -190,10 +190,10 @@ CREATE TABLE stage_staff(
 
 CREATE TABLE staff_specialization(
     staff_id int NOT NULL,
-    role_specialization_id int NOT NULL,
-    PRIMARY KEY(staff_id, role_specialization_id),
+    technician_specialization_id int NOT NULL,
+    PRIMARY KEY(staff_id, technician_specialization_id),
     FOREIGN KEY(staff_id) REFERENCES staff(staff_id) ON DELETE CASCADE,
-    FOREIGN KEY(role_specialization_id) REFERENCES role_specialization(role_specialization_id) ON DELETE CASCADE
+    FOREIGN KEY(technician_specialization_id) REFERENCES technician_specialization(technician_specialization_id) ON DELETE CASCADE
 );
 
 
