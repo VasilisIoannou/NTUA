@@ -63,11 +63,12 @@ CREATE TABLE event(
     event_name varchar(255) NOT NULL,
     festival_year int NOT NULL CHECK (festival_year > 0),
     stage_id int NOT NULL,
+    festival_day int NOT NULL,
     -- Duration of the event in minutes duration of performances + break_duration
     -- Instead of storing duration in 1 field, we broke it into 2 attributes (event_start, event_end) 
     -- for better query performance
-    event_start int NOT NULL,
-    event_end int NOT NULL,
+    event_start int NOT NULL CHECK (event_start >= 0 AND event_start <= 1440),
+    event_end int NOT NULL CHECK (event_end >= 0 AND event_end <= 1440),
     PRIMARY KEY(event_id),
     FOREIGN KEY(festival_year) REFERENCES festival(festival_year) ON DELETE CASCADE,
     FOREIGN KEY(stage_id) REFERENCES stage(stage_id) ON DELETE CASCADE

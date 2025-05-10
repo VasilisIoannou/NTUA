@@ -82,6 +82,7 @@ BEGIN
     FROM event e
     WHERE e.stage_id = NEW.stage_id 
     AND e.festival_year = NEW.festival_year
+    AND e.festival_day = NEW.festival_day
     AND(
         NEW.event_start BETWEEN e.event_start AND e.event_end
     );
