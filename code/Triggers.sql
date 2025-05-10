@@ -45,7 +45,7 @@ BEGIN
     END IF;
 END//
 
--- This trigger prevents bands from being assigned to multiple stages at the same time
+-- This trigger prevents artists from being assigned to multiple stages at the same time
 CREATE TRIGGER prevent_artist_stage_conflict
 BEFORE INSERT ON performance
 FOR EACH ROW
@@ -71,28 +71,6 @@ BEGIN
     END IF;
 END//
 
--- Trigger to prevent overlapping performances
-CREATE TRIGGER prevent_performance_overlapping
-BEFORE INSERT ON performance
-FOR EACH ROW
-BEGIN
-    DECLARE conflicts INT;
-
-    SELECT COUNT(*) INTO conflicts
-    FROM performance p
-    JOIN event e1 ON p.event_id = e1.event_id
-    JOIN event e2 ON NEW.event_id = e2.event_id
-    WHERE e1.event_id = e2.event_id
-    AND (
-        NEW.performance_start BETWEEN p.performance_start AND p.performance_end
-    );
-    
-    IF conflicts > 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'There is already a performance assigned to this stage during this time.';
-    END IF;
-END//
-
 -- Trigger to prevent overlapping events
 CREATE TRIGGER prevent_event_overlapping
 BEFORE INSERT ON event
@@ -114,6 +92,7 @@ BEGIN
     END IF;
 END;
 //
+
 /* Two triggers to manage band_members count */
 
 /* 1.Trigger to set band_members to 0 before inserting a band */
@@ -190,6 +169,48 @@ BEGIN
     WHERE event_id = OLD.event_id
       AND break_start = OLD.performance_end;
 END //
+
+
+/* Trigger to check band formation year before performance */
+CREATE TRIGGER check_band_formation_before_performance
+BEFORE INSERT ON performance
+FOR EACH ROW
+BEGIN
+    DECLARE v_festival_year INT;
+    DECLARE v_band_formation_year INT;
+
+    -- Get the festival year of the event this performance belongs to
+    SELECT festival_year INTO v_festival_year
+    FROM event
+    WHERE event_id = NEW.event_id;
+
+    -- Get the band's year of formation
+    SELECT bdf.band_year_of_formation INTO v_band_formation_year
+    FROM band b
+    JOIN band_date_of_formation bdf ON b.band_date_of_formation_id = bdf.band_date_of_formation_id
+    WHERE b.band_id = NEW.band_id;
+
+    -- Compare formation year with festival year
+    IF v_band_formation_year > v_festival_year THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Band cannot perform before its formation year.';
+    END IF;
+
+
+    /* Compare artists' year of birth and festival year*/
+    IF EXISTS (
+        SELECT 1
+        FROM artist a
+        JOIN artist_band ab ON a.artist_id = ab.artist_id
+        WHERE ab.band_id = NEW.band_id
+          AND a.artist_year_of_birth > v_festival_year
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'One or more artists were born after the festival year.';
+    END IF;
+    
+END;
+//
 
 DELIMITER ;
 
