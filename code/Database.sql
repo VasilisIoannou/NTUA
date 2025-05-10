@@ -95,7 +95,7 @@ CREATE TABLE band_date_of_formation(
 
 CREATE TABLE genre(
     genre_id int AUTO_INCREMENT,
-    genre_name varchar(255) NOT NULL,
+    genre_name varchar(255) NOT NULL UNIQUE,
     PRIMARY KEY(genre_id)
 );
 
@@ -198,7 +198,7 @@ CREATE TABLE staff_specialization(
 
 
 -- Many to many relationship between band and subgenre
--- A band is connected to its subgenres and a subgenre and from there we can find the genre
+-- A band is connected to its subgenres and from there we can find the genre
 
 CREATE TABLE subgenre(
     subgenre_id int AUTO_INCREMENT,
@@ -208,7 +208,6 @@ CREATE TABLE subgenre(
     FOREIGN KEY(genre_id) REFERENCES genre(genre_id) ON DELETE CASCADE
 );
 
---kammei cap sta 100 sorry :(
 CREATE TABLE band_subgenre(
     band_id int ,
     subgenre_id int,
