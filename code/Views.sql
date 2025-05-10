@@ -58,10 +58,11 @@ ORDER BY
 --2--
 
 /* View to find all the bands that belong to 'Rock' genre per year */
-CREATE OR REPLACE VIEW rock_bands_per_year AS
+CREATE OR REPLACE VIEW genre_bands_per_year AS
 SELECT DISTINCT
     f.festival_year,
-    b.band_name
+    b.band_name,
+    g.genre_name
 FROM
     band b
 JOIN band_subgenre bs ON b.band_id = bs.band_id
@@ -70,8 +71,6 @@ JOIN genre g ON g.genre_id = sg.genre_id
 JOIN performance p ON p.band_id = b.band_id
 JOIN event e ON e.event_id = p.event_id
 JOIN festival f ON f.festival_year = e.festival_year
-WHERE
-    g.genre_name = 'Rock'
 ORDER BY
     f.festival_year,
     b.band_name;
@@ -100,3 +99,60 @@ HAVING
 ORDER BY
     f.festival_year,
     b.band_name;
+
+--4--
+
+
+
+
+
+--5--
+
+/* View to find the artists who are below 30 years old and have performed the most times in festivals */
+CREATE OR REPLACE VIEW most_appearances_by_young_artists AS
+SELECT 
+    a.artist_name,
+    COUNT(DISTINCT f.festival_year) AS festivals_performed
+FROM 
+    artist a
+JOIN artist_band ab ON a.artist_id = ab.artist_id
+JOIN band b ON b.band_id = ab.band_id
+JOIN performance p ON p.band_id = b.band_id
+JOIN event e ON e.event_id = p.event_id
+JOIN festival f ON f.festival_year = e.festival_year
+WHERE 
+    (YEAR(CURDATE()) - a.artist_year_of_birth) < 30
+GROUP BY 
+    a.artist_name
+ORDER BY 
+    festivals_performed DESC;
+
+
+--6--
+
+
+
+--7--
+
+/* View to find festival with lowest average experience of technichal staff*/
+CREATE OR REPLACE VIEW festival_lowest_avg_experience_tech_staff AS
+SELECT 
+    f.festival_year,
+    AVG(level_of_experience.level_of_experience_id) AS lvl_exp
+FROM
+    festival f
+JOIN event e ON e.festival_year = f.festival_year
+JOIN stage s ON e.stage_id = s.stage_id
+JOIN stage_staff ss ON s.stage_id = ss.stage_id
+JOIN staff st ON ss.staff_id = st.staff_id
+JOIN staff_role sr ON st.staff_role_id = sr.staff_role_id
+JOIN level_of_experience ON st.level_of_experience = level_of_experience.level_of_experience_id
+WHERE
+    sr.staff_role_id = 1
+GROUP BY
+    f.festival_year
+ORDER BY
+    lvl_exp ASC
+LIMIT 1;
+
+
