@@ -137,7 +137,9 @@ BEGIN
     AND e.festival_year = NEW.festival_year
     AND e.festival_day = NEW.festival_day
     AND(
-        NEW.event_start BETWEEN e.event_start AND e.event_end
+        (NEW.event_start BETWEEN e.event_start AND e.event_end) OR
+        (NEW.event_end BETWEEN e.event_start AND e.event_end) OR
+        (NEW.event_start <= e.event_start AND NEW.event_end >= e.event_end)
     );
 
     IF conflicts > 0 THEN
@@ -159,7 +161,9 @@ BEGIN
     AND e.festival_year = NEW.festival_year
     AND e.festival_day = NEW.festival_day
     AND(
-        NEW.event_start BETWEEN e.event_start AND e.event_end
+        (NEW.event_start BETWEEN e.event_start AND e.event_end) OR
+        (NEW.event_end BETWEEN e.event_start AND e.event_end) OR
+        (NEW.event_start <= e.event_start AND NEW.event_end >= e.event_end)
     );
 
     IF conflicts > 0 THEN
@@ -437,7 +441,7 @@ BEGIN
 END;
 //
 
-
+/* Triggers to call reselling ticket procedure */
 CREATE TRIGGER check_matches_reselling_tickets
 AFTER INSERT ON reselling_tickets FOR EACH ROW
 BEGIN
@@ -451,7 +455,113 @@ BEGIN
 	CALL process_ticket_matches();
 END//
 
+
+/* Trigger to ensure that staff specialization is only assigned to technicians */
+CREATE TRIGGER check_technician_specialization_insert
+BEFORE INSERT ON staff_specialization
+FOR EACH ROW
+BEGIN
+    DECLARE staff_role_id INT;
+
+    SELECT sr.staff_role_id INTO staff_role_id
+    FROM staff s
+    JOIN staff_role sr ON s.staff_role_id = sr.staff_role_id
+    WHERE s.staff_id = NEW.staff_id;
+
+    IF staff_role_id != 1 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Staff specialization can only be assigned to technicians.';
+    END IF;
+END//
+
+CREATE TRIGGER check_technician_specialization_update
+BEFORE UPDATE ON staff_specialization
+FOR EACH ROW
+BEGIN
+    DECLARE staff_role_id INT;
+
+    SELECT sr.staff_role_id INTO staff_role_id
+    FROM staff s
+    JOIN staff_role sr ON s.staff_role_id = sr.staff_role_id
+    WHERE s.staff_id = NEW.staff_id;
+
+    IF staff_role_id != 1 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Staff specialization can only be assigned to technicians.';
+    END IF;
+END//
+
+/* Trigger to automatically set staff_role_id to 1 for technician_specialization */
+CREATE TRIGGER auto_set_role_id_insert
+BEFORE INSERT ON technician_specialization
+FOR EACH ROW
+BEGIN
+    SET NEW.staff_role_id = 1;
+END//
+
+CREATE TRIGGER auto_set_role_id_update
+BEFORE UPDATE ON technician_specialization
+FOR EACH ROW
+BEGIN
+    SET NEW.staff_role_id = 1;
+END//
+
+/* Trigger to prevent staff overlaping */
+DELIMITER //
+
+CREATE TRIGGER prevent_staff_stage_overlap_insert
+BEFORE INSERT ON stage_staff
+FOR EACH ROW
+BEGIN
+    DECLARE conflict_count INT;
+
+    SELECT COUNT(*) INTO conflict_count
+    FROM stage_staff ss
+    JOIN event e1 ON e1.stage_id = ss.stage_id
+    JOIN event e2 ON e2.stage_id = NEW.stage_id
+    WHERE ss.staff_id = NEW.staff_id
+      AND e1.festival_year = e2.festival_year
+      AND e1.festival_day = e2.festival_day
+      AND (
+           (e2.event_start BETWEEN e1.event_start AND e1.event_end) OR
+           (e2.event_end BETWEEN e1.event_start AND e1.event_end) OR
+           (e2.event_start <= e1.event_start AND e2.event_end >= e1.event_end)
+          );
+
+    IF conflict_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Staff member has a scheduling conflict on a different stage at the same time.';
+    END IF;
+END//
+
+CREATE TRIGGER prevent_staff_stage_overlap_update
+BEFORE UPDATE ON stage_staff
+FOR EACH ROW
+BEGIN
+    DECLARE conflict_count INT;
+
+    SELECT COUNT(*) INTO conflict_count
+    FROM stage_staff ss
+    JOIN event e1 ON e1.stage_id = ss.stage_id
+    JOIN event e2 ON e2.stage_id = NEW.stage_id
+    WHERE ss.staff_id = NEW.staff_id
+      AND e1.festival_year = e2.festival_year
+      AND e1.festival_day = e2.festival_day
+      AND (
+           (e2.event_start BETWEEN e1.event_start AND e1.event_end) OR
+           (e2.event_end BETWEEN e1.event_start AND e1.event_end) OR
+           (e2.event_start <= e1.event_start AND e2.event_end >= e1.event_end)
+          );
+
+    IF conflict_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Staff member has a scheduling conflict on a different stage at the same time.';
+    END IF;
+END//
+
 DELIMITER ;
+
+
 
 
 
