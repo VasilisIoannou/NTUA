@@ -76,4 +76,27 @@ ORDER BY
     f.festival_year,
     b.band_name;
 
+--3--
 
+/* View to find all the artists that performed more than 2 warmup performances in a festival */
+CREATE OR REPLACE VIEW more_than_two_warm_up AS
+SELECT DISTINCT
+    f.festival_year,
+    a.artist_name
+FROM
+    artist a
+JOIN artist_band ab ON a.artist_id = ab.artist_id
+JOIN band b ON b.band_id = ab.band_id
+JOIN performance p ON p.band_id = b.band_id
+JOIN event e ON e.event_id = p.event_id
+JOIN festival f ON f.festival_year = e.festival_year
+WHERE
+    p.performance_type_id = 1
+GROUP BY 
+    f.festival_year, 
+    a.artist_name
+HAVING 
+    COUNT(p.performance_id) > 2
+ORDER BY
+    f.festival_year,
+    b.band_name;
