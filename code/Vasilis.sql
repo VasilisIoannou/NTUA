@@ -1,406 +1,76 @@
+/* After you Insert to Reselling Tickets or to desired by event */
+/* Check if there any matches to do the transaction */
 DELIMITER //
 
-CREATE PROCEDURE insert_visitor_with_ticket(
-    IN p_visitor_name VARCHAR(255),
-    IN p_visitor_surname VARCHAR(255),
-    IN p_visitor_age INT,
-    IN p_visitor_email VARCHAR(255),  -- Now optional
-    IN p_visitor_phone VARCHAR(255),  -- Now optional
-    IN p_EAN_13 BIGINT,
-    IN p_ticket_type_name VARCHAR(255),
-    IN p_event_id INT,
-    IN p_payment_method_id INT,
-    OUT result_message VARCHAR(255)
-)
+CREATE PROCEDURE process_ticket_matches()
 BEGIN
-    DECLARE v_visitor_id INT;
-    DECLARE v_ticket_type_id INT;
-    DECLARE v_ticket_price FLOAT;
-    DECLARE v_price_exists INT;
-    DECLARE v_stage_capacity INT;	
-    DECLARE v_sold_count INT; 
-    DECLARE v_max_stage_capacity INT;
-    DECLARE v_max_vip_tickets INT;
-    DECLARE v_vip_tickets_sold INT;
-
-    DECLARE v_pass_checks BOOLEAN DEFAULT TRUE;
-
-    -- Variables for EAN-13 check
-    DECLARE ean13_str CHAR(13);
-    DECLARE ean12_str CHAR(12);
-    DECLARE i INT DEFAULT 1;
-    DECLARE sum_odd INT DEFAULT 0;
-    DECLARE sum_even INT DEFAULT 0;
-    DECLARE digit INT;
-    DECLARE calculated_check_digit INT;
-    DECLARE provided_check_digit INT;
-
-
-    -- Start transaction
-    START TRANSACTION;
-    
-    -- Validate ticket type
-    SELECT ticket_type_id INTO v_ticket_type_id 
-    FROM ticket_type 
-    WHERE ticket_type_name = p_ticket_type_name;
-    
-    IF v_ticket_type_id IS NULL THEN
-        SET result_message = 'Invalid ticket type specified';
-    	v_pass_checks = FALSE;
-    END IF;
-    
-    -- Validate ticket price exists
-    SELECT COUNT(*), ticket_price_price INTO v_price_exists, v_ticket_price
-    FROM ticket_price
-    WHERE ticket_type_id = v_ticket_type_id AND event_id = p_event_id;
-    
-    IF v_price_exists = 0 THEN
-        SET result_message = 'No price defined for this ticket type at the specified event';
-    	v_pass_checks = FALSE;
-    END IF;
-
-    -- EAN-13 Validation check
-    -- Convert input to string and ensure it has exactly 13 digits
-    SET ean13_str = LPAD(p_EAN_13, 13, '0');
-    IF CHAR_LENGTH(ean13_str) != 13 THEN
-        SET result_message = 'EAN-13 code must be exactly 13 digits long.';
-    	v_pass_checks = FALSE;
-    END IF;
-
-    -- Extract the first 12 digits
-    SET ean12_str = LEFT(ean13_str, 12);
-
-    -- Calculate the sum of digits in odd and even positions
-    WHILE i <= 12 DO
-        SET digit = CAST(SUBSTRING(ean12_str, i, 1) AS UNSIGNED);
-        IF MOD(i, 2) = 1 THEN
-            SET sum_odd = sum_odd + digit;
-        ELSE
-            SET sum_even = sum_even + digit;
-        END IF;
-        SET i = i + 1;
-    END WHILE;
-
-    -- Calculate the check digit
-    SET calculated_check_digit = (10 - ((sum_odd + sum_even * 3) MOD 10)) MOD 10;
-
-    -- Extract the provided check digit
-    SET provided_check_digit = CAST(RIGHT(ean13_str, 1) AS UNSIGNED);
-
-    -- Compare the calculated check digit with the provided one
-    IF calculated_check_digit != provided_check_digit THEN
-            SET result_message = 'Invalid EAN-13 check digit.';
-    	    v_pass_checks = FALSE;
-    END IF;
-
-    -- VIP capacity check (only if ticket type is VIP)
-    IF p_ticket_type_name = 'VIP' THEN
-        -- Get stage capacity for this event
-        SELECT s.stage_capacity INTO v_stage_capacity
-        FROM event e
-        JOIN stage s ON e.stage_id = s.stage_id
-        WHERE e.event_id = p_event_id;
-        
-        -- Calculate 10% of capacity
-        SET v_max_vip_tickets = FLOOR(v_stage_capacity * 0.1);
-        
-        -- Count existing VIP tickets for this event
-        SELECT COUNT(*) INTO v_vip_tickets_sold
-        FROM ticket t
-        JOIN ticket_type tt ON t.ticket_type_id = tt.ticket_type_id
-        WHERE t.event_id = p_event_id
-        AND tt.ticket_type_name = 'VIP';
-        
-        -- Check if adding one more would exceed limit
-        IF v_vip_tickets_sold >= v_max_vip_tickets THEN
-            SET result_message = CONCAT('Vip Tickets reach max capacity, current tickets: ', v_vip_tickets_sold, ' - max vip tickets: ', v_max_vip_tickets);
-	    v_pass_checks = FALSE;        
-	END IF;
-    END IF;
-
-
-
-  -- A) Look up the stage’s capacity for this event:
-  SELECT stage_capacity
-    INTO v_stage_capacity
-    FROM event e
-    JOIN stage s 
-      ON e.stage_id = s.stage_id
-   WHERE e.event_id = p_event_id;
-
-  -- B) Count existing tickets for that same stage:
-  SELECT COUNT(*) 
-    INTO v_sold_count
-    FROM ticket t
-    JOIN event ev 
-      ON t.event_id = ev.event_id
-   WHERE ev.stage_id = (
-           SELECT stage_id 
-             FROM event 
-            WHERE event_id = p_event_id
-         );
-
-  -- C) If this new ticket would exceed capacity, abort the insert:
-  IF (v_sold_count + 1) > FLOOR(v_stage_capacity * 0.93) THEN
-        SET result_message = CONCAT('Tickets sold out, v_sold_count: ', v_sold_count, ' - v_stage_capacity: ', v_stage_capacity);
-  	v_pass_checks = FALSE;
-  END IF;
-
-  IF NOT v_pass_checks THEN
-	ROLLBACK;
-	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = result_message;
-  END IF
-
-  -- Insert visitor data
-  INSERT INTO visitor (visitor_name, visitor_surname, visitor_age)
-  VALUES (p_visitor_name, p_visitor_surname, p_visitor_age);
-  
-  -- Get the auto-generated visitor_id
-  SET v_visitor_id = LAST_INSERT_ID();
-  
-  
-  -- Insert visitor contact information
-  INSERT INTO visitor_contact (visitor_id, visitor_email, visitor_phone)
-  VALUES (v_visitor_id, p_visitor_email, p_visitor_phone);
-
-  -- Insert ticket data
-  INSERT INTO ticket (EAN_13, ticket_type_id, visitor_id, event_id, ticket_price, payment_method_id, validated)
-  VALUES (p_EAN_13, v_ticket_type_id, v_visitor_id, p_event_id, v_ticket_price, p_payment_method_id, FALSE);
-  
-  -- Commit the transaction
-  COMMIT;
-  
-  -- Return the new visitor_id and EAN_13 for reference
-  SELECT v_visitor_id AS new_visitor_id, p_EAN_13 AS ticket_EAN;
-END //
-
-DELIMITER ;
-
--- Reselling tickets is only available if all tickets are sold per stage
--- I will create a procedure to allow inserting records to resseling_tickets only if the number of tickets == stage capacity 
-
-DELIMITER //
-
-CREATE PROCEDURE insert_reseling_ticket_proc(
-   IN p_EAN BIGINT,
-   OUT result_message VARCHAR(255)
-)
-BEGIN
-  DECLARE v_event_id INT;
-  DECLARE v_number_of_tickets INT;
-  DECLARE v_stage_capacity INT;
-
-  -- Find the event_id
-  SELECT event_id INTO v_event_id FROM tickets WHERE EAN_13 = p_EAN;
-  
-  -- Count the tickets
-  SELECT COUNT(*) INTO v_number_of_tickets FROM tickets WHERE event_id = v_event_id;
-
-  -- Find the Stage Capacity
-  SELECT s.stage_capacity INTO v_stage_capacity
-  FROM events e
-  JOIN stage s ON e.stage_id = s.stage_id
-  WHERE e.event_id = v_event_id;
-
-  -- Check if the stage is sold out 
-  IF v_number_of_tickets < v_stage_capacity THEN
-    SET result_message = 'Cannot resell - tickets still available for purchase';
-  ELSE
-    INSERT INTO reseling_tickets (EAN_13) VALUES (p_EAN);
-    SET result_message = 'Ticket added to reselling platform';
-  END IF;
-END //
-
-
-DELIMITER ;
-
--- Reselling tickets is only available if all tickets are sold per stage
--- I will create a procedure to allow inserting records to resseling_tickets only if the number of tickets == stage capacity 
-
-DELIMITER //
-
-CREATE PROCEDURE insert_reseling_ticket_proc(
-   IN p_EAN BIGINT,
-   OUT result_message VARCHAR(255)
-)
-BEGIN
-  DECLARE v_event_id INT;
-  DECLARE v_number_of_tickets INT;
-  DECLARE v_stage_capacity INT;
-
-  -- Find the event_id
-  SELECT event_id INTO v_event_id FROM tickets WHERE EAN_13 = p_EAN;
-  
-  -- Count the tickets
-  SELECT COUNT(*) INTO v_number_of_tickets FROM tickets WHERE event_id = v_event_id;
-
-  -- Find the Stage Capacity
-  SELECT s.stage_capacity INTO v_stage_capacity
-  FROM events e
-  JOIN stage s ON e.stage_id = s.stage_id
-  WHERE e.event_id = v_event_id;
-
-  -- Check if the stage is sold out 
-  IF v_number_of_tickets < v_stage_capacity THEN
-    SET result_message = 'Cannot resell - tickets still available for purchase';
-  ELSE
-    INSERT INTO reseling_tickets (EAN_13) VALUES (p_EAN);
-    SET result_message = 'Ticket added to reselling platform';
-  END IF;
-END //
-
-DELIMITER ;
-
--- When Inserting a Performance it must check if the Artist in that performance are valid
--- An Artist can not be in the festiuval 3 years in a row
--- Artist -> Band -> Performance -> Event -> festival years
--- Find all the Bands the Artist is in, then find all the Performances the Bands previously found are in and then find all the events the Performances(p)
--- Check the current year (Max(festival_years)) and then search for the 2 previous years if they are in the query
-
-DELIMITER //
-CREATE PROCEDURE insert_performance_break(
-    p_performance_type_id INT,
-    p_performance_start INT,
-    p_performance_end INT,
-    p_event_id INT,
-    p_band_id INT,
-    p_break_duration INT
-)
-BEGIN
-    DECLARE v_current_year INT;
-    DECLARE v_previous_year_1 INT;
-    DECLARE v_previous_year_2 INT;
-    DECLARE v_artist_id INT;
-    DECLARE v_artist_count INT;
-    DECLARE v_artist_violation_found BOOLEAN DEFAULT FALSE;
     DECLARE done INT DEFAULT FALSE;
-
-    DECLARE artist_cursor CURSOR FOR 
-        SELECT artist_id FROM artist_band WHERE band_id = p_band_id;
+    DECLARE v_ean BIGINT;
+    DECLARE v_buyer_id INT;
+    DECLARE v_visitor_id INT;
+    DECLARE v_date_issued_id INT;
     
-    -- Handler for when no more rows in cursor
+    -- Cursor to find all matching tickets with buyer priorities
+    DECLARE match_cursor CURSOR FOR
+        SELECT rt.EAN_13, d.buyer_id, b.visitor_id, d.date_issued_id
+        FROM reselling_tickets rt
+        JOIN ticket t ON rt.EAN_13 = t.EAN_13
+        JOIN desired_ticket_by_event d ON d.event_id = t.event_id 
+                                     AND d.ticket_type_id = t.ticket_type_id
+        JOIN buyer b ON d.buyer_id = b.buyer_id
+        WHERE t.validated = FALSE
+        ORDER BY rt.EAN_13, d.date_issued_id;
+    
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    DECLARE conflicts INT;
-    DECLARE event_conflicts INT;
-    DECLARE v_event_start INT;
-    DECLARE v_event_end INT;
- 
-
-    -- Basic Checks
-    -- First validate performance time constraints
-    IF p_performance_start >= p_performance_end THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Performance start time must be before end time';
-    END IF;
-
-    IF (p_performance_end - p_performance_start) > 180 THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Performance duration cannot exceed 3 hours';
-    END IF;
-
-    -- Find Event starnt and end
-    SELECT event_start INTO v_event_start FROM event WHERE event_id = p_event_id
-    SELECT event_end INTO v_event_end FROM event WHERE event_id = p_event_id
-
-    --Check Overlapping Performances
-    SELECT COUNT(*) INTO conflicts
-    FROM performance p
-    JOIN event e1 ON p.event_id = e1.event_id
-    JOIN event e2 ON NEW.event_id = e2.event_id
-    WHERE e1.event_id = e2.event_id
-    AND (
-        p_performance_start BETWEEN p_performance_start AND (p_performance_end + p_break_duration / 60) OR
-        (p_performance_end + p_break_duration / 60) BETWEEN p_performance_start AND p_performance_end
-    );
-
-    IF conflicts > 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'There is already a performance asssigned to this stage during this time.';
-    END IF;
-
-    --Check if the Performances are within Event duration
-    IF (p_performance_start < v_event start) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'The Performance start can not be before the event start';
-    END IF;
-
-    IF (p_performance_end + p_break_duration / 60) > v_event_end THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'The performance + break can not exceed the event duration';
-    END IF;
-
-    -- Get the current festival year from the event
-    SELECT festival_year INTO v_current_year
-    FROM event
-    WHERE event_id = p_event_id;
-
-    -- Calculate previous years
-    SET v_previous_year_1 = v_current_year - 1;
-    SET v_previous_year_2 = v_current_year - 2;
-
-   -- Must Find all the Artist associated with this performance
-   -- An artist can not play 3 years in a row ...
-
-   -- Open cursor
-   OPEN artist_cursor;
-
-   -- Loop through artists
-   artist_loop: LOOP
-        FETCH artist_cursor INTO v_artist_id;
-        IF done THEN
-        	 LEAVE artist_loop;
-        END IF;
-
-
-        -- Count how many of the previous two years this artist performed
-        SELECT COUNT(DISTINCT e.festival_year) INTO v_artist_count
-        FROM performance p
-        JOIN event e ON p.event_id = e.event_id
-        JOIN artist_band ab ON p.band_id = ab.band_id  -- Link to artist via artist_band
-        WHERE ab.artist_id = v_artist_id
-        AND e.festival_year IN (v_previous_year_1, v_previous_year_2);
-        
-	-- If artist performed in both previous years, set violation flag
-        IF v_artist_count >= 2 THEN
-            SET v_artist_violation_found = TRUE;
-            LEAVE artist_loop; -- No need to check other artists
-        END IF;
-    END LOOP artist_loop;
     
-    -- Close cursor
-    CLOSE artist_cursor;
-
-     -- If any artist violates the constraint, return false
-    IF v_artist_violation_found THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Artist cannot perform in the festival for 3 consecutive years';
-    END IF;
-
-    -- Check the break duration
-    IF p_break_duration < 300 OR p_break_duration > 1800 THEN
-	SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'The break should be between 300 and 1800 seconds';
-    END IF;
-
-    -- If all checks passed, insert the performance
-    INSERT INTO performance (
-        performance_type_id,
-        performance_start,
-        performance_end,
-        event_id,
-        band_id
-    ) VALUES (
-        p_performance_type_id,
-        p_performance_start,
-        p_performance_end,
-        p_event_id,
-        p_band_id
+    -- Create a temporary table to track processed tickets
+    CREATE TEMPORARY TABLE IF NOT EXISTS processed_tickets (
+        ean_13 BIGINT PRIMARY KEY
     );
-
-    -- Insert the break
-    INSERT INTO break_duration(break_start,break_duration,event_id)
-    VALUES (p_performance_end,p_break_duration,p_event_id);
+    
+    OPEN match_cursor;
+    
+    match_loop: LOOP
+        FETCH match_cursor INTO v_ean, v_buyer_id, v_visitor_id, v_date_issued_id;
+        IF done THEN
+            LEAVE match_loop;
+        END IF;
+        
+        -- Check if this ticket hasn't been processed yet
+        IF NOT EXISTS (SELECT 1 FROM processed_tickets WHERE ean_13 = v_ean) THEN
+            -- Update the ticket with new owner
+            UPDATE ticket 
+            SET visitor_id = v_visitor_id,
+                validated = FALSE -- Keep as unvalidated until actually used
+            WHERE EAN_13 = v_ean;
+            
+            -- Remove from reselling tickets
+            DELETE FROM reselling_tickets WHERE EAN_13 = v_ean;
+            
+            -- Mark as processed
+            INSERT INTO processed_tickets (ean_13) VALUES (v_ean);
+ 		
+	    -- Save to ticket_tranfer log
+	    INSERT INTO ticket_transfer(buyer_id,EAN_13) VALUES (v_buyer_id,v_ean);
+        END IF;
+    END LOOP;
+    
+    CLOSE match_cursor;
+    DROP TEMPORARY TABLE IF EXISTS processed_tickets;
 END//
 
 DELIMITER ;
+
+CREATE TRIGGER desired_by_id
+BEFORE INSERT ON reselling_tickets FOR EACH ROW
+BEGIN
+	CALL check_for_matches();
+END//
+
+
+CREATE TRIGGER desired_ticket_by_event
+BEFORE INSERT ON desired_by_id FOR EACH ROW
+BEGIN
+	CALL check_for_matches();
+END//
+

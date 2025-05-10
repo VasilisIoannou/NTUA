@@ -413,7 +413,10 @@ BEGIN
 
    -- Remove the ticket from the Reselling_ticket
    DELETE FROM reselling_tickets WHERE reselling_ticket_id = p_reselling_ticket_id;
-  
+ 
+   -- Save to ticket_transfer log
+   INSERT INTO ticket_transfer(buyer_id,EAN_13) VALUES (p_buyer_id,v_EAN_13);
+
    SET result_message = 'The ticket was bought successfully!'; 
 END//
 
@@ -431,6 +434,7 @@ BEGIN
 
      INSERT INTO buyer(visitor_id) VALUES (v_visitor_id);
 END//
+
 
 
 DELIMITER ;

@@ -344,12 +344,12 @@ CREATE TABLE reselling_tickets(
 --sto er diagram en eshei PK
 
 
-CREATE TABLE desired_by_id(
+CREATE TABLE ticket_transfers(
     buyer_id int NOT NULL,
-    reselling_ticket_id int,
-    PRIMARY KEY(buyer_id,reselling_ticket_id),
+    EAN_13 ginint NOT NULL,
+    PRIMARY KEY(buyer_id,EAN_13),
     FOREIGN KEY(buyer_id) REFERENCES buyer(buyer_id) ON DELETE CASCADE,
-    FOREIGN KEY(reselling_ticket_id) REFERENCES reselling_tickets(reselling_ticket_id) ON DELETE CASCADE
+    FOREIGN KEY(EAN_13) REFERENCES ticket(ticket) ON DELETE CASCADE
 );
 
 
