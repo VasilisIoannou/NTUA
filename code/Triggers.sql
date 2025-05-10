@@ -448,7 +448,6 @@ BEGIN
 	CALL process_ticket_matches();
 END//
 
-
 CREATE TRIGGER check_matches_desired_ticket_by_event
 AFTER INSERT ON desired_ticket_by_event FOR EACH ROW
 BEGIN
@@ -557,21 +556,6 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Staff member has a scheduling conflict on a different stage at the same time.';
     END IF;
-END//
-
-/* Trigger to call staff assignment procedure */
-CREATE TRIGGER assign_security_staff
-BEFORE INSERT ON ticket
-FOR EACH ROW
-BEGIN
-    CALL assign_security_staff();
-END//
-
-CREATE TRIGGER assign_secondary_staff
-BEFORE INSERT ON ticket
-FOR EACH ROW
-BEGIN
-    CALL assign_secondary_staff();
 END//
 
 /* This trigger assigns security staff to stages based on ticket sales. If */
