@@ -304,7 +304,8 @@ CREATE TABLE ticket(
     FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id),
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE,
-    FOREIGN KEY(payment_method_id) REFERENCES payment_method(payment_method_id)
+    FOREIGN KEY(payment_method_id) REFERENCES payment_method(payment_method_id),
+    UNIQUE KEY(visitor_id, event_id)
 );
 
 CREATE TABLE ticket_price(
