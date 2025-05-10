@@ -1,7 +1,7 @@
 -- Active: 1746819443116@@127.0.0.1@3309@festivaldb
 DELIMITER //
 
-CREATE PROCEDURE insert_reselling_ticket_proc(
+CREATE PROCEDURE insert_reselling_ticket(
    IN p_EAN BIGINT,
    OUT result_message VARCHAR(255)
 )
@@ -23,7 +23,7 @@ BEGIN
   WHERE e.event_id = v_event_id;
 
   -- Check if the stage is sold out 
-  IF v_number_of_tickets < v_stage_capacity THEN
+  IF v_number_of_tickets < FLOOR(v_stage_capacity*0.93) THEN
     SET result_message = 'Cannot resell - tickets still available for purchase';
   ELSE
     INSERT INTO reselling_tickets (EAN_13) VALUES (p_EAN);

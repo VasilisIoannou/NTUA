@@ -294,9 +294,9 @@ CREATE TABLE visitor_contact(
 --prepei na kamoume tin timi tou eisitiriou na terkazei me to type tou
 CREATE TABLE ticket(
     EAN_13 bigint NOT NULL CHECK (EAN_13 > 0),
-    ticket_type_id int,
-    visitor_id int,
-    event_id int,
+    ticket_type_id int NOT NULL,
+    visitor_id int NOT NULL,
+    event_id int NOT NULL,
     ticket_price float NOT NULL CHECK(ticket_price >= 0),
     payment_method_id int NOT NULL,
     validated boolean NOT NULL,
@@ -309,7 +309,7 @@ CREATE TABLE ticket(
 );
 
 CREATE TABLE ticket_price(
-    ticket_price_id int,
+    ticket_price_id int AUTO_INCREMENT,
     ticket_type_id int,
     event_id int,
     ticket_price_price float UNIQUE NOT NULL CHECK(ticket_price_price >= 0), 
