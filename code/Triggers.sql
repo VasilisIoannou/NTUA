@@ -1,5 +1,6 @@
 -- Active: 1746819443116@@127.0.0.1@3309@festivaldb
-/* Trigger to prevent deletion of festivals*/
+
+/* Trigger to prevent deletion of festivals */
 DELIMITER //
 
 CREATE TRIGGER prevent_festival_deletion
@@ -10,7 +11,7 @@ BEGIN
     SET MESSAGE_TEXT = 'Festivals cannot be deleted from the system';
 END//
 
--- Trigger to prevent deletion of events
+/* Trigger to prevent deletion of events */
 CREATE TRIGGER prevent_event_deletion
 BEFORE DELETE ON event
 FOR EACH ROW
@@ -27,19 +28,16 @@ BEGIN
     DECLARE event_of_performance INT;
     DECLARE ticket_count INT;
 
-    -- Get the event_id related to the performance
     SELECT event_id INTO event_of_performance
     FROM performance
     WHERE performance_id = NEW.performance_id;
 
-    -- Check if the visitor has a validated ticket for that event
     SELECT COUNT(*) INTO ticket_count
     FROM ticket
     WHERE visitor_id = NEW.visitor_id
       AND event_id = event_of_performance
       AND validated = TRUE;
 
-    -- If not, raise an error
     IF ticket_count = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Visitor cannot review performance. Ticket not validated.';
@@ -157,54 +155,6 @@ BEGIN
     SET band_members = band_members - 1;
 END//
 
-
-/* Trigger to check staffing requirements after a ticket is sold */
-CREATE TRIGGER check_staffing_requirements
-AFTER INSERT ON ticket
-FOR EACH ROW
-BEGIN
-    DECLARE v_stage_id INT;
-    DECLARE v_total_tickets INT;
-    DECLARE v_security_staff INT;
-    DECLARE v_secondary_staff INT;
-
-    -- Retrieve the stage_id associated with the event
-    SELECT e.stage_id INTO v_stage_id
-    FROM event e
-    WHERE e.event_id = NEW.event_id;
-
-    -- Count total tickets sold for the event
-    SELECT COUNT(*) INTO v_total_tickets
-    FROM ticket
-    WHERE event_id = NEW.event_id;
-
-    -- Count security staff assigned to the stage
-    SELECT COUNT(*) INTO v_security_staff
-    FROM stage_staff ss
-    JOIN staff s ON ss.staff_id = s.staff_id
-    JOIN staff_role sr ON s.staff_role_id = sr.staff_role_id
-    WHERE ss.stage_id = v_stage_id AND sr.staff_role_name = 'Security';
-
-    -- Count secondary staff assigned to the stage
-    SELECT COUNT(*) INTO v_secondary_staff
-    FROM stage_staff ss
-    JOIN staff s ON ss.staff_id = s.staff_id
-    JOIN staff_role sr ON s.staff_role_id = sr.staff_role_id
-    WHERE ss.stage_id = v_stage_id AND sr.staff_role_name = 'Secondary';
-
-    -- Check if security staff is less than 5% of total tickets
-    IF v_security_staff < CEIL(v_total_tickets * 0.05) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Warning: Add more security staff for this stage.';
-    END IF;
-
-    -- Check if secondary staff is less than 2% of total tickets
-    IF v_secondary_staff < CEIL(v_total_tickets * 0.02) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Warning: Add more secondary staff for this stage.';
-    END IF;
-END//
-
 /* Trigger to delete break after performance deletion */
 CREATE TRIGGER delete_break_after_performance
 AFTER DELETE ON performance
@@ -224,18 +174,15 @@ BEGIN
     DECLARE v_festival_year INT;
     DECLARE v_band_formation_year INT;
 
-    -- Get the festival year of the event this performance belongs to
     SELECT festival_year INTO v_festival_year
     FROM event
     WHERE event_id = NEW.event_id;
 
-    -- Get the band's year of formation
     SELECT bdf.band_year_of_formation INTO v_band_formation_year
     FROM band b
     JOIN band_date_of_formation bdf ON b.band_date_of_formation_id = bdf.band_date_of_formation_id
     WHERE b.band_id = NEW.band_id;
 
-    -- Compare formation year with festival year
     IF v_band_formation_year > v_festival_year THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Band cannot perform before its formation year.';
@@ -321,35 +268,7 @@ BEGIN
     SET NEW.staff_role_id = 1;
 END//
 
-/* Trigger to prevent staff overlaping */
-DELIMITER //
-
-CREATE TRIGGER prevent_staff_stage_overlap
-BEFORE INSERT ON stage_staff
-FOR EACH ROW
-BEGIN
-    DECLARE conflict_count INT;
-
-    SELECT COUNT(*) INTO conflict_count
-    FROM stage_staff ss
-    JOIN event e1 ON e1.stage_id = ss.stage_id
-    JOIN event e2 ON e2.stage_id = NEW.stage_id
-    WHERE ss.staff_id = NEW.staff_id
-      AND e1.festival_year = e2.festival_year
-      AND e1.festival_day = e2.festival_day
-      AND (
-           (e2.event_start BETWEEN e1.event_start AND e1.event_end) OR
-           (e2.event_end BETWEEN e1.event_start AND e1.event_end) OR
-           (e2.event_start <= e1.event_start AND e2.event_end >= e1.event_end)
-          );
-
-    IF conflict_count > 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Staff member has a scheduling conflict on a different stage at the same time.';
-    END IF;
-END//
-
-/* This trigger assigns security staff to stages based on ticket sales. If */
+/* Trigger to assign security staff to stages based on ticket sales. */
 CREATE TRIGGER assign_security_if_needed
 BEFORE INSERT ON ticket
 FOR EACH ROW
@@ -358,51 +277,49 @@ BEGIN
     DECLARE security_count INT;
     DECLARE stage_id_val INT;
     DECLARE staff_to_assign INT;
-    DECLARE available_staff_count INT;
 
-    -- Get stage_id from the event
     SELECT e.stage_id INTO stage_id_val
     FROM event e WHERE e.event_id = NEW.event_id;
 
-    -- Count existing tickets for this stage
     SELECT COUNT(*) INTO ticket_count
     FROM ticket t
     JOIN event e ON e.event_id = t.event_id
     WHERE e.stage_id = stage_id_val;
 
-    -- Count current security staff on the stage
     SELECT COUNT(*) INTO security_count
     FROM stage_staff ss
     JOIN staff s ON s.staff_id = ss.staff_id
     WHERE ss.stage_id = stage_id_val AND s.staff_role_id = 2;
 
-    -- Count available security staff not assigned to the stage
-    SELECT COUNT(*) INTO available_staff_count
-    FROM staff s
-    WHERE s.staff_role_id = 2
-      AND s.staff_id NOT IN (
-          SELECT staff_id FROM stage_staff WHERE stage_id = stage_id_val
-      );
-
-    -- Check if more security is needed
     IF ticket_count + 1 > security_count * 20 THEN
-        -- Find one available security staff not yet on this stage
+
         SELECT s.staff_id INTO staff_to_assign
         FROM staff s
         WHERE s.staff_role_id = 2
+          AND s.staff_id NOT IN (
+              SELECT ss.staff_id
+              FROM stage_staff ss
+              JOIN event e1 ON ss.stage_id = e1.stage_id
+              JOIN event e2 ON e2.event_id = NEW.event_id
+              WHERE e1.festival_year = e2.festival_year
+                AND e1.festival_day = e2.festival_day
+                AND (
+                    (e2.event_start BETWEEN e1.event_start AND e1.event_end) OR
+                    (e2.event_end BETWEEN e1.event_start AND e1.event_end) OR
+                    (e2.event_start <= e1.event_start AND e2.event_end >= e1.event_end)
+                )
+          )
           AND s.staff_id NOT IN (
               SELECT staff_id FROM stage_staff WHERE stage_id = stage_id_val
           )
         LIMIT 1;
 
-        -- If we found one, assign them
         IF staff_to_assign IS NOT NULL THEN
             INSERT INTO stage_staff(stage_id, staff_id)
             VALUES (stage_id_val, staff_to_assign);
         ELSE
-            -- If no staff available, issue a warning
             SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Cannot add ticket: This stage needs more security staff. Not enough security staff available to assign to the stage.';
+            SET MESSAGE_TEXT = 'Cannot add ticket: No available security staff without schedule conflict.';
         END IF;
     END IF;
 END;
@@ -417,55 +334,147 @@ BEGIN
     DECLARE secondary_count INT;
     DECLARE stage_id_val INT;
     DECLARE staff_to_assign INT;
-    DECLARE available_staff_count INT;
 
-    -- Get stage_id from the event
     SELECT e.stage_id INTO stage_id_val
     FROM event e WHERE e.event_id = NEW.event_id;
 
-    -- Count existing tickets for this stage
     SELECT COUNT(*) INTO ticket_count
     FROM ticket t
     JOIN event e ON e.event_id = t.event_id
     WHERE e.stage_id = stage_id_val;
 
-    -- Count current secondary staff on the stage
     SELECT COUNT(*) INTO secondary_count
     FROM stage_staff ss
     JOIN staff s ON s.staff_id = ss.staff_id
-    WHERE ss.stage_id = stage_id_val AND s.staff_role_id = 3;  -- Role ID for Secondary staff
+    WHERE ss.stage_id = stage_id_val AND s.staff_role_id = 3;
 
-    -- Count available secondary staff not assigned to the stage
-    SELECT COUNT(*) INTO available_staff_count
-    FROM staff s
-    WHERE s.staff_role_id = 3  -- Secondary staff role ID
-      AND s.staff_id NOT IN (
-          SELECT staff_id FROM stage_staff WHERE stage_id = stage_id_val
-      );
+    IF ticket_count + 1 > secondary_count * 50 THEN
 
-    -- Check if more secondary staff is needed (2% of tickets sold)
-    IF ticket_count + 1 > secondary_count * 50 THEN  -- 2% corresponds to 1 staff per 50 tickets
-        -- Find one available secondary staff not yet on this stage
         SELECT s.staff_id INTO staff_to_assign
         FROM staff s
-        WHERE s.staff_role_id = 3  -- Secondary staff role ID
+        WHERE s.staff_role_id = 3
+          AND s.staff_id NOT IN (
+              SELECT ss.staff_id
+              FROM stage_staff ss
+              JOIN event e1 ON ss.stage_id = e1.stage_id
+              JOIN event e2 ON e2.event_id = NEW.event_id
+              WHERE e1.festival_year = e2.festival_year
+                AND e1.festival_day = e2.festival_day
+                AND (
+                    (e2.event_start BETWEEN e1.event_start AND e1.event_end) OR
+                    (e2.event_end BETWEEN e1.event_start AND e1.event_end) OR
+                    (e2.event_start <= e1.event_start AND e2.event_end >= e1.event_end)
+                )
+          )
           AND s.staff_id NOT IN (
               SELECT staff_id FROM stage_staff WHERE stage_id = stage_id_val
           )
         LIMIT 1;
 
-        -- If we found one, assign them
         IF staff_to_assign IS NOT NULL THEN
             INSERT INTO stage_staff(stage_id, staff_id)
             VALUES (stage_id_val, staff_to_assign);
         ELSE
-            -- If no staff available, issue a warning
             SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Cannot add ticket: This stage needs more secondary staff. Not enough secondary staff available to assign to the stage.';
+            SET MESSAGE_TEXT = 'Cannot add ticket: No available secondary staff without schedule conflict.';
         END IF;
     END IF;
 END;
 //
 
+/* Trigger to assign technician to stage when a stage is added */
+CREATE TRIGGER assign_technicians_on_stage_insert
+AFTER INSERT ON stage
+FOR EACH ROW
+BEGIN
+    DECLARE tech_id INT;
+    DECLARE assigned_count INT DEFAULT 0;
+    DECLARE done INT DEFAULT 0;
+
+    technician_loop: LOOP
+        IF assigned_count >= 2 THEN
+            LEAVE technician_loop;
+        END IF;
+
+        SELECT s.staff_id INTO tech_id
+        FROM staff s
+        WHERE s.staff_role_id = 1
+          AND s.staff_id NOT IN (
+              SELECT ss.staff_id
+              FROM stage_staff ss
+              JOIN event e1 ON ss.stage_id = e1.stage_id
+              JOIN event e2 ON e2.stage_id = NEW.stage_id
+              WHERE e1.festival_year = e2.festival_year
+                AND e1.festival_day = e2.festival_day
+                AND (
+                    (e2.event_start BETWEEN e1.event_start AND e1.event_end) OR
+                    (e2.event_end BETWEEN e1.event_start AND e1.event_end) OR
+                    (e2.event_start <= e1.event_start AND e2.event_end >= e1.event_end)
+                )
+          )
+          AND s.staff_id NOT IN (
+              SELECT staff_id FROM stage_staff WHERE stage_id = NEW.stage_id
+          )
+        LIMIT 1;
+
+        IF tech_id IS NULL THEN
+            LEAVE technician_loop;
+        END IF;
+
+        INSERT INTO stage_staff(stage_id, staff_id)
+        VALUES (NEW.stage_id, tech_id);
+
+        SET assigned_count = assigned_count + 1;
+    END LOOP;
+
+    IF assigned_count < 2 THEN
+        SIGNAL SQLSTATE '01000'
+        SET MESSAGE_TEXT = CONCAT('Only ', assigned_count, ' technician(s) assigned to stage ', NEW.stage_id, '.');
+    END IF;
+END;
+//
+
+/* Trigger to assign a technician to a stage when they are added to the staff table */
+CREATE TRIGGER assign_stage_on_technician_insert
+AFTER INSERT ON staff
+FOR EACH ROW
+BEGIN
+    DECLARE stage_to_fill INT;
+
+    IF NEW.staff_role_id = 1 THEN
+
+        SELECT s.stage_id INTO stage_to_fill
+        FROM stage s
+        LEFT JOIN (
+            SELECT ss.stage_id, COUNT(*) AS tech_count
+            FROM stage_staff ss
+            JOIN staff st ON ss.staff_id = st.staff_id
+            WHERE st.staff_role_id = 1
+            GROUP BY ss.stage_id
+        ) AS tech_counts ON s.stage_id = tech_counts.stage_id
+        WHERE IFNULL(tech_counts.tech_count, 0) < 2
+          AND NOT EXISTS (
+              SELECT 1
+              FROM stage_staff ss
+              JOIN event e1 ON ss.stage_id = e1.stage_id
+              JOIN event e2 ON e2.stage_id = s.stage_id
+              WHERE ss.staff_id = NEW.staff_id
+                AND e1.festival_year = e2.festival_year
+                AND e1.festival_day = e2.festival_day
+                AND (
+                    (e2.event_start BETWEEN e1.event_start AND e1.event_end) OR
+                    (e2.event_end BETWEEN e1.event_start AND e1.event_end) OR
+                    (e2.event_start <= e1.event_start AND e2.event_end >= e1.event_end)
+                )
+          )
+        LIMIT 1;
+
+        IF stage_to_fill IS NOT NULL THEN
+            INSERT INTO stage_staff(stage_id, staff_id)
+            VALUES (stage_to_fill, NEW.staff_id);
+        END IF;
+    END IF;
+END;
+//
 DELIMITER ;
 
