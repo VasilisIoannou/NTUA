@@ -1,6 +1,6 @@
 # **International Music Festival of Pulse University Database**
 
-A comprehensive database system for managing Pulse University's annual international music festival.
+This project manages all data for Pulse University's annual music festival, including artist lineups, stage schedules, ticket sales, equipment logistics, and performance ratings. The database is designed to streamline every aspect of festival operations - from tracking which bands need drum kits to coordinating staff assignments across multiple venues.
 
 ## **Table of Contents**
 - Features
@@ -9,6 +9,7 @@ A comprehensive database system for managing Pulse University's annual internati
 - Usage
 - Contributing
 - License
+
 ## **Directory Features**
  - Database Managememnt:
         MariaDB-powered: Scalable and robust storage for contest data.
@@ -30,12 +31,13 @@ A comprehensive database system for managing Pulse University's annual internati
 ## **Database Scema**
 ### Entity Related Diagram
 
- (Add ER Diagram Here)
+![ERD](./diagrams/ER_Diagram.png)
 
 ### Relational Schema
 
- (Add Relational Diagram Here)
- (Add a link to PNG directory)
+![RelD](./diagrams/relational_diagram.png)
+
+*link to the diagram folder: https://github.com/VasilisIoannou/DatabaseNTUA/tree/main/diagrams*
 
 ## **Installation**  
 Steps to install the project:  
@@ -59,7 +61,6 @@ Steps to install the project:
     
     INSERT INTO festival (festival_year, festival_month, festival_day, duration, location_id) VALUES (2030, 10, 20, 5, 10);
 
-        
     The above will create an instance of the festival starting 20/10/2030 (DD/MM/YYYY) until 25/10/2030
     Note: For the Instance of the Festival to be created the instance of location/coordinates must already exist
 
@@ -67,4 +68,4 @@ Steps to install the project:
 Participants: 
         Vasilis Ioannou, 
         Dimitris Markidis,
-        Theodoros Tsakalos,
+        Theodoros Tsakalos
