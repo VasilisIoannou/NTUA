@@ -52,10 +52,12 @@ Steps to install the project:
 
 ## Usage Examples
 
-Query Artist By Age:
-    SELECT * FROM artist WHERE artist_age < 35
+###Query Artist By Age:
+    
+    SELECT * FROM artist WHERE artist_age < 35;
 
-Add a New festival
+###Add a New festival
+    
     INSERT INTO festival (festival_year, festival_month, festival_day, duration, location_id) VALUES (2030, 10, 20, 5, 10);
 
     The above will create an instance of the festival starting 20/10/2030 (DD/MM/YYYY) until 25/10/2030
