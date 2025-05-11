@@ -37,7 +37,7 @@ CREATE TABLE festival_location(
 
 CREATE TABLE festival(
     festival_year int NOT NULL CHECK (festival_year > 0),
-    festival_month int NOT NULL CHECK (festival_month > 0 && festival_month < 13),
+    festival_month int NOT NULL CHECK (festival_month > 0 AND festival_month < 13),
     festival_day int NOT NULL CHECK (festival_day > 0), -- A Trigger will check the festival_day < N
     duration int NOT NULL CHECK (duration > 0),  -- Duration of the festival in days
     location_id int NOT NULL UNIQUE,

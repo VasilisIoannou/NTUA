@@ -476,5 +476,76 @@ BEGIN
     END IF;
 END;
 //
+
+/* Trigger to check correct festival day and month */
+CREATE TRIGGER check_festival_day
+BEFORE INSERT ON festival
+FOR EACH ROW
+BEGIN
+    IF NEW.festival_month IN (1, 3, 5, 7, 8, 10, 12) THEN
+        IF NEW.festival_day > 31 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'The month has only 31 days';
+        END IF;
+    ELSEIF NEW.festival_month IN (4, 6, 9, 11) THEN
+        IF NEW.festival_day > 30 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'The month has only 30 days';
+        END IF;
+    ELSEIF NEW.festival_month = 2 THEN
+        IF NEW.festival_day > 28 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'February has only 28 days';
+        END IF;
+    END IF;
+END;
+//
+
+
+/* Trigger to check correct date_issued day and month */
+CREATE TRIGGER check_date_issued 
+BEFORE INSERT ON date_issued
+FOR EACH ROW
+BEGIN
+    IF NEW.month_issued IN (1, 3, 5, 7, 8, 10, 12) THEN
+        IF NEW.day_issued > 31 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'The month has only 31 days';
+        END IF;
+    ELSEIF NEW.month_issued IN (4, 6, 9, 11) THEN
+        IF NEW.day_issued > 30 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'The month has only 30 days';
+        END IF;
+    ELSEIF NEW.month_issued = 2 THEN
+        IF NEW.day_issued > 28 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'February has only 28 days';
+        END IF;
+    END IF;
+END;
+//
+
+CREATE TRIGGER remove_validated_tickets
+AFTER UPDATE ON ticket
+FOR EACH ROW
+BEGIN
+    DECLARE v_reselling_ticket_id INT;
+
+    IF NEW.validated = TRUE THEN
+        -- Check if the ticket is in the reselling list
+        SELECT reselling_ticket_id INTO v_reselling_ticket_id
+        FROM reselling_tickets
+        WHERE EAN_13 = NEW.EAN_13
+        LIMIT 1;
+
+        IF v_reselling_ticket_id IS NOT NULL THEN
+            DELETE FROM reselling_tickets 
+            WHERE reselling_ticket_id = v_reselling_ticket_id;
+        END IF;
+    END IF;
+END;
+//
+
 DELIMITER ;
 
