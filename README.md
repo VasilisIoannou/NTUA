@@ -1,9 +1,14 @@
 # International Music Festival of Pulse University Database
 
-## Description  
-A brief description of your project, what problem it solves, and its main features.
 
-## Table of Contents  
+
+## Table of Contents 
+    - Features
+    - Database Schema
+    - Installation
+    - Usage
+    - Contributing
+    - License
 
 ## Directory Features
  - Database Managememnt:
@@ -22,10 +27,6 @@ A brief description of your project, what problem it solves, and its main featur
         Reselling ticket application: Automate the reselling of tickets for the event
 
  (Write something about the project)
-
-## Database Features
-
- (Write here a list of things the Database stores )
 
 ## Database Scema
 ### Entity Related Diagram
@@ -49,8 +50,19 @@ Steps to install the project:
 3. Generate dummy data:
     mysql -u root -p festivalDB < InsertsTsakalos.sql
 
+## Usage Examples
+
+Query Artist By Age:
+    SELECT * FROM artist WHERE artist_age < 35
+
+Add a New festival
+    INSERT INTO festival (festival_year, festival_month, festival_day, duration, location_id) VALUES (2030, 10, 20, 5, 10);
+
+    The above will create an instance of the festival starting 20/10/2030 (DD/MM/YYYY) until 25/10/2030
+    Note: For the Instance of the Festival to be created the instance of location/coordinates must already exist
+
 ## Acknowledgements 
-    Participants: 
+Participants: 
         Vasilis Ioannou 
         Dimitris Markidis
         Theodoros Tsakalos
