@@ -188,6 +188,12 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = result_message;
     END IF;
 
+    -- Senior must be >= 65 years
+    IF p_ticket_type_name = 'Senior' AND p_visitor_age < 65 THEN
+	ROLLBACK;
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Seniors must be 65 years old or older';
+    END IF;
+
     -- Insert visitor data
     INSERT INTO visitor (visitor_name, visitor_surname, visitor_age)
     VALUES (p_visitor_name, p_visitor_surname, p_visitor_age);
@@ -470,7 +476,9 @@ END//
 CREATE PROCEDURE insert_buyer_visitor(
      p_name VARCHAR(255),
      p_surname VARCHAR(255),
-     p_age INT
+     p_age INT,
+     p_visitor_email VARCHAR(255),
+     p_visitor_phone VARCHAR(255)
 )
 BEGIN
      DECLARE v_visitor_id INT;
@@ -480,6 +488,7 @@ BEGIN
      SET v_visitor_id = LAST_INSERT_ID();
 
      INSERT INTO buyer(visitor_id) VALUES (v_visitor_id);
+     INSERT INTO visitor_contact(visitor_id,visitor_email,visitor_phone) VALUES (v_visitor_id,p_visitor_email,p_visitor_phone);`
 END//
 
 
