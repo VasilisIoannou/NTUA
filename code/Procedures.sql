@@ -62,6 +62,8 @@ BEGIN
 
     DECLARE v_pass_checks BOOLEAN DEFAULT TRUE;
 
+    DECLARE v_visitor_age INT;
+
     -- Variables for EAN-13 check
     DECLARE ean13_str CHAR(13);
     DECLARE ean12_str CHAR(12);
@@ -183,6 +185,12 @@ BEGIN
     END IF;
 
     -- Senior must be >= 65 years
+
+    -- Find the visitors age
+    SELECT visitor_age INTO v_visitor_age
+    FROM visitor
+    WHERE visitor_id = p_visitor_id
+
     IF p_ticket_type_name = 'Senior' AND p_visitor_age < 65 THEN
 	ROLLBACK;
 	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Seniors must be 65 years old or older';
