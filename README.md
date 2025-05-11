@@ -48,18 +48,18 @@ Steps to install the project:
 </div>
 <br>
 2. Set up MariaDB:
-
+<br>
 <div>
     mysql -u root -p < Database.sql
 </div>
 <br>
 3. Generate dummy data:
-
+<br>
 <div>     
     mysql -u root -p festivalDB < InsertsTsakalos.sql
 </div>
 
-## **Usage Examples**
+## Usage Examples:
 
 - Query Artist By Age:
     
@@ -68,15 +68,16 @@ Steps to install the project:
 - Add a New festival:
 <div>    
     INSERT INTO festival (festival_year, festival_month, festival_day, duration, location_id) 
-           VALUES (2030, 10, 20, 5, 10);
+    <p> VALUES (2030, 10, 20, 5, 10); </p>
 </div>
 <br>
 <div>
     The above will create an instance of the festival starting 20/10/2030 (DD/MM/YYYY) until 25/10/2030
     Note: For the Instance of the Festival to be created the instance of location/coordinates must already exist
 </div>
+
 ## **Acknowledgements** 
 Participants: 
-        Vasilis Ioannou, 
-        Dimitris Markidis,
-        Theodoros Tsakalos
+<p> Vasilis Ioannou </p> 
+<p> Dimitris Markidis </p>
+<p> Theodoros Tsakalos </p>
