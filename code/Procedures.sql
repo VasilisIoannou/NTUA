@@ -40,6 +40,161 @@ BEGIN
   END IF;
 END //
 
+/* Procedure to add Ticket to existing visitor */
+CREATE PROCEDURE insert_ticket_with_existing_visitor( 
+    IN p_EAN_13 BIGINT,
+    IN p_ticket_type_name VARCHAR(255),
+    IN p_event_id INT,
+    IN p_payment_method_id INT,
+    IN p_visior_id INT,
+    OUT result_message VARCHAR(255)
+)
+BEGIN
+    DECLARE v_visitor_id INT;
+    DECLARE v_ticket_type_id INT;
+    DECLARE v_ticket_price FLOAT;
+    DECLARE v_price_exists INT;
+    DECLARE v_stage_capacity INT;	
+    DECLARE v_sold_count INT; 
+    DECLARE v_max_stage_capacity INT;
+    DECLARE v_max_vip_tickets INT;
+    DECLARE v_vip_tickets_sold INT;
+
+    DECLARE v_pass_checks BOOLEAN DEFAULT TRUE;
+
+    -- Variables for EAN-13 check
+    DECLARE ean13_str CHAR(13);
+    DECLARE ean12_str CHAR(12);
+    DECLARE i INT DEFAULT 1;
+    DECLARE sum_odd INT DEFAULT 0;
+    DECLARE sum_even INT DEFAULT 0;
+    DECLARE digit INT;
+    DECLARE calculated_check_digit INT;
+    DECLARE provided_check_digit INT;
+
+    -- Validate ticket type
+    SELECT ticket_type_id INTO v_ticket_type_id 
+    FROM ticket_type 
+    WHERE ticket_type_name = p_ticket_type_name;
+    
+    IF v_ticket_type_id IS NULL THEN
+        SET result_message = 'Invalid ticket type specified';
+    	SET v_pass_checks = FALSE;
+    END IF;
+    
+    -- Validate ticket price exists
+    SELECT COUNT(*), ticket_price_price INTO v_price_exists, v_ticket_price
+    FROM ticket_price
+    WHERE ticket_type_id = v_ticket_type_id AND event_id = p_event_id;
+    
+    IF v_price_exists = 0 THEN
+        SET result_message = 'No price defined for this ticket type at the specified event';
+    	SET v_pass_checks = FALSE;
+    END IF;
+
+    -- EAN-13 Validation check
+    -- Convert input to string and ensure it has exactly 13 digits
+    SET ean13_str = LPAD(p_EAN_13, 13, '0');
+    IF CHAR_LENGTH(ean13_str) != 13 THEN
+        SET result_message = 'EAN-13 code must be exactly 13 digits long.';
+    	SET v_pass_checks = FALSE;
+    END IF;
+
+    -- Extract the first 12 digits
+    SET ean12_str = LEFT(ean13_str, 12);
+
+    -- Calculate the sum of digits in odd and even positions
+    WHILE i <= 12 DO
+        SET digit = CAST(SUBSTRING(ean12_str, i, 1) AS UNSIGNED);
+        IF MOD(i, 2) = 1 THEN
+            SET sum_odd = sum_odd + digit;
+        ELSE
+            SET sum_even = sum_even + digit;
+        END IF;
+        SET i = i + 1;
+    END WHILE;
+
+    -- Calculate the check digit
+    SET calculated_check_digit = (10 - ((sum_odd + sum_even * 3) MOD 10)) MOD 10;
+
+    -- Extract the provided check digit
+    SET provided_check_digit = CAST(RIGHT(ean13_str, 1) AS UNSIGNED);
+
+    -- Compare the calculated check digit with the provided one
+    IF calculated_check_digit != provided_check_digit THEN
+            SET result_message = 'Invalid EAN-13 check digit.';
+    	    SET v_pass_checks = FALSE;
+    END IF;
+
+    -- VIP capacity check (only if ticket type is VIP)
+    IF p_ticket_type_name = 'VIP' THEN
+        -- Get stage capacity for this event
+        SELECT s.stage_capacity INTO v_stage_capacity
+        FROM event e
+        JOIN stage s ON e.stage_id = s.stage_id
+        WHERE e.event_id = p_event_id;
+        
+        -- Calculate 10% of capacity
+        SET v_max_vip_tickets = FLOOR(v_stage_capacity * 0.1 * 0.93);
+        
+        -- Count existing VIP tickets for this event
+        SELECT COUNT(*) INTO v_vip_tickets_sold
+        FROM ticket t
+        JOIN ticket_type tt ON t.ticket_type_id = tt.ticket_type_id
+        WHERE t.event_id = p_event_id
+        AND tt.ticket_type_name = 'VIP';
+        
+        -- Check if adding one more would exceed limit
+        IF v_vip_tickets_sold >= v_max_vip_tickets THEN
+            SET result_message = CONCAT('Vip Tickets reach max capacity, current tickets: ', v_vip_tickets_sold, ' - max vip tickets: ', v_max_vip_tickets);
+	        SET v_pass_checks = FALSE;        
+	    END IF;
+    END IF;
+
+    -- A) Look up the stage's capacity for this event:
+    SELECT stage_capacity
+    INTO v_stage_capacity
+    FROM event e
+    JOIN stage s 
+    ON e.stage_id = s.stage_id
+    WHERE e.event_id = p_event_id;
+
+    -- B) Count existing tickets for that same stage:
+    SELECT COUNT(*) 
+    INTO v_sold_count
+    FROM ticket t
+    JOIN event ev 
+    ON t.event_id = ev.event_id
+    WHERE ev.stage_id = (
+        SELECT stage_id 
+        FROM event 
+        WHERE event_id = p_event_id
+    );
+
+    -- C) If this new ticket would exceed capacity, abort the insert:
+    IF (v_sold_count + 1) > FLOOR(v_stage_capacity * 0.93) THEN
+        SET result_message = CONCAT('Tickets sold out, v_sold_count: ', v_sold_count, ' - v_stage_capacity: ', v_stage_capacity);
+  	    SET v_pass_checks = FALSE;
+    END IF;
+
+    IF NOT v_pass_checks THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = result_message;
+    END IF;
+
+    -- Senior must be >= 65 years
+    IF p_ticket_type_name = 'Senior' AND p_visitor_age < 65 THEN
+	ROLLBACK;
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Seniors must be 65 years old or older';
+    END IF;
+
+    -- Insert ticket data
+    INSERT INTO ticket (EAN_13, ticket_type_id, visitor_id, event_id, ticket_price, payment_method_id, validated)
+    VALUES (p_EAN_13, v_ticket_type_id, p_visitor_id, p_event_id, v_ticket_price, p_payment_method_id, FALSE);
+END //
+
+
+
 CREATE PROCEDURE insert_visitor_with_ticket(
     IN p_visitor_name VARCHAR(255),
     IN p_visitor_surname VARCHAR(255),
