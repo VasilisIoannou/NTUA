@@ -311,7 +311,7 @@ CREATE TABLE ticket_price(
     ticket_price_id int AUTO_INCREMENT,
     ticket_type_id int,
     event_id int,
-    ticket_price_price float UNIQUE NOT NULL CHECK(ticket_price_price >= 0), 
+    ticket_price_price float NOT NULL CHECK(ticket_price_price >= 0), 
     PRIMARY KEY(ticket_price_id),
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
     FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id) ON DELETE CASCADE
