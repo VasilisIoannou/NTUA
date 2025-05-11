@@ -50,6 +50,7 @@ Steps to install the project:
 <br>
 2. Set up MariaDB:
 <br>
+
 ```
     mysql -u root -p < Database.sql
 
@@ -57,6 +58,7 @@ Steps to install the project:
 <br>
 3. Generate dummy data:
 <br>
+
 ```
     mysql -u root -p festivalDB < InsertsTsakalos.sql
 
@@ -87,3 +89,4 @@ Participants:
 <div> Vasilis Ioannou </div> 
 <div> Dimitris Markidis </div>
 <div> Theodoros Tsakalos </div>
+
