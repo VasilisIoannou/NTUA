@@ -78,6 +78,6 @@ Steps to install the project:
 
 ## **Acknowledgements** 
 Participants: 
-<p> Vasilis Ioannou </p> 
-<p> Dimitris Markidis </p>
-<p> Theodoros Tsakalos </p>
+<div> Vasilis Ioannou </div> 
+<div> Dimitris Markidis </div>
+<div> Theodoros Tsakalos </div>
