@@ -102,8 +102,22 @@ ORDER BY
 
 --4--
 
-
-
+/* View to find the average of reviews per band */
+CREATE OR REPLACE VIEW avg_of_reviews_per_band AS
+SELECT DISTINCT
+    b.band_name,
+    AVG(ls.performance_score)AS avg_performance_score,
+    AVG(ls.stage_presence_score) AS avg_stage_presence_score
+FROM
+    likert_scale ls
+JOIN reviews r ON ls.reviews_id = r.reviews_id
+JOIN performance p ON r.performance_id = p.performance_id
+JOIN band b ON b.band_id = p.band_id
+GROUP BY 
+    b.band_name
+ORDER BY
+    avg_performance_score DESC,
+    avg_stage_presence_score DESC;
 
 
 --5--
@@ -129,7 +143,26 @@ ORDER BY
 
 
 --6--
-
+/* View to find the average review score per visitor for each event */
+CREATE OR REPLACE VIEW avg_review_score_visitor_per_event AS
+SELECT
+    r.visitor_id,
+    e.event_id,
+    ROUND(AVG(
+        ls.performance_score +
+        ls.sound_light_quality_score +
+        ls.stage_presence_score +
+        ls.organization_score +
+        ls.total_impression_score
+    ), 2) AS avg_review_score
+FROM
+    reviews r
+JOIN likert_scale ls ON r.reviews_id = ls.reviews_id
+JOIN performance p ON r.performance_id = p.performance_id
+JOIN event e ON p.event_id = e.event_id
+GROUP BY
+    r.visitor_id,
+    e.event_id;
 
 
 --7--
@@ -203,7 +236,43 @@ WHERE
 
 
 --9--
-
+/* View to find all visitors who have attended the same number of events in a festival year */
+CREATE OR REPLACE VIEW visitors_same_event_attendance_per_year AS
+WITH attendance_counts AS (
+    SELECT
+        v.visitor_id,
+        v.visitor_name,
+        v.visitor_surname,
+        f.festival_year,
+        COUNT(DISTINCT t.event_id) AS events_attended
+    FROM ticket t
+    JOIN visitor v ON t.visitor_id = v.visitor_id
+    JOIN event e ON t.event_id = e.event_id
+    JOIN festival f ON e.festival_year = f.festival_year
+    WHERE t.validated = TRUE
+    GROUP BY v.visitor_id, v.visitor_name, v.visitor_surname, f.festival_year
+    HAVING COUNT(DISTINCT t.event_id) > 3
+),
+grouped_attendance AS (
+    SELECT 
+        festival_year,
+        events_attended,
+        COUNT(*) AS num_visitors
+    FROM attendance_counts
+    GROUP BY festival_year, events_attended
+    HAVING COUNT(*) > 1
+)
+SELECT 
+    ac.visitor_id,
+    ac.visitor_name,
+    ac.visitor_surname,
+    ac.festival_year,
+    ac.events_attended
+FROM attendance_counts ac
+JOIN grouped_attendance ga
+  ON ac.festival_year = ga.festival_year
+ AND ac.events_attended = ga.events_attended
+ORDER BY ac.festival_year, ac.events_attended, ac.visitor_surname, ac.visitor_name;
 
 
 --10--
