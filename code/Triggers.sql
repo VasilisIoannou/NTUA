@@ -396,6 +396,7 @@ BEGIN
             LEAVE technician_loop;
         END IF;
 
+        -- Select available technician who isn't assigned to the same stage
         SELECT s.staff_id INTO tech_id
         FROM staff s
         WHERE s.staff_role_id = 1
@@ -429,10 +430,9 @@ BEGIN
 
     IF assigned_count < 2 THEN
         SIGNAL SQLSTATE '01000'
-        SET MESSAGE_TEXT = CONCAT('Only ', assigned_count, ' technician(s) assigned to stage ', NEW.stage_id, '.');
+        SET MESSAGE_TEXT = 'More technicians need to be assigned to stage.';
     END IF;
-END;
-//
+END//
 
 /* Trigger to assign a technician to a stage when they are added to the staff table */
 CREATE TRIGGER assign_stage_on_technician_insert

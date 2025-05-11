@@ -488,7 +488,7 @@ BEGIN
      SET v_visitor_id = LAST_INSERT_ID();
 
      INSERT INTO buyer(visitor_id) VALUES (v_visitor_id);
-     INSERT INTO visitor_contact(visitor_id,visitor_email,visitor_phone) VALUES (v_visitor_id,p_visitor_email,p_visitor_phone);`
+     INSERT INTO visitor_contact(visitor_id,visitor_email,visitor_phone) VALUES (v_visitor_id,p_visitor_email,p_visitor_phone);
 END//
 
 
