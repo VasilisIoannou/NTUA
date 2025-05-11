@@ -81,7 +81,7 @@ ORDER BY
 CREATE OR REPLACE VIEW more_than_two_warm_up AS
 SELECT DISTINCT
     f.festival_year,
-    a.artist_name
+    a.artist_stage_name
 FROM
     artist a
 JOIN artist_band ab ON a.artist_id = ab.artist_id
@@ -90,12 +90,12 @@ JOIN performance p ON p.band_id = b.band_id
 JOIN event e ON e.event_id = p.event_id
 JOIN festival f ON f.festival_year = e.festival_year
 WHERE
-    p.performance_type_id = 1
+    p.performance_type_id = 2
 GROUP BY 
     f.festival_year, 
-    a.artist_name
+    a.artist_stage_name
 HAVING 
-    COUNT(p.performance_id) > 2
+    COUNT(p.performance_id) > 1
 ORDER BY
     f.festival_year,
     b.band_name;
@@ -118,7 +118,6 @@ GROUP BY
 ORDER BY
     avg_performance_score DESC,
     avg_stage_presence_score DESC;
-
 
 --5--
 

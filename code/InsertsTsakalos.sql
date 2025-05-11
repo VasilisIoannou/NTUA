@@ -635,8 +635,8 @@ CALL insert_performance_break(1, 300, 400, 1, 1, 600);   -- Radiohead (Band 1)
 CALL insert_performance_break(2, 410, 500, 1, 2, 600);   -- Rammstein (Band 2)
 CALL insert_performance_break(3, 510, 550, 1, 3, 600);   -- Coldplay (Band 3)
 
-CALL insert_performance_break(4, 650, 740, 2, 4, 900);   -- ABBA (Band 4)
-CALL insert_performance_break(2, 770, 795, 2, 5, 300);   -- Måneskin (Band 5)
+CALL insert_performance_break(2, 650, 740, 2, 4, 900);   -- ABBA (Band 4)
+CALL insert_performance_break(4, 770, 795, 2, 5, 300);   -- Måneskin (Band 5)
 
 CALL insert_performance_break(2, 900, 950, 3, 6, 1200);  -- The Killers (Band 6)
 CALL insert_performance_break(3, 970, 990, 3, 7, 600);  -- Arcade Fire (Band 7)
@@ -655,8 +655,8 @@ CALL insert_performance_break(3, 750, 840, 7, 14, 400); -- The xx (Band 14)
 CALL insert_performance_break(1, 900, 960, 8, 15, 600);  -- Phoenix (Band 15)
 CALL insert_performance_break(2, 970, 980, 8, 16, 900); -- Editors (Band 16)
 
-CALL insert_performance_break(4, 300, 420, 9, 17, 600);  -- Within Temptation (Band 17)
-CALL insert_performance_break(3, 450, 490, 9, 18, 330);  -- Nightwish (Band 18)
+CALL insert_performance_break(3, 300, 420, 9, 17, 600);  -- Within Temptation (Band 17)
+CALL insert_performance_break(4, 450, 490, 9, 18, 330);  -- Nightwish (Band 18)
 
 CALL insert_performance_break(1, 600, 720, 10, 19, 500); -- Evanescence (Band 19)
 CALL insert_performance_break(2, 730, 760, 10, 20, 600);  -- Paramore (Band 20)
@@ -669,8 +669,8 @@ CALL insert_performance_break(2, 240, 380, 12, 24, 450); -- Amaranthe (Band 24)
 
 CALL insert_performance_break(3, 450, 600, 13, 25, 1200);-- Bring Me The Horizon (Band 25)
 
-CALL insert_performance_break(4, 750, 870, 14, 26, 600); -- The Hives (Band 26)
-CALL insert_performance_break(2, 880, 890, 14, 27, 300); -- Biffy Clyro (Band 27)
+CALL insert_performance_break(2, 750, 870, 14, 26, 600); -- The Hives (Band 26)
+CALL insert_performance_break(4, 880, 890, 14, 27, 300); -- Biffy Clyro (Band 27)
 
 CALL insert_performance_break(2, 950, 1000, 15, 28, 500);-- Ghost (Band 28)
 CALL insert_performance_break(3, 1010, 1080, 15, 29, 480);-- The 1975 (Band 29)
