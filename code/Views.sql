@@ -176,7 +176,9 @@ WHERE
 /* View to find all the staff that are not assigned to any stage per festival day */
 CREATE OR REPLACE VIEW unassigned_secondary_staff_per_day AS
 SELECT 
-    d.day AS festival_day,
+    f.festival_year,
+    f.festival_month,
+    d.festival_day,
     s.staff_id,
     s.staff_name,
     s.staff_email,
@@ -184,18 +186,20 @@ SELECT
 FROM 
     staff s
 CROSS JOIN (
-    SELECT DISTINCT festival_day AS day FROM event
+    SELECT DISTINCT e.festival_year, e.festival_day
+    FROM event e
 ) d
+JOIN festival f ON f.festival_year = d.festival_year
 WHERE 
     s.staff_role_id = 3
     AND NOT EXISTS (
         SELECT 1
         FROM stage_staff ss
         JOIN event e ON ss.stage_id = e.stage_id
-        WHERE e.festival_day = d.day
+        WHERE e.festival_year = d.festival_year
+          AND e.festival_day = d.festival_day
           AND ss.staff_id = s.staff_id
-    );
-
+);
 
 
 --9--
@@ -203,10 +207,39 @@ WHERE
 
 
 --10--
+/* View to find the top 3 genre combinations that have performed in festivals */
+CREATE OR REPLACE VIEW top_3_genre_combinations AS
+SELECT 
+    LEAST(g1.genre_name, g2.genre_name) AS genre_1,
+    GREATEST(g1.genre_name, g2.genre_name) AS genre_2,
+    COUNT(DISTINCT bs1.band_id) AS band_count
+FROM band_subgenre bs1
+JOIN subgenre sg1 ON bs1.subgenre_id = sg1.subgenre_id
+JOIN genre g1 ON sg1.genre_id = g1.genre_id
+
+JOIN band_subgenre bs2 ON bs1.band_id = bs2.band_id AND bs1.subgenre_id < bs2.subgenre_id
+JOIN subgenre sg2 ON bs2.subgenre_id = sg2.subgenre_id
+JOIN genre g2 ON sg2.genre_id = g2.genre_id
+
+WHERE EXISTS (
+    SELECT 1
+    FROM performance p
+    JOIN event e ON e.event_id = p.event_id
+    JOIN festival f ON f.festival_year = e.festival_year
+    WHERE p.band_id = bs1.band_id
+)
+
+-- Avoid genre pairs like (Rock, Rock)
+AND g1.genre_id != g2.genre_id
+
+GROUP BY genre_1, genre_2
+ORDER BY band_count DESC
+LIMIT 3;
+
 
 
 --11--
-/* View to find all artists who have performed in 5 less festivals than the most performing artist */
+/* View to find all artists who have performed in more than 5 less festivals than the most performing artist */
 CREATE OR REPLACE VIEW artists_more_than_5_less_festivals_than_max AS
 WITH artist_festival_counts AS (
     SELECT 
@@ -246,7 +279,8 @@ SELECT
     f.festival_year,
     e.festival_day,
     CEIL(COUNT(t.EAN_13) * 0.05) AS required_security_staff,
-    CEIL(COUNT(t.EAN_13) * 0.02) AS required_secondary_staff
+    CEIL(COUNT(t.EAN_13) * 0.02) AS required_secondary_staff,
+    COUNT(DISTINCT e.event_id) * 2 AS required_technicians
 FROM
     ticket t
 JOIN event e ON t.event_id = e.event_id
@@ -257,6 +291,7 @@ GROUP BY
 ORDER BY
     f.festival_year,
     e.festival_day;
+
 
 
 --13--
@@ -326,6 +361,27 @@ ORDER BY
     genre_name, year1;
 
 
+--15--
+/* View to find the top 5 visitors who have given the highest total review score for a specific artist and band */
+SELECT 
+    CONCAT(v.visitor_name, ' ', v.visitor_surname) AS visitor_name,
+    b.band_name,
+    SUM(ls.performance_score +  ls.stage_presence_score + ls.total_impression_score) AS total_review_score
+FROM 
+    reviews r
+JOIN 
+    likert_scale ls ON r.reviews_id = ls.reviews_id
+JOIN 
+    visitor v ON r.visitor_id = v.visitor_id
+JOIN 
+    performance p ON r.performance_id = p.performance_id
+JOIN 
+    band b ON p.band_id = b.band_id
+GROUP BY 
+    v.visitor_id, b.band_id
+ORDER BY 
+    total_review_score DESC
+LIMIT 5;
 
 
 
