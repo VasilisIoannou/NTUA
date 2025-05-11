@@ -90,12 +90,12 @@ JOIN performance p ON p.band_id = b.band_id
 JOIN event e ON e.event_id = p.event_id
 JOIN festival f ON f.festival_year = e.festival_year
 WHERE
-    p.performance_type_id = 2
+    p.performance_type_id = 1
 GROUP BY 
     f.festival_year, 
     a.artist_id
 HAVING 
-    COUNT(p.performance_id) > 1
+    COUNT(p.performance_id) > 2
 ORDER BY
     f.festival_year,
     b.band_name;
