@@ -70,9 +70,8 @@ Steps to install the project:
 - Add a New festival:
 
 ```
-    INSERT INTO festival (festival_year, festival_month, festival_day, duration, location_id)
+    INSERT INTO festival (festival_year, festival_month, festival_day, duration, location_id) VALUES (2030, 10, 20, 5, 10);
 ```
-<p> VALUES (2030, 10, 20, 5, 10); </p>
 <br>
 <div>
     The above will create an instance of the festival starting 20/10/2030 (DD/MM/YYYY) until 25/10/2030
