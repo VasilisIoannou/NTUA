@@ -41,33 +41,40 @@ This project manages all data for Pulse University's annual music festival, incl
 Steps to install the project:  
 
 1. Clone the repo: 
-
+```
 <div>
     git clone https://github.com/VasilisIoannou/DatabaseNTUA
     cd DatabaseNTUA
 </div>
+```
 <br>
 2. Set up MariaDB:
 <br>
+```
 <div>
     mysql -u root -p < Database.sql
 </div>
+```
 <br>
 3. Generate dummy data:
 <br>
+```
 <div>     
     mysql -u root -p festivalDB < InsertsTsakalos.sql
 </div>
+```
 
 ## Usage Examples:
 
 - Query Artist By Age:
-    
+```    
     SELECT * FROM artist WHERE artist_age < 35;
-
+```
 - Add a New festival:
-<div>    
+<div>
+```
     INSERT INTO festival (festival_year, festival_month, festival_day, duration, location_id) 
+``` 
     <p> VALUES (2030, 10, 20, 5, 10); </p>
 </div>
 <br>
