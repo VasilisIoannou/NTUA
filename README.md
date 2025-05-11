@@ -26,8 +26,6 @@ This project manages all data for Pulse University's annual music festival, incl
         Rating Systems: Automate score calculations and leaderboard
         Reselling ticket application: Automate the reselling of tickets for the event
 
- (Write something about the project)
-
 ## **Database Scema**
 ### Entity Related Diagram
 
@@ -41,16 +39,19 @@ This project manages all data for Pulse University's annual music festival, incl
 
 ## **Installation**  
 Steps to install the project:  
-1. Clone the repo:  
+1. Clone the repo: 
+<div>
     git clone https://github.com/VasilisIoannou/DatabaseNTUA
     cd DatabaseNTUA
-
-2. Set up MariaDB
+</div>
+2. Set up MariaDB:
+<div>
     mysql -u root -p < Database.sql
-
+</div>
 3. Generate dummy data:
+<div>     
     mysql -u root -p festivalDB < InsertsTsakalos.sql
-
+</div>
 ## **Usage Examples**
 
 ### Query Artist By Age:
@@ -58,12 +59,13 @@ Steps to install the project:
     SELECT * FROM artist WHERE artist_age < 35;
 
 ### Add a New festival:
-    
+<div>    
     INSERT INTO festival (festival_year, festival_month, festival_day, duration, location_id) VALUES (2030, 10, 20, 5, 10);
-
+</div>
+<div>
     The above will create an instance of the festival starting 20/10/2030 (DD/MM/YYYY) until 25/10/2030
     Note: For the Instance of the Festival to be created the instance of location/coordinates must already exist
-
+</div>
 ## **Acknowledgements** 
 Participants: 
         Vasilis Ioannou, 
