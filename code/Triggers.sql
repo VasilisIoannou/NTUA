@@ -526,6 +526,32 @@ BEGIN
 END;
 //
 
+/* Trigger to check correct date_issued day and month */
+CREATE TRIGGER check_band_date_of_formation 
+BEFORE INSERT ON band_date_of_formation
+FOR EACH ROW
+BEGIN
+    IF NEW.band_month_of_formation IN (1, 3, 5, 7, 8, 10, 12) THEN
+        IF NEW.band_day_of_formation > 31 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'The month has only 31 days';
+        END IF;
+    ELSEIF NEW.band_month_of_formation IN (4, 6, 9, 11) THEN
+        IF NEW.band_day_of_formation > 30 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'The month has only 30 days';
+        END IF;
+    ELSEIF NEW.band_month_of_formation = 2 THEN
+        IF NEW.band_day_of_formation > 28 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'February has only 28 days';
+        END IF;
+    END IF;
+END;
+//
+
+
+
 CREATE TRIGGER remove_validated_tickets
 AFTER UPDATE ON ticket
 FOR EACH ROW
