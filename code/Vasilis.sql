@@ -27,6 +27,7 @@ LIMIT 5;
 
 CREATE TRIGGER IF NOT EXISTS check_festival_day
 BEFORE INSERT ON festival
+FOR EACH ROW
 BEGIN
     IF NEW.festival_month = 1 OR NEW.festival_month = 3 OR NEW.festival_month = 5 OR NEW.festival_month = 7 OR NEW.festival_month = 8 OR NEW.festival_month = 10 OR NEW.festival_month = 12 THEN
 	IF NEW.festival_day > 31 THEN
@@ -48,6 +49,7 @@ END//
 
 
 CREATE TRIGGER IF NOT EXISTS check_day_issued
+FOR EACH ROW
 BEFORE INSERT ON date_issued
 BEGIN
     IF NEW.month_issued = 1 OR NEW.month_issued = 3 OR NEW.month_issued = 5 OR NEW.month_issued = 7 OR NEW.month_issued = 8 OR NEW.month_issued = 10 OR NEW.month_issued = 12 THEN
@@ -68,3 +70,22 @@ BEGIN
     END IF;
 END//
 
+
+CREATE TRIGGER IF NOT EXISTS remove_validated_tickets
+AFTER UPDATE ON ticket
+FOR EACH ROW
+BEGIN
+	DECLARE v_reselling_ticket_id;
+
+	IF NEW.validated = TRUE THEN
+		-- Find is there the ticket was put in the reselling list
+		SELECT reselling_ticket_id INTO v_reselling_ticket_id
+		FROM reselling_tickets
+		WHERE EAN_13 = NEW.EAN_13
+		LIMIT 1;
+
+		IF reselling_ticket_id IS NOT NULL THEN
+			DELETE FROM reselling_tickets WHERE reselling_ticket_id = v_reselling_tciket_id
+		END IF;
+	END IF;
+END//
