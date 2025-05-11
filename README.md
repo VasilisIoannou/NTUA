@@ -39,18 +39,27 @@ This project manages all data for Pulse University's annual music festival, incl
 
 ## **Installation**  
 Steps to install the project:  
+
 1. Clone the repo: 
+
 <div>
     git clone https://github.com/VasilisIoannou/DatabaseNTUA
     cd DatabaseNTUA
+
 </div>
+
 2. Set up MariaDB:
+
 <div>
     mysql -u root -p < Database.sql
+
 </div>
+
 3. Generate dummy data:
+
 <div>     
     mysql -u root -p festivalDB < InsertsTsakalos.sql
+
 </div>
 ## **Usage Examples**
 
