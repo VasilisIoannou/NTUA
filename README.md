@@ -1,15 +1,14 @@
 # International Music Festival of Pulse University Database
 
-
+A comprehensive database system for managing Pulse University's annual international music festival.
 
 ## Table of Contents 
-    - Features
-    - Database Schema
-    - Installation
-    - Usage
-    - Contributing
-    - License
-
+    - [Features](#-features)  
+    - [Database Schema](#-database-schema)  
+    - [Installation](#-installation)  
+    - [Usage](#-usage)  
+    - [Contributing](#-contributing)  
+    - [License](#-license)  
 ## Directory Features
  - Database Managememnt:
         MariaDB-powered: Scalable and robust storage for contest data.
@@ -52,11 +51,11 @@ Steps to install the project:
 
 ## Usage Examples
 
-###Query Artist By Age:
+### Query Artist By Age:
     
     SELECT * FROM artist WHERE artist_age < 35;
 
-###Add a New festival
+### Add a New festival
     
     INSERT INTO festival (festival_year, festival_month, festival_day, duration, location_id) VALUES (2030, 10, 20, 5, 10);
 
