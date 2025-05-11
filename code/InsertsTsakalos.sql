@@ -689,9 +689,9 @@ CALL insert_performance_break(1, 550, 650, 19, 35, 1600); -- Jacob Anderson
 CALL insert_performance_break(2, 680, 790, 19, 36, 600); -- Panic! At The Disco
 
 -- High Middle Ages (Event 20)
-CALL insert_performance_break(4, 950, 1000,20, 38, 600);-- Ariana Grande
+CALL insert_performance_break(3, 950, 1000,20, 38, 600);-- Ariana Grande
 
-CALL insert_performance_break(3, 1030, 1100, 20, 37, 1200);-- Khalid
+CALL insert_performance_break(4, 1030, 1100, 20, 37, 1200);-- Khalid
 
 
 -- Late Middle Ages (Event 21)
@@ -733,11 +733,11 @@ CALL insert_performance_break(2, 1150, 1250, 30, 6, 600);-- The Killers (reappea
 CALL insert_performance_break(3, 1270, 1390, 30, 7, 300);-- Arcade Fire (reappearance)
 
 -- Ming Dynasty (Event 31)
-CALL insert_performance_break(1, 800, 880, 19, 9, 500);  -- Muse (reappearance)
+CALL insert_performance_break(2, 800, 880, 19, 9, 500);  -- Muse (reappearance)
 CALL insert_performance_break(3, 260, 330, 31, 8, 600);  -- Placebo (reappearance)
 
 -- Mughal Empire (Event 32)
-CALL insert_performance_break(1, 1320, 1390, 25, 10, 600);
+CALL insert_performance_break(3, 1320, 1390, 25, 10, 600);
 CALL insert_performance_break(2, 400, 530, 32, 47, 700);-- Sigur Rós (reappearance)
 CALL insert_performance_break(3, 560, 640, 32, 11, 600);-- Interpol (reappearance)
 
@@ -758,15 +758,15 @@ CALL insert_performance_break(1, 1300, 1390, 36, 17, 600);-- Within Temptation (
 -- World War I Era (Event 37)
 CALL insert_performance_break(2, 100, 250, 37, 18, 900);-- Nightwish (reappearance)
 CALL insert_performance_break(3, 265, 400, 37, 19, 1200);-- Evanescence (reappearance)
-CALL insert_performance_break(4, 420, 490, 37, 20, 600);-- Paramore (reappearance)
+CALL insert_performance_break(3, 420, 490, 37, 20, 600);-- Paramore (reappearance)
 
 -- Interwar Period (Event 38)
 CALL insert_performance_break(1, 550, 700, 38, 21, 900);-- The Cranberries (reappearance)
 CALL insert_performance_break(2, 720, 790, 38, 22, 300);-- Gojira (reappearance)
 
 -- World War II Era (Event 39)
-CALL insert_performance_break(3, 950, 1050, 39, 23, 900);-- Opeth (reappearance)
-CALL insert_performance_break(4, 1070, 1200, 39, 24, 1800);-- Amaranthe (reappearance)
+CALL insert_performance_break(2, 950, 1050, 39, 23, 900);-- Opeth (reappearance)
+CALL insert_performance_break(3, 1070, 1200, 39, 24, 1800);-- Amaranthe (reappearance)
 
 -- Cold War Era (Event 40)
 CALL insert_performance_break(1, 100, 250, 40, 25, 900);-- Bring Me The Horizon (reappearance)
@@ -796,8 +796,10 @@ INSERT INTO technical_equipment (technical_equipment_id,equipment_name,equipment
 (4,"Consoles",60),
 (5,"Special Effects",130);
 
+/*
 INSERT INTO stage_technical_equipment (stage_id,technical_equipment_id) VALUES
 ()
+*/
 
 INSERT INTO technician_specialization (technician_specialization_id,technician_specialization_name,staff_role_id) VALUES
 (1,"Sound Engineer",1),
@@ -878,54 +880,55 @@ INSERT INTO staff_specialization (staff_id,technician_specialization_id) VALUES
 (43,4),
 (44,4);
 
+/*
 --assign the 50 staff to stages
 INSERT INTO stage_staff (stage_id,staff_id) VALUES
-(1,1),(1,23), /*2018*/
+(1,1),(1,23), / 2018 /
 (2,1),(2,23),
 (3,2),(3,24),
 (1,17),(2,18),
 
 
-(4,2),(4,24), /*2019*/
+(4,2),(4,24), / 2019 /
 (4,3),(4,25),
 (5,4),(5,26),
 (5,2),(5,24),
 (5,3),(5,25),
 (5,18),(5,19),
 
-(6,2),(6,24), /*2020*/
+(6,2),(6,24), / 2020 /
 (7,5),(7,27),
 (8,5),(8,27),
 (6,19),(7,20),
 
-(9,6),(9,28), /*2021*/
+(9,6),(9,28), / 2021 /
 (10,7),(10,29),
 (11,8),(11,30),
 (12,6),(12,28),
 (13,7),(13,29),
 (10,20),(11,21),(12,21),
 
-(14,7),(14,29), /*2022*/
+(14,7),(14,29), / 2022 /
 (15,9),(15,30),
 (16,10),(16,30),
 (17,10),(17,31),
 (15,21),(16,22),
 
-(18,11),(18,32), /*2023*/
+(18,11),(18,32), / 2023 /
 (19,12),(19,32),
 (20,6),(20,33),
 (21,6),(21,33),
 (22,12),(22,29),
 (20,21),(21,22),(22,39),
 
-(23,35),(23,33), /*2024*/
+(23,35),(23,33), / 2024 /
 (23,36),(23,29),
 (23,11),(23,34),
 (24,36),(24,29),
 (24,11),(24,34),
 (23,39),
 
-(25,16),(25,13), /*2025*/
+(25,16),(25,13), / 2025 /
 (25,37),(25,14),
 (26,37),(26,14),
 (26,45),(26,15),
@@ -933,16 +936,16 @@ INSERT INTO stage_staff (stage_id,staff_id) VALUES
 (27,45),(27,14), 
 (25,22),(26,39),(27,40),
 
-(28,46),(28,41), /*2026*/
+(28,46),(28,41), / 2026 /
 (29,47),(29,42),
 (30,48),(30,42),
 (29,17),(30,18),
 
-(31,49),(31,43), /*2027*/
+(31,49),(31,43), / 2027 /
 (32,50),(32,44),
 (33,50),(33,44),
 (32,39),(33,40);
-
+*/
 
 INSERT INTO ticket_price (ticket_price_id, ticket_type_id, event_id, ticket_price_price) VALUES
 /* 2018 Day 1*/
