@@ -45,37 +45,33 @@ Steps to install the project:
 ```
     git clone https://github.com/VasilisIoannou/DatabaseNTUA
     cd DatabaseNTUA
-
 ```
 <br>
 2. Set up MariaDB:
 <br>
+
 ```
     mysql -u root -p < Database.sql
-
 ```
 <br>
 3. Generate dummy data:
 <br>
+
 ```
     mysql -u root -p festivalDB < InsertsTsakalos.sql
-
 ```
 
 ## Usage Examples:
 
 - Query Artist By Age:
-```    
+```  
     SELECT * FROM artist WHERE artist_age < 35;
-
 ```
 - Add a New festival:
 
 ```
-    INSERT INTO festival (festival_year, festival_month, festival_day, duration, location_id) 
-
-``` 
-    <p> VALUES (2030, 10, 20, 5, 10); </p>
+    INSERT INTO festival (festival_year, festival_month, festival_day, duration, location_id) VALUES (2030, 10, 20, 5, 10);
+```
 <br>
 <div>
     The above will create an instance of the festival starting 20/10/2030 (DD/MM/YYYY) until 25/10/2030
@@ -87,3 +83,4 @@ Participants:
 <div> Vasilis Ioannou </div> 
 <div> Dimitris Markidis </div>
 <div> Theodoros Tsakalos </div>
+
