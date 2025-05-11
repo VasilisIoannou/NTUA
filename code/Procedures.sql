@@ -253,6 +253,7 @@ BEGIN
     DECLARE existing_closing INT;
     DECLARE warm_up_conflict INT;
     DECLARE closing_conflict INT;
+    DECLARE after_closing_conflict INT;
 
     DECLARE artist_cursor CURSOR FOR 
         SELECT artist_id FROM artist_band WHERE band_id = p_band_id;
@@ -342,6 +343,16 @@ BEGIN
             SIGNAL SQLSTATE '45000' 
             SET MESSAGE_TEXT = 'Closing act must be the last performance in the event';
         END IF;
+    END IF;
+
+    -- Cant Add Performances after Closing Act
+    SELECT COUNT(*) INTO after_closing_conflict
+    FROM performance
+    WHERE event_id = p_event_id AND performance_type_id = v_closing_act_id;
+
+    IF after_closing_conflict > 0 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Cant have performances after the Closing Act' ;
     END IF;
 
     -- Get the current festival year from the event

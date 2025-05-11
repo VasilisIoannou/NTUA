@@ -2,13 +2,13 @@
 
 A comprehensive database system for managing Pulse University's annual international music festival.
 
-## **Table of Contents** 
-    - Features
-    - Database Schema
-    - Installation
-    - Usage
-    - Contributing
-    - License
+## **Table of Contents**
+- Features
+- Database Schema
+- Installation
+- Usage
+- Contributing
+- License
 ## **Directory Features**
  - Database Managememnt:
         MariaDB-powered: Scalable and robust storage for contest data.
@@ -65,6 +65,6 @@ Steps to install the project:
 
 ## **Acknowledgements** 
 Participants: 
-        Vasilis Ioannou 
-        Dimitris Markidis
-        Theodoros Tsakalos
+        Vasilis Ioannou, 
+        Dimitris Markidis,
+        Theodoros Tsakalos,
