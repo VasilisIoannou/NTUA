@@ -120,12 +120,13 @@ CREATE TABLE performance(
     performance_start int CHECK (performance_start >= 0 AND performance_start <= 1440),  -- 0 to 24 hours
     performance_end int CHECK(performance_end >= 0),
     CHECK (performance_start < performance_end AND performance_end - performance_start <= 180),  -- 0 to 3 hours
-    event_id int INDEX,
+    event_id int ,
     band_id int NOT NULL,
     PRIMARY KEY(performance_id),
     FOREIGN KEY(performance_type_id) REFERENCES performance_type(performance_type_id),
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
-    FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE
+    FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE,
+    INDEX event_id_index(event_id)
 );
 
 CREATE TABLE technical_equipment(
@@ -222,9 +223,10 @@ CREATE TABLE artist(
     artist_id int AUTO_INCREMENT,
     artist_name varchar(255) NOT NULL,
     artist_stage_name varchar(255),
-    artist_year_of_birth int NOT NULL INDEX,
+    artist_year_of_birth int NOT NULL ,
     artist_website varchar(255),
-    PRIMARY KEY(artist_id)
+    PRIMARY KEY(artist_id),
+    INDEX artist_year_of_birth_index(artist_year_of_birth)
 );
 
 CREATE TABLE artist_band(
@@ -298,7 +300,7 @@ CREATE TABLE ticket(
     ticket_type_id int NOT NULL,
     visitor_id int NOT NULL,
     event_id int NOT NULL,
-    ticket_price float NOT NULL INDEX CHECK(ticket_price >= 0),
+    ticket_price float NOT NULL CHECK(ticket_price >= 0),
     payment_method_id int NOT NULL,
     validated boolean NOT NULL,
     PRIMARY KEY(EAN_13),
@@ -306,7 +308,8 @@ CREATE TABLE ticket(
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE,
     FOREIGN KEY(payment_method_id) REFERENCES payment_method(payment_method_id),
-    UNIQUE KEY(visitor_id, event_id)
+    UNIQUE KEY(visitor_id, event_id),
+    INDEX ticket_price_index(ticket_price)
 );
 
 CREATE TABLE ticket_price(
@@ -337,9 +340,10 @@ CREATE TABLE date_issued(
 
 CREATE TABLE reselling_tickets(
     reselling_ticket_id int AUTO_INCREMENT UNIQUE,
-    EAN_13 bigint NOT NULL UNIQUE INDEX CHECK (EAN_13 > 0),
+    EAN_13 bigint NOT NULL UNIQUE CHECK (EAN_13 > 0),
     PRIMARY KEY(reselling_ticket_id),
-    FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13) ON DELETE CASCADE
+    FOREIGN KEY(EAN_13) REFERENCES ticket(EAN_13) ON DELETE CASCADE,
+    INDEX EAN_13_index (EAN_13)
 );
 
 --sto er diagram en eshei PK
@@ -371,11 +375,12 @@ CREATE TABLE desired_ticket_by_event(
 
 CREATE TABLE reviews(
     reviews_id int AUTO_INCREMENT,
-    visitor_id int NOT NULL INDEX,
+    visitor_id int NOT NULL,
     performance_id int NOT NULL,
     PRIMARY KEY(reviews_id),
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE,
-    FOREIGN KEY(performance_id) REFERENCES performance(performance_id) ON DELETE CASCADE
+    FOREIGN KEY(performance_id) REFERENCES performance(performance_id) ON DELETE CASCADE,
+    INDEX visitor_id_index (visitor_id)
 );
 
 -- otan en one-on-one en kamnei generate one-on-one
