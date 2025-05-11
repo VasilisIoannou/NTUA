@@ -93,7 +93,7 @@ WHERE
     p.performance_type_id = 2
 GROUP BY 
     f.festival_year, 
-    a.artist_stage_name
+    a.artist_id
 HAVING 
     COUNT(p.performance_id) > 1
 ORDER BY
@@ -106,15 +106,15 @@ ORDER BY
 CREATE OR REPLACE VIEW avg_of_reviews_per_band AS
 SELECT DISTINCT
     b.band_name,
-    AVG(ls.performance_score)AS avg_performance_score,
-    AVG(ls.stage_presence_score) AS avg_stage_presence_score
+    ROUND(AVG(ls.performance_score),2)AS avg_performance_score,
+    ROUND(AVG(ls.stage_presence_score),2) AS avg_stage_presence_score
 FROM
     likert_scale ls
 JOIN reviews r ON ls.reviews_id = r.reviews_id
 JOIN performance p ON r.performance_id = p.performance_id
 JOIN band b ON b.band_id = p.band_id
 GROUP BY 
-    b.band_name
+    b.band_id
 ORDER BY
     avg_performance_score DESC,
     avg_stage_presence_score DESC;
@@ -124,7 +124,7 @@ ORDER BY
 /* View to find the artists who are below 30 years old and have performed the most times in festivals */
 CREATE OR REPLACE VIEW most_appearances_by_young_artists AS
 SELECT 
-    a.artist_name,
+    a.artist_stage_name,
     COUNT(DISTINCT f.festival_year) AS festivals_performed
 FROM 
     artist a
@@ -136,7 +136,7 @@ JOIN festival f ON f.festival_year = e.festival_year
 WHERE 
     (YEAR(CURDATE()) - a.artist_year_of_birth) < 30
 GROUP BY 
-    a.artist_name
+    a.artist_id
 ORDER BY 
     festivals_performed DESC;
 
@@ -147,13 +147,13 @@ CREATE OR REPLACE VIEW avg_review_score_visitor_per_event AS
 SELECT
     r.visitor_id,
     e.event_id,
-    ROUND(AVG(
+    ROUND(AVG((
         ls.performance_score +
         ls.sound_light_quality_score +
         ls.stage_presence_score +
         ls.organization_score +
         ls.total_impression_score
-    ), 2) AS avg_review_score
+    ) /5 ), 2) AS avg_review_score
 FROM
     reviews r
 JOIN likert_scale ls ON r.reviews_id = ls.reviews_id
@@ -161,7 +161,9 @@ JOIN performance p ON r.performance_id = p.performance_id
 JOIN event e ON p.event_id = e.event_id
 GROUP BY
     r.visitor_id,
-    e.event_id;
+    e.event_id
+ORDER BY
+    avg_review_score DESC;
 
 
 --7--
@@ -231,7 +233,12 @@ WHERE
         WHERE e.festival_year = d.festival_year
           AND e.festival_day = d.festival_day
           AND ss.staff_id = s.staff_id
-);
+)
+ORDER BY 
+    f.festival_year,
+    f.festival_month,
+    d.festival_day,
+    s.staff_name;
 
 
 --9--
@@ -271,7 +278,7 @@ FROM attendance_counts ac
 JOIN grouped_attendance ga
   ON ac.festival_year = ga.festival_year
  AND ac.events_attended = ga.events_attended
-ORDER BY ac.festival_year, ac.events_attended, ac.visitor_surname, ac.visitor_name;
+ORDER BY ac.events_attended, ac.festival_year, ac.visitor_surname, ac.visitor_name;
 
 
 --10--
@@ -296,8 +303,6 @@ WHERE EXISTS (
     JOIN festival f ON f.festival_year = e.festival_year
     WHERE p.band_id = bs1.band_id
 )
-
--- Avoid genre pairs like (Rock, Rock)
 AND g1.genre_id != g2.genre_id
 
 GROUP BY genre_1, genre_2
@@ -312,7 +317,7 @@ CREATE OR REPLACE VIEW artists_more_than_5_less_festivals_than_max AS
 WITH artist_festival_counts AS (
     SELECT 
         a.artist_id,
-        a.artist_name,
+        a.artist_stage_name,
         COUNT(DISTINCT f.festival_year) AS festivals_participated
     FROM 
         artist a
@@ -329,7 +334,7 @@ max_festival_count AS (
 )
 SELECT 
     afc.artist_id,
-    afc.artist_name,
+    afc.artist_stage_name,
     afc.festivals_participated
 FROM 
     artist_festival_counts afc
@@ -367,7 +372,7 @@ ORDER BY
 CREATE OR REPLACE VIEW artists_in_3_or_more_continents AS
 SELECT 
     a.artist_id,
-    a.artist_name,
+    a.artist_stage_name,
     COUNT(DISTINCT fl.continent) AS unique_continents
 FROM 
     artist a
