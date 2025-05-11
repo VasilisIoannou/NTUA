@@ -636,13 +636,13 @@ CALL insert_performance_break(2, 410, 500, 1, 2, 600);   -- Rammstein (Band 2)
 CALL insert_performance_break(3, 510, 550, 1, 3, 600);   -- Coldplay (Band 3)
 
 CALL insert_performance_break(4, 650, 740, 2, 4, 900);   -- ABBA (Band 4)
-CALL insert_performance_break(1, 770, 795, 2, 5, 300);   -- Måneskin (Band 5)
+CALL insert_performance_break(2, 770, 795, 2, 5, 300);   -- Måneskin (Band 5)
 
 CALL insert_performance_break(2, 900, 950, 3, 6, 1200);  -- The Killers (Band 6)
 CALL insert_performance_break(3, 970, 990, 3, 7, 600);  -- Arcade Fire (Band 7)
 
-CALL insert_performance_break(4, 100, 220, 4, 8, 330);   -- Muse (Band 8)
-CALL insert_performance_break(1, 230, 290, 4, 9, 400);   -- Placebo (Band 9)
+CALL insert_performance_break(1, 100, 220, 4, 8, 330);   -- Muse (Band 8)
+CALL insert_performance_break(4, 230, 290, 4, 9, 400);   -- Placebo (Band 9)
 
 CALL insert_performance_break(3, 350, 440, 5, 10, 1500); -- Sigur Rós (Band 10)
 CALL insert_performance_break(2, 465, 480, 5, 11, 350);  -- Interpol (Band 11)
@@ -652,8 +652,8 @@ CALL insert_performance_break(4, 655, 680, 6, 13, 300);  -- Franz Ferdinand (Ban
 
 CALL insert_performance_break(3, 750, 840, 7, 14, 400); -- The xx (Band 14)
 
-CALL insert_performance_break(2, 900, 960, 8, 15, 600);  -- Phoenix (Band 15)
-CALL insert_performance_break(1, 970, 980, 8, 16, 900); -- Editors (Band 16)
+CALL insert_performance_break(1, 900, 960, 8, 15, 600);  -- Phoenix (Band 15)
+CALL insert_performance_break(2, 970, 980, 8, 16, 900); -- Editors (Band 16)
 
 CALL insert_performance_break(4, 300, 420, 9, 17, 600);  -- Within Temptation (Band 17)
 CALL insert_performance_break(3, 450, 490, 9, 18, 330);  -- Nightwish (Band 18)
@@ -664,13 +664,13 @@ CALL insert_performance_break(2, 730, 760, 10, 20, 600);  -- Paramore (Band 20)
 CALL insert_performance_break(3, 900, 1040, 11, 21, 550); -- The Cranberries (Band 21)
 CALL insert_performance_break(4, 1060, 1080, 11, 22, 300);-- Gojira (Band 22)
 
-CALL insert_performance_break(2, 100, 220, 12, 23, 600); -- Opeth (Band 23)
-CALL insert_performance_break(1, 240, 380, 12, 24, 450); -- Amaranthe (Band 24)
+CALL insert_performance_break(1, 100, 220, 12, 23, 600); -- Opeth (Band 23)
+CALL insert_performance_break(2, 240, 380, 12, 24, 450); -- Amaranthe (Band 24)
 
 CALL insert_performance_break(3, 450, 600, 13, 25, 1200);-- Bring Me The Horizon (Band 25)
 
 CALL insert_performance_break(4, 750, 870, 14, 26, 600); -- The Hives (Band 26)
-CALL insert_performance_break(1, 880, 890, 14, 27, 300); -- Biffy Clyro (Band 27)
+CALL insert_performance_break(2, 880, 890, 14, 27, 300); -- Biffy Clyro (Band 27)
 
 CALL insert_performance_break(2, 950, 1000, 15, 28, 500);-- Ghost (Band 28)
 CALL insert_performance_break(3, 1010, 1080, 15, 29, 480);-- The 1975 (Band 29)
@@ -709,32 +709,32 @@ CALL insert_performance_break(2, 835, 890, 23, 44, 600);-- Liam Payne
 CALL insert_performance_break(3, 950, 995, 24, 45, 300);-- Echo Mirage
 
 -- Mayan Classic Period (Event 25)
-CALL insert_performance_break(4, 1050, 1150, 25, 46, 600);-- Justin Bieber
-CALL insert_performance_break(1, 1170, 1300, 25, 47, 900);-- Shania Twain
+CALL insert_performance_break(1, 1050, 1150, 25, 46, 600);-- Justin Bieber
+CALL insert_performance_break(3, 1170, 1300, 25, 47, 900);-- Shania Twain
 
 -- Viking Age (Event 26)
 CALL insert_performance_break(2, 50, 150, 26, 48, 900);  -- Taylor Swift
 CALL insert_performance_break(3, 170, 290, 26, 49, 600); -- Hugh Masekela
 
 -- Carolingian Renaissance (Event 27)
-CALL insert_performance_break(4, 350, 500, 27, 50, 1200);-- Coltrane Drive
-CALL insert_performance_break(1, 520, 590, 27, 2, 600);  -- Radiohead (reappearance)
+CALL insert_performance_break(1, 350, 500, 27, 50, 1200);-- Coltrane Drive
+CALL insert_performance_break(3, 520, 590, 27, 2, 600);  -- Radiohead (reappearance)
 
 -- Chola Dynasty (Event 28)
 CALL insert_performance_break(2, 650, 750, 28, 1, 900);  -- Rammstein (reappearance)
 CALL insert_performance_break(3, 810, 890, 28, 3, 600);  -- Coldplay (reappearance)
 
 -- Reformation (Event 29)
-CALL insert_performance_break(4, 950, 1040, 29, 4, 900);-- ABBA (reappearance)
-CALL insert_performance_break(1, 1060, 1090, 29, 5, 300);-- Måneskin (reappearance)
+CALL insert_performance_break(1, 950, 1040, 29, 4, 900);-- ABBA (reappearance)
+CALL insert_performance_break(4, 1060, 1090, 29, 5, 300);-- Måneskin (reappearance)
 
 -- Age of Discovery (Event 30)
 CALL insert_performance_break(2, 1150, 1250, 30, 6, 600);-- The Killers (reappearance)
 CALL insert_performance_break(3, 1270, 1390, 30, 7, 300);-- Arcade Fire (reappearance)
 
 -- Ming Dynasty (Event 31)
-CALL insert_performance_break(3, 800, 880, 19, 9, 500);  -- Muse (reappearance)
-CALL insert_performance_break(1, 260, 330, 31, 8, 600);  -- Placebo (reappearance)
+CALL insert_performance_break(1, 800, 880, 19, 9, 500);  -- Muse (reappearance)
+CALL insert_performance_break(3, 260, 330, 31, 8, 600);  -- Placebo (reappearance)
 
 -- Mughal Empire (Event 32)
 CALL insert_performance_break(1, 1320, 1390, 25, 10, 600);
@@ -774,8 +774,8 @@ CALL insert_performance_break(2, 270, 400, 40, 26, 1200);-- The Hives (reappeara
 CALL insert_performance_break(3, 430, 490, 40, 27, 600);-- Biffy Clyro (reappearance)
 
 -- Postcolonial Era (Event 41)
-CALL insert_performance_break(4, 600, 700, 41, 28, 900);-- Ghost (reappearance)
-CALL insert_performance_break(1, 715, 810, 41, 29, 1200);-- The 1975 (reappearance)
+CALL insert_performance_break(1, 600, 700, 41, 28, 900);-- Ghost (reappearance)
+CALL insert_performance_break(3, 715, 810, 41, 29, 1200);-- The 1975 (reappearance)
 
 -- Anthropocene (Event 42)
 CALL insert_performance_break(2, 950, 1100, 42, 30, 900);-- Kasabian (reappearance)
@@ -783,15 +783,10 @@ CALL insert_performance_break(3, 1120, 1200, 42, 31, 1800);-- Rihanna (reappeara
 
 CALL insert_performance_break(2, 820, 890, 38, 5, 600);-- Gojira (reappearance) 800 mexri 900
 
-CALL insert_performance_break(4, 1230, 1370, 39, 19, 600);-- Amaranthe (reappearance) mexri 1400
+CALL insert_performance_break(2, 1230, 1370, 39, 19, 600);-- Amaranthe (reappearance) mexri 1400
 
 CALL insert_performance_break(3, 1250, 1370, 42, 3, 800);-- Rihanna (reappearance) mexri 1400
 
-
-SELECT DISTINCT band.*
-FROM band
-INNER JOIN performance
-ON band.band_id = performance.band_id;
 
 
 INSERT INTO technical_equipment (technical_equipment_id,equipment_name,equipment_quantity) VALUES
@@ -804,13 +799,13 @@ INSERT INTO technical_equipment (technical_equipment_id,equipment_name,equipment
 INSERT INTO stage_technical_equipment (stage_id,technical_equipment_id) VALUES
 ()
 
-INSERT INTO role_specialization (role_specialization_id,role_specialization_name,staff_role_id) VALUES
+INSERT INTO technician_specialization (technician_specialization_id,technician_specialization_name,staff_role_id) VALUES
 (1,"Sound Engineer",1),
 (2,"Light Engineer",1),
 (3,"Network Engineer" ,1),
 (4,"Pyro Technician" ,1);
 
---insert 30 staff
+--insert 50 staff
 INSERT INTO staff (staff_id, staff_name, staff_role_id, staff_phone, staff_email, staff_age, level_of_experience) VALUES
 (1, 'Dimitrios Papadopoulos', 2, '99123456', 'papadopoulos@gmail.com', 28, 2),
 (2, 'Maria Ioannou', 2, '99234567', 'ioannou@gmail.com', 24, 1),
@@ -864,8 +859,8 @@ INSERT INTO staff (staff_id, staff_name, staff_role_id, staff_phone, staff_email
 (50, 'Eirini Liaskou', 2, '992234567', 'liaskou@gmail.com', 40, 3);
 
 
---make the 16 technicians one of four specialization
-INSERT INTO staff_specialization (staff_id,role_specialization_id) VALUES
+--make the 16 technicians one of four specializations
+INSERT INTO staff_specialization (staff_id,technician_specialization_id) VALUES
 (23,1),
 (24,1),
 (25,1),
@@ -1206,19 +1201,6 @@ INSERT INTO ticket_price (ticket_price_id, ticket_type_id, event_id, ticket_pric
 (208, 3, 42, 20.0),
 (209, 4, 42, 15.0),
 (210, 5, 42, 110.0);
-
-SET FOREIGN_KEY_CHECKS = 0;
-
--- Truncate the child tables first (those that reference others)
-TRUNCATE TABLE ticket;
-TRUNCATE TABLE visitor_contact;
-
--- Then truncate the parent table
-TRUNCATE TABLE visitor;
-TRUNCATE TABLE buyer;
-TRUNCATE TABLE date_issued;
--- Re-enable foreign key checks
-SET FOREIGN_KEY_CHECKS = 1;
 
 
 -- YEAR 1 (Event IDs 1-3)
