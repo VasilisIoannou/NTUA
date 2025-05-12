@@ -131,8 +131,7 @@ CREATE TABLE performance(
 
 CREATE TABLE technical_equipment(
     technical_equipment_id int AUTO_INCREMENT,
-    equipment_name varchar(255) NOT NULL,
-    equipment_quantity int NOT NULL CHECK (equipment_quantity > 0),
+    equipment_name varchar(255) NOT NULL
     PRIMARY KEY(technical_equipment_id)
 );
 
