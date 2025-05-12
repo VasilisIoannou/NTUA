@@ -59,7 +59,7 @@ CREATE TABLE stage(
     stage_capacity int NOT NULL CHECK (stage_capacity > 0),
     festival_location_id INT NOT NULL,
     PRIMARY KEY(stage_id),
-    FOREIGN KET(festival_location_id) REFERENCES festival_location(festival_location_id)
+    FOREIGN KEY(festival_location_id) REFERENCES festival_location(location_id)
 );
 
 CREATE TABLE event(
@@ -133,7 +133,7 @@ CREATE TABLE performance(
 
 CREATE TABLE technical_equipment(
     technical_equipment_id int AUTO_INCREMENT,
-    equipment_name varchar(255) NOT NULL
+    equipment_name varchar(255) NOT NULL,
     PRIMARY KEY(technical_equipment_id)
 );
 
@@ -143,7 +143,7 @@ CREATE TABLE stage_technical_equipment(
     stage_id int,
     technical_equipment_id int,
     PRIMARY KEY(stage_id, technical_equipment_id),
-    FOREIGN KEY(stage_id) REFERENCES stage(stage_id),
+    FOREIGN KEY(stage_id) REFERENCES stage(stage_id) ON DELETE CASCADE,
     FOREIGN KEY(technical_equipment_id) REFERENCES technical_equipment(technical_equipment_id) ON DELETE CASCADE
 );
 
@@ -320,7 +320,7 @@ CREATE TABLE ticket_price(
     ticket_price_price float NOT NULL CHECK(ticket_price_price >= 0), 
     PRIMARY KEY(ticket_price_id),
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
-    FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id) ON DELETE CASCADE+
+    FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id) ON DELETE CASCADE
 );
 
 CREATE TABLE buyer(
@@ -330,12 +330,12 @@ CREATE TABLE buyer(
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE
 );
 
--- opos to ekamame iparxei periptosi na exoume presale 40 xronia prin
+
 CREATE TABLE date_issued(
     date_issued_id int AUTO_INCREMENT,
     year_issued int NOT NULL CHECK (year_issued > 0),
     month_issued int NOT NULL CHECK (month_issued >= 1 AND month_issued <= 12),
-    day_issued int NOT NULL CHECK (day_issued >= 1 AND day_issued <= 31),
+    day_issued int NOT NULL CHECK (day_issued >= 1), -- Chekck with Trigger
     PRIMARY KEY(date_issued_id)
 );
 
@@ -347,7 +347,6 @@ CREATE TABLE reselling_tickets(
     INDEX EAN_13_index (EAN_13)
 );
 
---sto er diagram en eshei PK
 
 
 CREATE TABLE ticket_transfers(
