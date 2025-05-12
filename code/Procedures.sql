@@ -46,7 +46,7 @@ CREATE PROCEDURE insert_ticket_with_existing_visitor(
     IN p_ticket_type_name VARCHAR(255),
     IN p_event_id INT,
     IN p_payment_method_id INT,
-    IN p_visior_id INT,
+    IN p_visitor_id INT,
     OUT result_message VARCHAR(255)
 )
 BEGIN

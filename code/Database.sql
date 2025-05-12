@@ -57,7 +57,9 @@ CREATE TABLE stage(
     stage_id int AUTO_INCREMENT,
     stage_name varchar(255) NOT NULL,
     stage_capacity int NOT NULL CHECK (stage_capacity > 0),
-    PRIMARY KEY(stage_id)
+    festival_location_id INT NOT NULL,
+    PRIMARY KEY(stage_id),
+    FOREIGN KET(festival_location_id) REFERENCES festival_location(festival_location_id)
 );
 
 CREATE TABLE event(

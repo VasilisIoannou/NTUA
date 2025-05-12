@@ -90,12 +90,12 @@ JOIN performance p ON p.band_id = b.band_id
 JOIN event e ON e.event_id = p.event_id
 JOIN festival f ON f.festival_year = e.festival_year
 WHERE
-    p.performance_type_id = 1
+    p.performance_type_id = 1 AND f.festival_year < 2025
 GROUP BY 
     f.festival_year, 
     a.artist_id
 HAVING 
-    COUNT(p.performance_id) > 2
+    COUNT(p.performance_id) > 0
 ORDER BY
     f.festival_year,
     b.band_name;
@@ -134,7 +134,7 @@ JOIN performance p ON p.band_id = b.band_id
 JOIN event e ON e.event_id = p.event_id
 JOIN festival f ON f.festival_year = e.festival_year
 WHERE 
-    (YEAR(CURDATE()) - a.artist_year_of_birth) < 30
+    (YEAR(CURDATE()) - a.artist_year_of_birth) < 30 AND f.festival_year < 2025
 GROUP BY 
     a.artist_id
 ORDER BY 
@@ -301,7 +301,7 @@ WHERE EXISTS (
     FROM performance p
     JOIN event e ON e.event_id = p.event_id
     JOIN festival f ON f.festival_year = e.festival_year
-    WHERE p.band_id = bs1.band_id
+    WHERE p.band_id = bs1.band_id AND f.festival_year < 2025
 )
 AND g1.genre_id != g2.genre_id
 
@@ -326,6 +326,7 @@ WITH artist_festival_counts AS (
     JOIN performance p ON p.band_id = b.band_id
     JOIN event e ON e.event_id = p.event_id
     JOIN festival f ON f.festival_year = e.festival_year
+    WHERE f.festival_year < 2025
     GROUP BY a.artist_id, a.artist_name
 ),
 max_festival_count AS (
@@ -382,6 +383,7 @@ JOIN performance p ON p.band_id = b.band_id
 JOIN event e ON e.event_id = p.event_id
 JOIN festival f ON f.festival_year = e.festival_year
 JOIN festival_location fl ON f.location_id = fl.location_id
+WHERE f.festival_year < 2025
 GROUP BY 
     a.artist_id, a.artist_name
 HAVING 
@@ -406,6 +408,7 @@ WITH genre_performances AS (
     JOIN band_subgenre bs ON bs.band_id = b.band_id
     JOIN subgenre sg ON sg.subgenre_id = bs.subgenre_id
     JOIN genre g ON g.genre_id = sg.genre_id
+    WHERE f.festival_year < 2025
     GROUP BY
         f.festival_year, g.genre_name
     HAVING COUNT(*) >= 3
