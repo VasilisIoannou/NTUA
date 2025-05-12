@@ -574,5 +574,55 @@ BEGIN
 END;
 //
 
+/* Date issued of reselling_tickets cannto be after the event */
+
+CREATE TRIGGER IF NOT EXISTS date_issued_check_for_desired_ticket
+BEFORE INSERT ON desired_ticket_by_event
+BEGIN
+	DECLARE v_festival_year INT;
+	DECLARE v_festival_month INT;
+	DECLARE v_festival_day INT;
+
+	DECLARE v_event_day INT; 
+
+	DECLARE v_year_issued INT;
+	DECLARE v_month_issued INT;
+	DECLARE v_day_issued INT;
+
+	DECLARE v_festival_date_in_days INT;
+	DECLARE v_date_issued_date_in_days INT;
+
+	-- Find the festival dates
+	SELECT festival_year, festival_month, festival_day 
+	INTO v_festival_year, v_festival_month, v_festival_day
+	FROM festival f
+	JOIN event e ON e.festival_year = f.festival_year
+	WHERE e.event_id = NEW.event_id;
+
+	-- Find the date of issued
+	SELECT year_issued, month_issued, day_issued
+	INTO v_year_issued, v_month_issued, v_day_issued
+	FROM date_issued di
+	WHERE di.date_issued_id = NEW.date_issued_id;
+
+	-- Find the day of the event
+	SELECT festival_day
+	INTO v_event_day
+	FROM event e
+	WHERE e.event_id = NEW.event_id;
+
+	-- Find the date in days
+	SET v_festival_date_in_days = 365 * v_festival_year + 30 * v_festival_month + v_festival_day; 
+
+	SET v_date_issued_date_in_days = 365 * v_year_issued + 30 * v_month_issued + v_day_issued; 
+	-- Check if the date issued is before the day of the festival + event day
+	IF v_festival_date_in_days > v_date_issued_date_in_days THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Date Issued cannot be after the event';
+	END IF;
+
+END;
+//
+
 DELIMITER ;
 
