@@ -16,7 +16,7 @@ This project manages all data for Pulse University's annual music festival, incl
         Automated workflows: Triggers and stored procedures for seamless operations.
 
  - Data Generation: 
-        *Dummy Data was generated with the help of LLMs*
+        *Dummy Data was generated with the help of LLMs and Python Scripts*
  
   Core Modules:
         Events: Track the Stages, Performances, Bands and Staff of the Event
