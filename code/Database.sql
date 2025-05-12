@@ -245,7 +245,7 @@ CREATE TABLE artist_band(
 -- kai to artist_id sto band
 CREATE TABLE social_media_artist(
     social_media_artist_id int AUTO_INCREMENT,
-    artist_id int UNIQUE,
+    artist_id int,
     social_media_name varchar(255),
     social_media_url varchar(255),
     PRIMARY KEY(social_media_artist_id),
@@ -254,7 +254,7 @@ CREATE TABLE social_media_artist(
 
 CREATE TABLE social_media_band(
     social_media_band_id int AUTO_INCREMENT,
-    band_id int UNIQUE,
+    band_id int,
     social_media_name varchar(255),
     social_media_url varchar(255),
     PRIMARY KEY(social_media_band_id),
