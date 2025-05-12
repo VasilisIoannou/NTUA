@@ -33,7 +33,7 @@ This project manages all data for Pulse University's annual music festival, incl
 
 ### Relational Schema
 
-![RelD](./diagrams/relational_diagram.png)
+![RelD](./diagrams/relational_diagra)
 
 *link to the diagram folder: https://github.com/VasilisIoannou/DatabaseNTUA/tree/main/diagrams*
 
