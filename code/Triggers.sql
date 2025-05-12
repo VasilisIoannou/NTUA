@@ -616,7 +616,7 @@ BEGIN
 
 	SET v_date_issued_date_in_days = 365 * v_year_issued + 30 * v_month_issued + v_day_issued; 
 	-- Check if the date issued is before the day of the festival + event day
-	IF v_festival_date_in_days > v_date_issued_date_in_days THEN
+	IF v_festival_date_in_days < v_date_issued_date_in_days THEN
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Date Issued cannot be after the event';
 	END IF;

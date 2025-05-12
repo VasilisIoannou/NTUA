@@ -438,7 +438,7 @@ ORDER BY
 
 
 --15--
-/* View to find the top 5 visitors who have given the highest total review score for a specific artist and band */
+/* View to find the top 5 visitors who have given the highest total review score for a specific band */
 SELECT 
     CONCAT(v.visitor_name, ' ', v.visitor_surname) AS visitor_name,
     b.band_name,
