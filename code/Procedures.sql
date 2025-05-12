@@ -189,9 +189,9 @@ BEGIN
     -- Find the visitors age
     SELECT visitor_age INTO v_visitor_age
     FROM visitor
-    WHERE visitor_id = p_visitor_id
+    WHERE visitor_id = p_visitor_id;
 
-    IF p_ticket_type_name = 'Senior' AND p_visitor_age < 65 THEN
+    IF p_ticket_type_name = 'Senior' AND v_visitor_age < 65 THEN
 	ROLLBACK;
 	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Seniors must be 65 years old or older';
     END IF;

@@ -575,9 +575,9 @@ END;
 //
 
 /* Date issued of reselling_tickets cannto be after the event */
-
 CREATE TRIGGER IF NOT EXISTS date_issued_check_for_desired_ticket
 BEFORE INSERT ON desired_ticket_by_event
+FOR EACH ROW
 BEGIN
 	DECLARE v_festival_year INT;
 	DECLARE v_festival_month INT;
