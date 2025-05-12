@@ -255,8 +255,8 @@ CREATE TABLE social_media_artist(
 CREATE TABLE social_media_band(
     social_media_band_id int AUTO_INCREMENT,
     band_id int UNIQUE,
-    social_media_url varchar(255),
     social_media_name varchar(255),
+    social_media_url varchar(255),
     PRIMARY KEY(social_media_band_id),
     FOREIGN KEY(band_id) REFERENCES band(band_id) ON DELETE CASCADE
 );
@@ -275,7 +275,7 @@ CREATE TABLE ticket_type(
     PRIMARY KEY(ticket_type_id)
 );
 
-INSERT INTO ticket_type(ticket_type_name) VALUES('VIP'), ('Regular'), ('Student'), ('Senior citizen'),('Backstage');
+INSERT INTO ticket_type(ticket_type_name) VALUES('VIP'), ('Regular'), ('Student'), ('Senior Citizen'),('Backstage');
 
 CREATE TABLE visitor(
     visitor_id int AUTO_INCREMENT,
@@ -319,7 +319,7 @@ CREATE TABLE ticket_price(
     ticket_price_price float NOT NULL CHECK(ticket_price_price >= 0), 
     PRIMARY KEY(ticket_price_id),
     FOREIGN KEY(event_id) REFERENCES event(event_id) ON DELETE CASCADE,
-    FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id) ON DELETE CASCADE
+    FOREIGN KEY(ticket_type_id) REFERENCES ticket_type(ticket_type_id) ON DELETE CASCADE+
 );
 
 CREATE TABLE buyer(

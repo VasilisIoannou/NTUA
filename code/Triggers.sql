@@ -58,6 +58,7 @@ BEGIN
     JOIN artist_band ab1 ON ab1.band_id = p.band_id
     JOIN artist_band ab2 ON ab2.band_id = NEW.band_id
     WHERE ab1.artist_id = ab2.artist_id
+      AND e1.festival_year = e2.festival_year
       AND e1.stage_id != e2.stage_id
       AND (
         NEW.performance_start < p.performance_end AND
