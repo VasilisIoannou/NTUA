@@ -1,4 +1,4 @@
--- Active: 1742737422248@@127.0.0.1@3306@festivaldb
+-- Active: 1746819443116@@127.0.0.1@3309@festivaldb
 
 --create 12 sets of coordinates
 INSERT INTO coordinates (coordinate_id, latitude, longitude) VALUES
@@ -713,15 +713,15 @@ CALL insert_performance_break(1, 350 , 500 , 1 , 1 ,350);
 CALL insert_performance_break(2, 750 , 900 , 1 , 12 , 400);
 CALL insert_performance_break(3, 1100 , 1250 , 1 , 39 , 1000);
 
-CALL insert_performance_break(2, 380 , 500 , 2 , 1 ,450);
+CALL insert_performance_break(1, 380 , 500 , 2 , 40 ,450);
 CALL insert_performance_break(2, 650 , 800 , 2 , 12 , 400);
 CALL insert_performance_break(3, 1080 , 1150 , 2 , 39 , 600);
 
 CALL insert_performance_break(1, 100 , 250 , 3 , 40 ,800);
-CALL insert_performance_break(2, 450 , 600 , 3 , 40 , 400);
+CALL insert_performance_break(2, 450 , 600 , 3 , 1 , 400);
 CALL insert_performance_break(4, 820 , 1000 , 3 , 15 , 458);
 
-CALL insert_performance_break(2, 500 , 600 , 4 , 16 ,350);
+CALL insert_performance_break(1, 500 , 600 , 4 , 40 ,350);
 CALL insert_performance_break(3, 700 , 830 , 4 , 17 , 1000);
 CALL insert_performance_break(4, 860 , 1000 , 4 , 18 , 500);
 

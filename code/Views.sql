@@ -95,7 +95,7 @@ GROUP BY
     f.festival_year, 
     a.artist_id
 HAVING 
-    COUNT(p.performance_id) > 0
+    COUNT(p.performance_id) > 2
 ORDER BY
     f.festival_year,
     b.band_name;
@@ -145,7 +145,8 @@ ORDER BY
 /* View to find the average review score per visitor for each event */
 CREATE OR REPLACE VIEW avg_review_score_visitor_per_event AS
 SELECT
-    r.visitor_id,
+    v.visitor_name,
+    v.visitor_surname,
     e.event_id,
     ROUND(AVG((
         ls.performance_score +
@@ -157,6 +158,7 @@ SELECT
 FROM
     reviews r
 JOIN likert_scale ls ON r.reviews_id = ls.reviews_id
+JOIN visitor v ON r.visitor_id = v.visitor_id
 JOIN performance p ON r.performance_id = p.performance_id
 JOIN event e ON p.event_id = e.event_id
 GROUP BY
@@ -182,7 +184,7 @@ JOIN staff st ON ss.staff_id = st.staff_id
 JOIN staff_role sr ON st.staff_role_id = sr.staff_role_id
 JOIN level_of_experience ON st.level_of_experience = level_of_experience.level_of_experience_id
 WHERE
-    sr.staff_role_id = 1
+    sr.staff_role_id = 1 AND f.festival_year < 2025
 GROUP BY
     f.festival_year
 ORDER BY
@@ -255,7 +257,7 @@ WITH attendance_counts AS (
     JOIN visitor v ON t.visitor_id = v.visitor_id
     JOIN event e ON t.event_id = e.event_id
     JOIN festival f ON e.festival_year = f.festival_year
-    WHERE t.validated = TRUE
+    WHERE t.validated = TRUE AND f.festival_year < 2025
     GROUP BY v.visitor_id, v.visitor_name, v.visitor_surname, f.festival_year
     HAVING COUNT(DISTINCT t.event_id) > 3
 ),
@@ -326,7 +328,7 @@ WITH artist_festival_counts AS (
     JOIN performance p ON p.band_id = b.band_id
     JOIN event e ON e.event_id = p.event_id
     JOIN festival f ON f.festival_year = e.festival_year
-    WHERE f.festival_year < 2025
+    WHERE f.festival_year
     GROUP BY a.artist_id, a.artist_name
 ),
 max_festival_count AS (
@@ -341,7 +343,7 @@ FROM
     artist_festival_counts afc
 JOIN 
     max_festival_count mfc 
-    ON afc.festivals_participated < mfc.max_festivals - 5
+    ON afc.festivals_participated < mfc.max_festivals - 4
 ORDER BY 
     afc.festivals_participated DESC;
 
@@ -451,8 +453,11 @@ JOIN
     visitor v ON r.visitor_id = v.visitor_id
 JOIN 
     performance p ON r.performance_id = p.performance_id
+JOIN
+    event e ON p.event_id = e.event_id
 JOIN 
     band b ON p.band_id = b.band_id
+WHERE e.festival_year < 2025
 GROUP BY 
     v.visitor_id, b.band_id
 ORDER BY 
