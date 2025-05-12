@@ -593,7 +593,7 @@ BEGIN
 	DECLARE v_date_issued_date_in_days INT;
 
 	-- Find the festival dates
-	SELECT festival_year, festival_month, festival_day 
+	SELECT f.festival_year, f.festival_month, f.festival_day 
 	INTO v_festival_year, v_festival_month, v_festival_day
 	FROM festival f
 	JOIN event e ON e.festival_year = f.festival_year
