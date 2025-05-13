@@ -81,7 +81,8 @@ ORDER BY
 CREATE OR REPLACE VIEW more_than_two_warm_up AS
 SELECT DISTINCT
     f.festival_year,
-    a.artist_stage_name
+    a.artist_stage_name,
+    COUNT(p.performance_id) AS warm_up_performances
 FROM
     artist a
 JOIN artist_band ab ON a.artist_id = ab.artist_id
