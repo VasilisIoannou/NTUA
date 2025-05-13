@@ -137,8 +137,7 @@ CREATE TABLE technical_equipment(
     PRIMARY KEY(technical_equipment_id)
 );
 
---sta dummy data ena stage mporei na eshei panw pou ena technical equipment enw ston kodika parapanw
---sta data en je ta thkio unique enw ston kodika prepei nan mazi unique
+
 CREATE TABLE stage_technical_equipment( 
     stage_id int,
     technical_equipment_id int,
@@ -242,8 +241,6 @@ CREATE TABLE artist_band(
 -- For example, "https://www.facebook.com/artist_name" and "Facebook"
 -- We have 2 tables for social media, one for artists and one for bands
 
--- Na to ksanadoume giati exoume to band_id sto artist
--- kai to artist_id sto band
 CREATE TABLE social_media_artist(
     social_media_artist_id int AUTO_INCREMENT,
     artist_id int,
@@ -295,7 +292,6 @@ CREATE TABLE visitor_contact(
     FOREIGN KEY(visitor_id) REFERENCES visitor(visitor_id) ON DELETE CASCADE
 );
 
---prepei na kamoume tin timi tou eisitiriou na terkazei me to type tou
 CREATE TABLE ticket(
     EAN_13 bigint NOT NULL CHECK (EAN_13 > 0),
     ticket_type_id int NOT NULL,
@@ -358,8 +354,6 @@ CREATE TABLE ticket_transfers(
 );
 
 
---mporei na xreiazetai ON DELETE CASCADE
---sto er diagram en eshei PK
 
 CREATE TABLE desired_ticket_by_event(
     buyer_id int NOT NULL,
@@ -383,7 +377,6 @@ CREATE TABLE reviews(
     INDEX visitor_id_index (visitor_id)
 );
 
--- otan en one-on-one en kamnei generate one-on-one
 CREATE TABLE likert_scale(
     likert_scale_id int AUTO_INCREMENT,
     reviews_id int NOT NULL,
@@ -464,8 +457,7 @@ CREATE TABLE event_image(
 /*                                       PROCEDURES                                                 */
 /* ------------------------------------------------------------------------------------------------ */
 
--- Active: 1746819443116@@127.0.0.1@3309@festivaldb
--- Active: 1746819443116@@127.0.0.1@3309@festivaldb
+
 DELIMITER //
 
 CREATE PROCEDURE insert_reselling_ticket(
@@ -1196,7 +1188,6 @@ DELIMITER ;
 /*                                       VIEWS                                                      */
 /* ------------------------------------------------------------------------------------------------ */
 
--- Active: 1746819443116@@127.0.0.1@3309@festivaldb
 
 /* Trigger to prevent deletion of festivals */
 DELIMITER //
