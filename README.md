@@ -61,6 +61,14 @@ Steps to install the project:
     mysql -u root -p festivalDB < load.sql
 ```
 
+4. Test Query:
+<br>
+
+```
+    mysql -u root -p festivalDB < Q01.sql
+```
+Note: Some test Queries are in the folder ./sql/Query
+
 ## Usage Examples:
 
 - Query Artist By Age:
