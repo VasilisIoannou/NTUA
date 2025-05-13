@@ -76,7 +76,7 @@ SELECT DISTINCT
     ROUND(AVG(ls.performance_score), 2) AS avg_performance_score,
     ROUND(AVG(ls.stage_presence_score), 2) AS avg_stage_presence_score
 FROM
-    likert_scale ls FORCE INDEX (reviews_id)  -- Ensure index exists
+    likert_scale ls FORCE INDEX (reviews_id)
 JOIN reviews r FORCE INDEX (performance_id) ON ls.reviews_id = r.reviews_id
 JOIN performance p FORCE INDEX (band_id) ON r.performance_id = p.performance_id
 JOIN band b FORCE INDEX (PRIMARY) ON b.band_id = p.band_id

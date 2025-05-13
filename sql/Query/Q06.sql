@@ -1,5 +1,6 @@
 SELECT
-    r.visitor_id,
+    v.visitor_name,
+    v.visitor_surname,
     e.event_id,
     ROUND(AVG((
         ls.performance_score +
@@ -11,6 +12,7 @@ SELECT
 FROM
     reviews r
 JOIN likert_scale ls ON r.reviews_id = ls.reviews_id
+JOIN visitor v ON r.visitor_id = v.visitor_id
 JOIN performance p ON r.performance_id = p.performance_id
 JOIN event e ON p.event_id = e.event_id
 GROUP BY
@@ -18,5 +20,10 @@ GROUP BY
     e.event_id
 ORDER BY
     avg_review_score DESC;
+
+
+
+
+    
 
 
