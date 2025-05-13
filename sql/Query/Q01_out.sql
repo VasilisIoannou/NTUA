@@ -1,2 +1,0 @@
-festival_year	artist_stage_name	warm_up_performances
-2016	Kesha	3
