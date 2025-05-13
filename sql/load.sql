@@ -4034,7 +4034,7 @@ CALL insert_visitor_with_ticket('Rafael', 'Leão', 43, 'leao@milan.com', '691234
 CALL insert_visitor_with_ticket('Josko', 'Gvardiol', 21, 'gvardiol@mancity.com', '6912345694', '1000000000160', 'Student', 10, 2, @result);
 CALL insert_visitor_with_ticket('Markos', 'Markoglou', 21, 'oglou@mark.com', '6912341234', '1000000000597', 'Student', 10, 1, @result);
 CALL insert_visitor_with_ticket('Lionel', 'Messi', 67, 'messi@intermiami.com', '6912345695', '1000000000177', 'Senior Citizen', 11, 3, @result);
-CALL insert_visitor_with_ticket('Kevin', 'De Bruyne', 32, 'debruyne@mancity.com', '6912345696', '1000000000184', 'Backstage', 9, 4, @result);
+CALL insert_visitor_with_ticket('Kevin', 'De Bruyne', 32, 'debruyne@mancity.com', '6912345696', '1000000000184', 'Backstage', 9, 1, @result);
 
 -- YEAR 4 (Event IDs 12-16)
 CALL insert_visitor_with_ticket('Harry', 'Kane', 30, 'kane@bayern.com', '6912345697', '1000000000191', 'VIP', 12, 1, @result);
@@ -4056,7 +4056,7 @@ CALL insert_visitor_with_ticket('Achraf', 'Hakimi', 24, 'hakimi@psg.com', '69123
 CALL insert_visitor_with_ticket('Serge', 'Gnabry', 38, 'gnabry@bayern.com', '6912345713', '1000000000351', 'Student', 16, 1, @result);
 CALL insert_visitor_with_ticket('Loukas', 'Stylianou', 38, 'stylianou@omonia.com', '6978512355', '1000000000566', 'Student', 16, 2, @result);
 CALL insert_visitor_with_ticket('Robert', 'Lewandowski', 80, 'lewandowski@barcelona.com', '6912345714', '1000000000368', 'Senior Citizen', 13, 3, @result);
-CALL insert_visitor_with_ticket('Mohamed', 'Salah', 31, 'salah@liverpool.com', '6912345715', '1000000000375', 'Backstage', 14, 4, @result);
+CALL insert_visitor_with_ticket('Mohamed', 'Salah', 31, 'salah@liverpool.com', '6912345715', '1000000000375', 'Backstage', 14, 1, @result);
 
 -- YEAR 5 (Event IDs 17-19)
 CALL insert_visitor_with_ticket('Enzo', 'Fernández', 22, 'fernandez@chelsea.com', '6912345716', '1000000000382', 'VIP', 17, 2, @result);
@@ -4078,7 +4078,7 @@ CALL insert_visitor_with_ticket('Rasmus', 'Højlund', 20, 'hojlund@manutd.com', 
 CALL insert_visitor_with_ticket('Fotis', 'Ioannidis', 38, 'ioannidis@sporting.com', '6932354812', '1000000000573', 'Student', 18, 2, @result);
 CALL insert_visitor_with_ticket('Zeca', 'Rodrigues', 26, 'zeca@panathinaikos.com', '6912355531', '1000000000580', 'Student', 19, 3, @result);
 CALL insert_visitor_with_ticket('Manuel', 'Neuer', 79, 'neuer@bayern.com', '6912345732', '1000000000542', 'Senior Citizen', 19, 3, @result);
-CALL insert_visitor_with_ticket('Karim', 'Benzema', 36, 'benzema@alittihad.com', '6912345733', '1000000000559', 'Backstage', 17, 4, @result);
+CALL insert_visitor_with_ticket('Karim', 'Benzema', 36, 'benzema@alittihad.com', '6912345733', '1000000000559', 'Backstage', 17, 1, @result);
 
 -- YEAR 6 (Events 20-24)
 CALL insert_visitor_with_ticket('Lionel', 'Messi', 24, 'messi@barcelona.com', '6912345601', '1000000000603', 'VIP', 20, 2, @result);
@@ -4100,7 +4100,7 @@ CALL insert_visitor_with_ticket('Thierry', 'Henry', 54, 'henry@barcelona.com', '
 CALL insert_visitor_with_ticket('David', 'Villa', 23, 'villa@barcelona.com', '6912345617', '1000000000764', 'Student', 20, 2, @result);
 CALL insert_visitor_with_ticket('Thodoris', 'Zagorakis', 50, 'zagorakis@ellas.com', '6988885617', '1000000001174', 'Student', 24, 2, @result);
 CALL insert_visitor_with_ticket('Paolo', 'Maldini', 68, 'maldini@acmilan.com', '6912345618', '1000000000771', 'Senior Citizen', 21, 3, @result);
-CALL insert_visitor_with_ticket('Ronaldinho', 'Gaúcho', 29, 'gaucho@acmilan.com', '6912345619', '1000000000788', 'Backstage', 24, 4, @result);
+CALL insert_visitor_with_ticket('Ronaldinho', 'Gaúcho', 29, 'gaucho@acmilan.com', '6912345619', '1000000000788', 'Backstage', 24, 1, @result);
 
 -- YEAR 7 (Events 25-28)
 CALL insert_visitor_with_ticket('Arjen', 'Robben', 24, 'robben@bayern.com', '6912345620', '1000000000795', 'VIP', 25, 1, @result);
@@ -4122,7 +4122,7 @@ CALL insert_visitor_with_ticket('Patrick', 'Vieira', 24, 'vieira@inter.com', '69
 CALL insert_visitor_with_ticket('Paul', 'Scholes', 23, 'scholes@manutd.com', '6912345636', '1000000000955', 'Student', 25, 2, @result);
 CALL insert_visitor_with_ticket('Fanis', 'Gkekas', 43, 'gkekas@penalty.com', '6912348836', '1000000001181', 'Student', 28, 2, @result);
 CALL insert_visitor_with_ticket('Fabio', 'Cannavaro', 67, 'cannavaro@juventus.com', '6912345637', '1000000000962', 'Senior Citizen', 25, 3, @result);
-CALL insert_visitor_with_ticket('Ruud', 'van Nistelrooy', 28, 'nistelrooy@realmadrid.com', '6912345638', '1000000000979', 'Backstage', 26, 4, @result);
+CALL insert_visitor_with_ticket('Ruud', 'van Nistelrooy', 28, 'nistelrooy@realmadrid.com', '6912345638', '1000000000979', 'Backstage', 26, 1, @result);
 
 -- YEAR 8 (Events 29-33)
 CALL insert_visitor_with_ticket('David', 'Beckham', 25, 'beckham@acmilan.com', '6912345639', '1000000000986', 'VIP', 29, 2, @result);
@@ -4325,6 +4325,8 @@ INSERT INTO desired_ticket_by_event(buyer_id,ticket_type_id,event_id,date_issued
 (12,1,49,12);
 
 -- Insert about 9 reviews per year for 9 years (only for festivals that have happened)
+
+
 INSERT INTO reviews(reviews_id,visitor_id,performance_id) VALUES
 (1,1,1), /*2016*/
 (2,3,1),

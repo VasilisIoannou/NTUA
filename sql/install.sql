@@ -268,7 +268,7 @@ CREATE TABLE payment_method(
     PRIMARY KEY(payment_method_id)
 );
 
-INSERT INTO payment_method(payment_method_name) VALUES('Credit card'), ('Debit card'), ('Paypal'), ('Cash');
+INSERT INTO payment_method(payment_method_name) VALUES('Credit card'), ('Debit card'), ('Paypal'), ('Bitcoin');
 
 CREATE TABLE ticket_type(
     ticket_type_id int AUTO_INCREMENT,

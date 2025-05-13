@@ -17,7 +17,7 @@ grouped_attendance AS (
     SELECT 
         festival_year,
         events_attended,
-        COUNT(*) AS num_visitors
+        COUNT(*) 
     FROM attendance_counts
     GROUP BY festival_year, events_attended
     HAVING COUNT(*) > 1
