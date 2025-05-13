@@ -28,12 +28,12 @@ BEGIN
 
   IF v_validated THEN
         signal sqlstate '45000' 
-        set message_text = 'You Cant sell a validated ticket'; 
+        set message_text = 'You cannot sell a validated ticket'; 
   END IF;
 
   -- Check if the stage is sold out 
   IF v_number_of_tickets < FLOOR(v_stage_capacity*0.93) THEN
-    SET result_message = 'Cannot resell - tickets still available for purchase';
+    SET result_message = 'Cannot resell - Tickets still available for purchase';
   ELSE
     INSERT INTO reselling_tickets (EAN_13) VALUES (p_EAN);
     SET result_message = CONCAT('Ticket added to reselling platform. Number of Tickets: ', v_number_of_tickets, ' - stage capacity: ', v_stage_capacity);
@@ -315,7 +315,7 @@ BEGIN
         
         -- Check if adding one more would exceed limit
         IF v_vip_tickets_sold >= v_max_vip_tickets THEN
-            SET result_message = CONCAT('Vip Tickets reach max capacity, current tickets: ', v_vip_tickets_sold, ' - max vip tickets: ', v_max_vip_tickets);
+            SET result_message = CONCAT('Vip Tickets have reached max capacity, current tickets: ', v_vip_tickets_sold, ' - max vip tickets: ', v_max_vip_tickets);
 	        SET v_pass_checks = FALSE;        
 	    END IF;
     END IF;
@@ -443,12 +443,12 @@ BEGIN
     /*Check if the Performances are within Event duration*/
     IF (p_performance_start < v_event_start) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'The Performance start can not be before the event start';
+        SET MESSAGE_TEXT = 'Performance start can not be before the event start';
     END IF;
 
     IF (p_performance_end + p_break_duration / 60) > v_event_end THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'The performance + break can not exceed the event duration';
+        SET MESSAGE_TEXT = 'Performance + break can not exceed the event duration';
     END IF;
 
 
@@ -493,7 +493,7 @@ BEGIN
           AND performance_type_id = v_closing_act_id;
 	IF existing_closing > 0 THEN
             SIGNAL SQLSTATE '45000' 
-            SET MESSAGE_TEXT = 'Only one Closing act allowed per event';
+            SET MESSAGE_TEXT = 'Only one closing act allowed per event';
         END IF;
 
         -- Check performances after Closing act
@@ -515,7 +515,7 @@ BEGIN
 
     IF after_closing_conflict > 0 THEN
         SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Cant have performances after the Closing Act' ;
+        SET MESSAGE_TEXT = 'Cannot have performances after the closing act' ;
     END IF;
 
     -- Get the current festival year from the event
@@ -612,7 +612,7 @@ BEGIN
    SELECT COUNT(*) INTO v_check_buyer FROM buyer WHERE buyer_id = p_buyer_id;
    
    IF v_check_buyer = 0 THEN 
-	SET result_message = 'The buyer Id does not exists';
+	SET result_message = 'This Buyer ID does not exist';
 	SET v_valid = FALSE;
    END IF;
    
@@ -620,7 +620,7 @@ BEGIN
    SELECT COUNT(*) INTO v_check_reselling_ticket FROM reselling_tickets WHERE reselling_ticket_id = p_reselling_ticket_id;
    
    IF v_check_reselling_ticket = 0 THEN 
-	SET result_message = 'The buyer Id does not exists';
+	SET result_message = 'This Buyer ID does not exist';
 	SET v_valid = FALSE;
    END IF;   
    
@@ -644,7 +644,7 @@ BEGIN
    -- Save to ticket_transfer log
    INSERT INTO ticket_transfer(buyer_id,EAN_13) VALUES (p_buyer_id,v_EAN_13);
 
-   SET result_message = 'The ticket was bought successfully!'; 
+   SET result_message = 'Ticket was bought successfully!'; 
 END//
 
 CREATE PROCEDURE insert_buyer_visitor(

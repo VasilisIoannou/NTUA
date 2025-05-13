@@ -386,7 +386,7 @@ INSERT INTO artist_band (artist_id, band_id) VALUES
 (9, 19),
 (10, 20);
 
---insert artist's social media
+--insert one social media account to each artist
 INSERT INTO social_media_artist (social_media_artist_id,artist_id,social_media_name,social_media_url) VALUES
 (1, 131, 'Instagram', 'www.instagram/arloparks.com'),
 (2, 132, 'Instagram', 'www.instagram/alicemerton.com'),
@@ -407,9 +407,140 @@ INSERT INTO social_media_artist (social_media_artist_id,artist_id,social_media_n
 (17, 147, 'Facebook', 'www.facebook/shaniatwain.com'),
 (18, 148, 'Facebook', 'www.facebook/slausonmalone1.com'),
 (19, 149, 'Tumblr', 'www.tumblr/hughmasekela.com'),
-(20, 150, 'Tumblr', 'www.tumblr/johncoltrane.com');
+(20, 150, 'Tumblr', 'www.tumblr/johncoltrane.com'),
+(21, 1, 'Instagram', 'www.instagram/jay-z.com'),
+(22, 2, 'Instagram', 'www.instagram/drake.com'),
+(23, 3, 'Instagram', 'www.instagram/rihanna.com'),
+(24, 4, 'Instagram', 'www.instagram/taylorswift.com'),
+(25, 5, 'Instagram', 'www.instagram/ladygaga.com'),
+(26, 6, 'Instagram', 'www.instagram/eminem.com'),
+(27, 7, 'Instagram', 'www.instagram/beyoncé.com'),
+(28, 8, 'Instagram', 'www.instagram/kendricklamar.com'),
+(29, 9, 'Instagram', 'www.instagram/oliviarodrigo.com'),
+(30, 10, 'Instagram', 'www.instagram/billieeilish.com'),
+(31, 11, 'Instagram', 'www.instagram/snoopdogg.com'),
+(32, 12, 'Instagram', 'www.instagram/nickiminaj.com'),
+(33, 13, 'Instagram', 'www.instagram/brunomars.com'),
+(34, 14, 'Instagram', 'www.instagram/theweeknd.com'),
+(35, 15, 'Instagram', 'www.instagram/katyperry.com'),
+(36, 16, 'Instagram', 'www.instagram/adele.com'),
+(37, 17, 'Instagram', 'www.instagram/harrystyles.com'),
+(38, 18, 'Instagram', 'www.instagram/mileycyrus.com'),
+(39, 19, 'Instagram', 'www.instagram/travisscott.com'),
+(40, 20, 'Instagram', 'www.instagram/missyelliott.com'),
+(41, 21, 'Instagram', 'www.instagram/50cent.com'),
+(42, 22, 'Instagram', 'www.instagram/lanadelrey.com'),
+(43, 23, 'Instagram', 'www.instagram/postmalone.com'),
+(44, 24, 'Instagram', 'www.instagram/cardib.com'),
+(45, 25, 'Instagram', 'www.instagram/jasonderulo.com'),
+(46, 26, 'Instagram', 'www.instagram/dojacat.com'),
+(47, 27, 'Instagram', 'www.instagram/aliciakeys.com'),
+(48, 28, 'Instagram', 'www.instagram/johnlegend.com'),
+(49, 29, 'Facebook', 'www.facebook/chrisbrown.com'),
+(50, 30, 'Facebook', 'www.facebook/tinyharris.com'),
+(51, 31, 'Facebook', 'www.facebook/jimin.com'),
+(52, 32, 'Facebook', 'www.facebook/edsheeran.com'),
+(53, 33, 'Facebook', 'www.facebook/pitbull.com'),
+(54, 34, 'Facebook', 'www.facebook/luisfonsi.com'),
+(55, 35, 'Facebook', 'www.facebook/shakira.com'),
+(56, 36, 'Facebook', 'www.facebook/lilxan.com'),
+(57, 37, 'Tumblr', 'www.tumblr/sza.com'),
+(58, 38, 'Tumblr', 'www.tumblr/badbunny.com'),
+(59, 39, 'Tumblr', 'www.tumblr/burnaboy.com'),
+(60, 40, 'Tumblr', 'www.tumblr/charlixcx.com'),
+(61, 41, 'Instagram', 'www.instagram/trevordaniel.com'),
+(62, 42, 'Instagram', 'www.instagram/p!nk.com'),
+(63, 43, 'Instagram', 'www.instagram/dababy.com'),
+(64, 44, 'Instagram', 'www.instagram/fkatwigs.com'),
+(65, 45, 'Instagram', 'www.instagram/tylerthecreator.com'),
+(66, 46, 'Instagram', 'www.instagram/bretteldredge.com'),
+(67, 47, 'Instagram', 'www.instagram/bob.com'),
+(68, 48, 'Instagram', 'www.instagram/joshuabassett.com'),
+(69, 49, 'Instagram', 'www.instagram/lilnasx.com'),
+(70, 50, 'Instagram', 'www.instagram/halsey.com'),
+(71, 51, 'Instagram', 'www.instagram/nf.com'),
+(72, 52, 'Instagram', 'www.instagram/jcole.com'),
+(73, 53, 'Instagram', 'www.instagram/lilbaby.com'),
+(74, 54, 'Instagram', 'www.instagram/trippieredd.com'),
+(75, 55, 'Instagram', 'www.instagram/russ.com'),
+(76, 56, 'Instagram', 'www.instagram/arilennox.com'),
+(77, 57, 'Instagram', 'www.instagram/megantheestallion.com'),
+(78, 58, 'Instagram', 'www.instagram/lilyachty.com'),
+(79, 59, 'Instagram', 'www.instagram/lorde.com'),
+(80, 60, 'Instagram', 'www.instagram/slowthai.com'),
+(81, 61, 'Instagram', 'www.instagram/noahkahan.com'),
+(82, 62, 'Instagram', 'www.instagram/jasonmraz.com'),
+(83, 63, 'Instagram', 'www.instagram/2pac.com'),
+(84, 64, 'Instagram', 'www.instagram/adamlevine.com'),
+(85, 65, 'Instagram', 'www.instagram/macklemore.com'),
+(86, 66, 'Instagram', 'www.instagram/jimmieallen.com'),
+(87, 67, 'Instagram', 'www.instagram/camilacabello.com'),
+(88, 68, 'Instagram', 'www.instagram/anderson.paak.com'),
+(89, 69, 'Facebook', 'www.facebook/daya.com'),
+(90, 70, 'Facebook', 'www.facebook/georgeezra.com'),
+(91, 71, 'Facebook', 'www.facebook/roddyricch.com'),
+(92, 72, 'Facebook', 'www.facebook/chlöe.com'),
+(93, 73, 'Facebook', 'www.facebook/rani.com'),
+(94, 74, 'Facebook', 'www.facebook/aurora.com'),
+(95, 75, 'Facebook', 'www.facebook/declanmckenna.com'),
+(96, 76, 'Facebook', 'www.facebook/brittanyhoward.com'),
+(97, 77, 'Tumblr', 'www.tumblr/kaliuchis.com'),
+(98, 78, 'Tumblr', 'www.tumblr/frankocean.com'),
+(99, 79, 'Tumblr', 'www.tumblr/tinashe.com'),
+(100, 80, 'Tumblr', 'www.tumblr/mitski.com'),
+(101, 81, 'Instagram', 'www.instagram/tomgregory.com'),
+(102, 82, 'Instagram', 'www.instagram/frankiecosmos.com'),
+(103, 83, 'Instagram', 'www.instagram/barteesstrange.com'),
+(104, 84, 'Instagram', 'www.instagram/yola.com'),
+(105, 85, 'Instagram', 'www.instagram/stvincent.com'),
+(106, 86, 'Instagram', 'www.instagram/phoebebridgers.com'),
+(107, 87, 'Instagram', 'www.instagram/julienbaker.com'),
+(108, 88, 'Instagram', 'www.instagram/sudanarchives.com'),
+(109, 89, 'Instagram', 'www.instagram/tamino.com'),
+(110, 90, 'Instagram', 'www.instagram/weyesblood.com'),
+(111, 91, 'Instagram', 'www.instagram/jbalvin.com'),
+(112, 92, 'Instagram', 'www.instagram/djsnake.com'),
+(113, 93, 'Instagram', 'www.instagram/isabelamerced.com'),
+(114, 94, 'Instagram', 'www.instagram/stromae.com'),
+(115, 95, 'Instagram', 'www.instagram/tovelo.com'),
+(116, 96, 'Instagram', 'www.instagram/jaywheeler.com'),
+(117, 97, 'Instagram', 'www.instagram/evamarie.com'),
+(118, 98, 'Instagram', 'www.instagram/emmitfenn.com'),
+(119, 99, 'Instagram', 'www.instagram/aurelie.com'),
+(120, 100, 'Instagram', 'www.instagram/redfoo.com'),
+(121, 101, 'Instagram', 'www.instagram/miriammakeba.com'),
+(122, 102, 'Instagram', 'www.instagram/ruthb.com'),
+(123, 103, 'Instagram', 'www.instagram/lorde.com'),
+(124, 104, 'Instagram', 'www.instagram/jonasbrothers.com'),
+(125, 105, 'Instagram', 'www.instagram/joannanewsom.com'),
+(126, 106, 'Instagram', 'www.instagram/seungri.com'),
+(127, 107, 'Instagram', 'www.instagram/maximgorky.com'),
+(128, 108, 'Instagram', 'www.instagram/idriselba.com'),
+(129, 109, 'Instagram', 'www.instagram/teedramoses.com'),
+(130, 110, 'Instagram', 'www.instagram/charlieputh.com'),
+(131, 111, 'Instagram', 'www.instagram/lindsaylohan.com'),
+(132, 112, 'Instagram', 'www.instagram/riconasty.com'),
+(133, 113, 'Instagram', 'www.instagram/yvestumor.com'),
+(134, 114, 'Facebook', 'www.facebook/serpentwithfeet.bandcamp.com'),
+(135, 115, 'Facebook', 'www.facebook/lidopimienta.bandcamp.com'),
+(136, 116, 'Facebook', 'www.facebook/wizkid.com'),
+(137, 117, 'Facebook', 'www.facebook/tovestyrke.com'),
+(138, 118, 'Facebook', 'www.facebook/shawnmendes.com'),
+(139, 119, 'Facebook', 'www.facebook/poppy.com'),
+(140, 120, 'Facebook', 'www.facebook/beberexha.com'),
+(141, 121, 'Facebook', 'www.facebook/lilkim.com'),
+(142, 122, 'Facebook', 'www.facebook/megannicole.com'),
+(143, 123, 'Facebook', 'www.facebook/omarion.com'),
+(144, 124, 'Facebook', 'www.facebook/spellling.bandcamp.com'),
+(145, 125, 'Facebook', 'www.facebook/theneighbourhood.com'),
+(146, 126, 'Tumblr', 'www.tumblr/xxxtentacion.com'),
+(147, 127, 'Tumblr', 'www.tumblr/passenger-music.com'),
+(148, 128, 'Tumblr', 'www.tumblr/sammypharaoh.com'),
+(149, 129, 'Tumblr', 'www.tumblr/selenagomez.com'),
+(150, 130, 'Tumblr', 'www.tumblr/louistomlinson.com');
 
---insert band's social media
+
+--insert one social media account to each band
 INSERT INTO social_media_band (social_media_band_id, band_id, social_media_name, social_media_url) VALUES
 (1, 1, 'Instagram', 'www.instagram/radiohead.com'),
 (2, 2, 'Instagram', 'www.instagram/rammstein.com'),
@@ -699,16 +830,7 @@ INSERT INTO event (event_id,event_name,festival_year,stage_id,festival_day,event
 (50 ,"Anthropocene" , 2027 ,33 , 5, 950, 1400);
 
 
-
-SET FOREIGN_KEY_CHECKS = 0;
-
--- Truncate the child tables first (those that reference others)
-TRUNCATE TABLE performance;
-
--- Re-enable foreign key checks
-SET FOREIGN_KEY_CHECKS = 1;
-
-
+--create 106 performances
 CALL insert_performance_break(1, 350 , 500 , 1 , 1 ,350);
 CALL insert_performance_break(2, 750 , 900 , 1 , 12 , 400);
 CALL insert_performance_break(3, 1100 , 1250 , 1 , 39 , 1000);
@@ -895,6 +1017,7 @@ CALL insert_performance_break(4, 820, 890, 46, 5, 600);-- Gojira (reappearance) 
 CALL insert_performance_break(4, 1230, 1370, 47, 19, 600);-- Amaranthe (reappearance) mexri 1400
 
 CALL insert_performance_break(4, 1250, 1370, 50, 3, 800);-- Rihanna (reappearance) mexri 1400
+
 
 --insert 300 Speakers, 600 Lights, 210 Microphones, 100 Consoles and 130 Special Effects
 INSERT INTO technical_equipment (technical_equipment_id, equipment_name) VALUES
@@ -3466,7 +3589,7 @@ INSERT INTO technician_specialization (technician_specialization_id,technician_s
 (3,"Network Engineer" ,1),
 (4,"Pyro Technician" ,1);
 
---insert 30 staff
+--insert 50 staff
 INSERT INTO staff (staff_id, staff_name, staff_role_id, staff_phone, staff_email, staff_age, level_of_experience) VALUES
 (1, 'Dimitrios Papadopoulos', 2, '99123456', 'papadopoulos@gmail.com', 28, 2),
 (2, 'Maria Ioannou', 2, '99234567', 'ioannou@gmail.com', 24, 1),
@@ -3519,7 +3642,7 @@ INSERT INTO staff (staff_id, staff_name, staff_role_id, staff_phone, staff_email
 (49, 'Stamatis Karagiannis', 2, '99987654', 'karagiannis@gmail.com', 45, 4),
 (50, 'Eirini Liaskou', 2, '992234567', 'liaskou@gmail.com', 40, 3);
 
---make the 16 technicians one of four specialization
+--make the 16 technicians one of four specializations
 INSERT INTO staff_specialization (staff_id,technician_specialization_id) VALUES
 (23,1),
 (24,1),
@@ -3987,12 +4110,12 @@ CALL insert_visitor_with_ticket('John', 'Terry', 27, 'terry@chelsea.com', '69123
 CALL insert_visitor_with_ticket('Rio', 'Ferdinand', 28, 'ferdinand@manutd.com', '6912345624', '1000000000832', 'Regular', 28, 2, @result);
 CALL insert_visitor_with_ticket('Sergio', 'Agüero', 20, 'aguero@mancity.com', '6912345625', '1000000000849', 'Regular', 25, 2, @result);
 CALL insert_visitor_with_ticket('Nemanja', 'Vidić', 25, 'vidic@manutd.com', '6912345626', '1000000000856', 'Regular', 26, 1, @result);
-CALL insert_visitor_with_ticket('Bastian', 'Schweinsteiger', 24, 'schweinsteiger@bayern.com', '6912345627', '1000000000863', 'Regular', 27, 2, @result);
+CALL insert_visitor_with_ticket('Confucius', 'The Chinese', 24, 'confucius@china.com', '6912345627', '1000000000863', 'Regular', 27, 2, @result);
 CALL insert_visitor_with_ticket('Francesco', 'Totti', 22, 'totti@roma.com', '6912345628', '1000000000870', 'Student', 26, 2, @result);
 CALL insert_visitor_with_ticket('Raúl', 'González', 23, 'gonzalez@realmadrid.com', '6912345629', '1000000000887', 'Student', 25, 2, @result);
 CALL insert_visitor_with_ticket('Ryan', 'Giggs', 21, 'giggs@manutd.com', '6912345630', '1000000000894', 'Student', 28, 1, @result);
 CALL insert_visitor_with_ticket('Michael', 'Essien', 24, 'essien@chelsea.com', '6912345631', '1000000000900', 'Student', 27, 2, @result);
-CALL insert_visitor_with_ticket('Clarence', 'Seedorf', 20, 'seedorf@acmilan.com', '6912345632', '1000000000917', 'Student', 26, 2, @result);
+CALL insert_visitor_with_ticket('Ioustinianos', 'Vizantinos', 20, 'justin@byzantine.com', '6912345632', '1000000000917', 'Student', 26, 2, @result);
 CALL insert_visitor_with_ticket('Luís', 'Figo', 25, 'figo@inter.com', '6912345633', '1000000000924', 'Student', 25, 2, @result);
 CALL insert_visitor_with_ticket('Alessandro', 'Del Piero', 22, 'delpiero@juventus.com', '6912345634', '1000000000931', 'Student', 26, 1, @result);
 CALL insert_visitor_with_ticket('Patrick', 'Vieira', 24, 'vieira@inter.com', '6912345635', '1000000000948', 'Student', 27, 2, @result);
@@ -4128,7 +4251,7 @@ CALL insert_visitor_with_ticket('Panagiotis', 'Pikrammenos', 55, 'pikrammenos@ya
 CALL insert_visitor_with_ticket('Makis', 'Voridis', 30, 'voridis@yahoo.com', '+351912345684', 0100000001998, 'Backstage', 48, 1 , @result);
 CALL insert_visitor_with_ticket('Kyriakos', 'Pierrakakis', 100, 'pierrakakis@yahoo.com', '+49 15123456785', 0100000002001, 'Senior Citizen', 48, 2 , @result);
 
-
+--validate tickets for festivals that have happened 
 UPDATE ticket
 SET validated = 1
 WHERE event_id < 39;
@@ -4156,7 +4279,7 @@ CALL insert_buyer_visitor('Joaquín', 'Almunia', 54, 'almunia@gmail.com', '+9757
 CALL insert_buyer_visitor('Miguel', 'Arias', 42, 'arias@gmail.com', '+8613903456781');
 CALL insert_buyer_visitor('Pilar', 'Delgado', 23, 'delgado@gmail.com', '+8210509876543');
 
--- 12 Tickets poeple are selling
+-- 12 Tickets people are selling
 INSERT INTO date_issued(year_issued,month_issued,day_issued) VALUES
 (2015,12,4),
 (2016,7,9),
@@ -4178,7 +4301,7 @@ INSERT INTO reselling_tickets(reselling_ticket_id,`EAN_13`) VALUES
 (3,1000000000009),
 (4,1000000000191),
 (5,1000000000382),
-(6,1000000000603), --
+(6,1000000000603),
 (7,1000000000795),
 (8,1000000000986),
 (9,0100000001202),
@@ -4201,9 +4324,8 @@ INSERT INTO desired_ticket_by_event(buyer_id,ticket_type_id,event_id,date_issued
 (11,1,46,11),
 (12,1,49,12);
 
--- Insert about 9 reviews per year for 9 years
+-- Insert about 9 reviews per year for 9 years (only for festivals that have happened)
 INSERT INTO reviews(reviews_id,visitor_id,performance_id) VALUES
-
 (1,1,1), /*2016*/
 (2,3,1),
 (3,3,2),
@@ -4379,7 +4501,7 @@ INSERT INTO likert_scale(likert_scale_id,reviews_id,performance_score,sound_ligh
 (81, 81, 1, 2, 3, 4, 5);
 
 
--- Images
+--------------------------Images----------------------------
 INSERT INTO festival_image(festival_image_id,festival_year,festival_image_description,festival_image_path) VALUES
 (1,2023,"2023 Festival Poster","C:/Images/FestivalPosters/2023.png"),
 (2,2024,"2024 Festival Poster","C:/Images/FestivalPosters/2024.png"),
