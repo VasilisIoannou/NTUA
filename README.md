@@ -29,7 +29,7 @@ This project manages all data for Pulse University's annual music festival, incl
 ## **Database Scema**
 ### Entity Related Diagram
 
-![ERD](./diagrams/ER_Diagram.png)
+![ERD](./diagrams/ER_diagram.png)
 
 ### Relational Schema
 
