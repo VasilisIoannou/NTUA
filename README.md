@@ -48,7 +48,7 @@ Steps to install the project:
 ```
 <br>
 2. Set up MariaDB:
-<br>
+
 
 ```
     mysql -u root -p < install.sql
@@ -63,10 +63,12 @@ Steps to install the project:
 
 4. Test Query:
 <br>
+
 ```
     mysql -u root -p festivalDB < Q01.sql
 ```
 Note: Some test Queries are in the folder ./sql/Query
+
 
 ## Usage Examples:
 
