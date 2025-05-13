@@ -1,17 +1,17 @@
-SELECT
+SELECT DISTINCT
     f.festival_year,
-    pm.payment_method_name,
-    SUM(t.ticket_price) AS total_earnings
+    b.band_name,
+    g.genre_name
 FROM
-    festival f
-JOIN event e ON e.festival_year = f.festival_year
-JOIN ticket t ON t.event_id = e.event_id
-JOIN payment_method pm ON pm.payment_method_id = t.payment_method_id
-GROUP BY
-    f.festival_year,
-    pm.payment_method_name
+    band b
+JOIN band_subgenre bs ON b.band_id = bs.band_id
+JOIN subgenre sg ON sg.subgenre_id = bs.subgenre_id
+JOIN genre g ON g.genre_id = sg.genre_id
+JOIN performance p ON p.band_id = b.band_id
+JOIN event e ON e.event_id = p.event_id
+JOIN festival f ON f.festival_year = e.festival_year
 ORDER BY
     f.festival_year,
-    pm.payment_method_name;
+    b.band_name;
 
 

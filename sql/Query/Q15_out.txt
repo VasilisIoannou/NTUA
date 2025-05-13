@@ -1,0 +1,6 @@
+visitor_name	band_name	total_review_score
+Stephen Curry	Neon Howl	21
+Declan Rice	Radiohead	15
+Rúben Dias	Sigur Rós	15
+Luka Doncic	Neon Howl	15
+Oliver Kahn	Justin Bieber	15

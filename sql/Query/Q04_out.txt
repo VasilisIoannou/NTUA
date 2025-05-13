@@ -1,0 +1,40 @@
+band_name	avg_performance_score	avg_stage_presence_score
+Måneskin	5.00	4.00
+Jacob Anderson	5.00	2.00
+Nina Simone	4.50	3.00
+Keane	4.33	3.33
+The Hives	4.00	4.50
+Gojira	4.00	4.00
+Panic! At The Disco	4.00	4.00
+Ariana Grande	4.00	4.00
+Rammstein	4.00	4.00
+Khalid	4.00	4.00
+Editors	4.00	4.00
+Alice Merton	4.00	4.00
+The Killers	4.00	4.00
+Hugh Masekela	4.00	4.00
+Amaranthe	4.00	3.50
+The xx	4.00	3.00
+Within Temptation	4.00	3.00
+Neon Howl	3.88	4.25
+Radiohead	3.83	4.00
+Nightwish	3.67	4.33
+Zayn	3.67	3.67
+Coldplay	3.50	4.50
+Evanescence	3.50	4.00
+Bring Me The Horizon	3.50	3.50
+Blurry Signal	3.50	3.00
+Sigur Rós	3.00	3.60
+Interpol	3.00	3.50
+Muse	3.00	3.00
+Placebo	3.00	3.00
+Wiz Khalifa	3.00	3.00
+Phoenix	3.00	3.00
+Justin Bieber	2.67	2.67
+Arcade Fire	2.50	4.00
+Rihanna	2.50	2.50
+Taylor Swift	2.00	2.33
+Ghost	2.00	2.00
+ABBA	1.00	4.00
+Opeth	1.00	1.50
+Paramore	1.00	1.00
