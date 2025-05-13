@@ -62,7 +62,6 @@ Steps to install the project:
 ```
 
 4. Test Query:
-<br>
 
 ```
     mysql -u root -p festivalDB < Q01.sql
