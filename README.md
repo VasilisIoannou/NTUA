@@ -51,7 +51,7 @@ Steps to install the project:
 <br>
 
 ```
-    mysql -u root -p < Database.sql
+    mysql -u root -p < install.sql
 ```
 <br>
 3. Generate dummy data:
