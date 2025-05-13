@@ -1,0 +1,39 @@
+festival_year	payment_method_name	total_earnings
+2016	Credit card	135
+2016	Debit card	335
+2017	Credit card	256
+2017	Debit card	301
+2018	Cash	100
+2018	Credit card	145
+2018	Debit card	220
+2018	Paypal	10
+2019	Cash	100
+2019	Credit card	165
+2019	Debit card	280
+2019	Paypal	5
+2020	Cash	105
+2020	Credit card	132
+2020	Debit card	277
+2020	Paypal	35
+2021	Cash	107
+2021	Credit card	153
+2021	Debit card	299
+2021	Paypal	10
+2022	Cash	102
+2022	Credit card	144
+2022	Debit card	241
+2022	Paypal	7
+2023	Cash	109
+2023	Credit card	278
+2023	Debit card	332
+2023	Paypal	130
+2024	Credit card	300
+2024	Debit card	435
+2025	Credit card	175
+2025	Debit card	400
+2026	Cash	40
+2026	Credit card	170
+2026	Debit card	475
+2026	Paypal	115
+2027	Credit card	220
+2027	Debit card	315

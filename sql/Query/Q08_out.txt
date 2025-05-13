@@ -1,0 +1,8 @@
+staff_id	staff_name	staff_email	staff_phone
+18	Despina Nicolaou	nicolaou@gmail.com	99888999
+19	Costas Hadjikyriacou	hadjikyriacou@gmail.com	99999000
+20	Marina Spyrou	spyrou@gmail.com	99000111
+21	Andreas Charalambous	charalambous@gmail.com	99112233
+22	Elena Kallis	kallis@gmail.com	99223344
+39	Lebron James	savva@gmail.com	99112233
+40	Alexandra Kouris	kouris@gmail.com	99223344
