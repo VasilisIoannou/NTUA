@@ -1,3 +1,0 @@
-visitor_id	visitor_name	visitor_surname	festival_year	events_attended
-103	Xavi	Hernández	2023	4
-102	Cristiano	Ronaldo	2023	4
