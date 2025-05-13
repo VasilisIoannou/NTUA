@@ -58,7 +58,7 @@ Steps to install the project:
 <br>
 
 ```
-    mysql -u root -p festivalDB < InsertsTsakalos.sql
+    mysql -u root -p festivalDB < load.sql
 ```
 
 ## Usage Examples:
