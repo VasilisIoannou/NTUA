@@ -88,7 +88,7 @@ Note: Some test Queries are in the folder ./sql/Query
 
 ## **Acknowledgements** 
 Participants: 
-<div> Vasilis Ioannou </div> 
-<div> Dimitris Markidis </div>
-<div> Theodoros Tsakalos </div>
+<div><a href="https://github.com/VasilisIoannou/">Vasilis Ioannou</a></div>
+<div><a href="https://github.com/jmkn03/">Demetris Markides</a></div>
+<div><a href="https://github.com/tsakalost">Theodoros Tsakalos</a></div>
 
