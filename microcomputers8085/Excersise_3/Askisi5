@@ -1,0 +1,61 @@
+	MVI A,0DH ;Interrupt Mask for 6.5
+	SIM
+	LXI H,00H 
+	MVI C,64d ;store the counter in C
+	EI
+AVG:
+	MVI A,C
+	CPI 00H
+	JNZ AVG ;Loop if not Zero
+
+	DI ; Disable Interrupts
+
+	DAD H
+	DAD H
+	DAD H ;3*(H-L)
+
+	MOV A,L
+	ANI 80H ; 1000 0000;
+	MVI L,00H
+	CPI 00H
+	JNZ ROUND ; if ( A != 0 ) then jump to ROUND
+
+END:
+	HLT
+
+ROUND:
+	IN H
+	JMP END
+
+0034: ; vector address of RST6.5
+	JMP RST6.5
+
+RST6.5:
+	PUSH RSW
+	MOV A,C
+	ANI 01H ; 0000 0001
+	JPO 4MSB ; if the parity is odd then we got MSB
+	IN 20H
+	ANI 0FH
+	MOV B,A ;Sore 4 LSB in B
+	JMP 4MSB
+
+4MSB:
+	IN 20H
+	ANI 0FH
+	;shift 4 MSB
+	RLC
+	RLC
+	RLC
+	RLC
+
+	ORA B ;Combine the 4 LSB with 4 MSB
+	MVI D,00H
+	MOV E,A ;Store in E
+	DAD D ;sum data
+
+4LSB: 
+	POP PSW
+	DCR C ;Update counter
+	EI
+	RET

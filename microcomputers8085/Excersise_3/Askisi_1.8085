@@ -1,0 +1,76 @@
+	IN 10H
+	
+	 ;Set up Display
+	MVI A,10H  		
+	STA 0B00H 
+	STA 0B01H 
+	STA 0B02H 
+	STA 0B03H 
+	STA 0B04H 
+	STA 0B05H	
+	
+	;Initialization of Interupt mask
+	MVI A,0DH			
+	SIM
+	EI
+WAIT: ; while(1)
+	JMP WAIT
+
+
+INTR_ROUTINE:
+	EI	
+	;Turn on LEDs
+	MVI A,00H 		
+	STA 3000H
+	MVI H,06H 		;Counter for 6 iterations / 6 * 10 sec
+ 	MOV A,H
+	DCR A		
+	;Save the number in 0B01 and 0B00
+	STA 0B01H			
+SECONDS:
+	MVI A,09H			
+LIGHTS_ON:
+	STA 0B00H	
+	CALL DISPLAY		
+	DCR A 			
+	CPI 00H 			;Compare with zero
+	JNZ LIGHTS_ON	 	;If Z=0 then 9 seconds passed
+	CALL ZERO			;Display zero unit (1 sec)
+	DCR H			;Decrease counter
+	JZ EXIT			;If Z=0 end timer
+	MOV A,H
+	DCR A		
+	STA 0B01H
+	JMP SECONDS		;Reapeat for 60 seconds
+EXIT:
+	MVI A,FFH 		;Turn off LEDs
+	STA 3000H 
+	JMP WAIT			;Return to wait (main program)
+DISPLAY: 	
+	LXI B,0064H 		;100 msec delay
+	LXI D,0B00H		;For STDM
+	PUSH PSW
+	PUSH H
+	PUSH D
+	PUSH B
+	CALL STDM
+	MVI A,0AH 		;10*100msec=1sec
+1SEC:
+	CALL DCD			
+	CALL DELB
+	DCR A
+	CPI 00H
+	JNZ 1SEC
+	POP B
+	POP D
+	POP H
+	POP PSW
+	RET
+ZERO: 				;Display zero in the 3rd segment display
+	MVI A,00H
+	STA 0B02H
+	CALL DISPLAY
+	CALL DELB
+	RET
+	
+	END
