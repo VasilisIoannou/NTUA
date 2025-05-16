@@ -1,0 +1,50 @@
+	LXI B,0064H	;We call delb with 64Hms = 1/10 sec delay
+START:
+	LDA 2000H	
+	RAR		
+	JNC OFF	;If LSB is off then go to OFF
+	JMP START
+OFF:			;We check if the switch is turned on
+	MVI A,FFH
+	STA 3000H ; Swicth light off
+
+	LDA 2000H
+	RAR
+	JC ON1		;If it's on then go to ON1
+	JMP OFF	;Else wait until it's on
+ON1:			;In order to light up the LEDs we have to switch off
+			;the LSB, but when that happens we'll have to call delb
+	MVI D,C8H	;200 times(we want them on for 20s), that's why D = 200 
+	LDA 2000H
+	RAR
+	JNC OPEN	;If LSB turned off then push button(off-on-off) is activated
+	JMP ON1
+OPEN:
+	LDA 2000H	;If LSB turns on the 20s timer keeps on going, but if that
+	RAR		;happens then we have to check whether it turns off or not.
+	JC ON_AGAIN	;If it does so, then we have to reset the timer
+	MVI A,00H
+	STA 3000H	;Turn on all LEDs
+	CALL DELB
+	DCR D		;Decrease D
+	JZ OFF	;If D = 0 then 20s passed
+	MVI A,FFH
+	STA 3000H	;Turn off all LEDs and start checking again
+	JMP OPEN
+ON_AGAIN:		;Getting here means that if the MSB switch turns off then the 
+	LDA 2000H	;timer has to reset.If the MSB stays on the whole time then we
+	RAR		;repeat the same process as above
+	JNC RESTART
+	MVI A,00H
+	STA 3000H
+	CALL DELB
+	DCR D
+	JNZ ON_AGAIN
+	MVI A,FFH
+	STA 3000H
+	JMP OFF
+RESTART:		;If on-off occured while we had the LEDs on then reset the timer
+	MVI D,C8H
+	JMP OPEN
+
+	END

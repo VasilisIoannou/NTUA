@@ -1,0 +1,43 @@
+LXI B,0FFFH
+
+START:
+	CALL KIND
+	CPI 00H	;If we press 0 then go to OFF
+	JZ OFF
+	CPI 09H	;If we press 9 then go to OFF
+	JNC OFF
+	CPI 05H 	
+	JC LOWER_INIT	;we pressed < 05H =>(01-04)H
+ 	JMP HIGHER_INIT
+
+LOWER_INIT:
+	MVI A,FEH
+	JMP LOWER
+LOWER:
+	STA 3000H
+	CALL DELB
+	CPI FBH
+	JC OFF
+	STC
+	RAL
+	JMP LOWER
+	
+HIGHER_INIT:
+	MVI A,7FH
+	JMP HIGHER
+
+HIGHER:
+	STA 3000H
+	CALL DELB
+	CPI EFH
+	JNC OFF
+	STC
+	RAR
+	JMP HIGHER
+
+OFF:			;If we pressed 0 or 9 then turn off all LEDs and go to START
+	MVI A,FFH
+	STA 3000H
+	JMP START
+
+	END

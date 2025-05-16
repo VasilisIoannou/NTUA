@@ -1,0 +1,51 @@
+       
+START:
+	MVI L,FFH ; L - STORE INVERSE OPERATOR
+        LXI B,0F00H  ;This will be the delay (500ms = 01F4Hms)
+        LDA 2000H
+        CPI C8H ; Check Ift he number is larger than 200
+        JNC TWO
+
+        CPI 64H ;Check If number is larger than 100
+        JNC ONE
+CONTINUE:
+        MVI H,FFH
+DECA:
+        INR H
+        SUI 0AH
+        JNC DECA
+        ADI 0AH
+        ANI 0FH
+        MOV E,A
+        MOV A,H
+        ANI 0FH
+        RAL
+        RAL
+        RAL
+        RAL
+        ORA E
+ 	CMA
+FLASH:
+	
+        STA 3000H
+        CALL DELB
+	          MOV D,A
+	ANA L
+	
+	STA 3000H
+	CALL DELB
+	MOV A,D	 
+        JMP START
+
+        JMP ENDS
+
+ONE:
+	MVI L,F0H
+        SUI 64H
+        JMP CONTINUE
+TWO:
+	MVI L,0FH
+        SUI C8H ; CHANGE THIS TO 200
+        JMP CONTINUE
+ENDS:
+        END

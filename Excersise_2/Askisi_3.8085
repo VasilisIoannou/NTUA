@@ -1,0 +1,34 @@
+PR_START:
+	MVI D,00H
+	LDA 2000H 
+FIND:
+	RAL
+	INR D
+	JNC FIND ;MSB == 0
+	JC OPEN_INIT  ;MSB == 1
+
+OPEN_INIT:
+	MVI A,00H
+	JMP OPEN
+
+OPEN:
+	MOV E,A ;Save A temporarly
+	MOV A,D
+	CPI 00H ;If A == 0
+	JZ FINISH
+	DCR A ; D--
+	MOV D,A
+	MOV A,E ; Restore A
+	ADI 80H ; A += 1000 0000
+	RAR ; Left Shift A
+	JMP OPEN
+
+FINISH:
+	MOV A,E ; Restore A
+	RAL ; needs two less Right shifts 
+	RAL 
+	STA 3000H
+	
+	JMP PR_START
+	
+END
