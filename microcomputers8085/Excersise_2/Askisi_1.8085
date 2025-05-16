@@ -1,0 +1,48 @@
+	IN 10H
+	LXI H,0900H
+	LXI B,0000H
+	MVI A,00H
+	MVI D,00H
+STORE:
+	MOV M,A
+	INR A
+	INX H
+	
+	MVI E,08H
+	JMP COUNT_ONES
+
+STORE_CONTINUE:
+
+	JMP COMP	
+STORE_CONTINUE_2:
+
+	CPI 00H
+	JNZ STORE	
+	JMP END_PRO
+	
+
+COUNT_ONES:
+	; Right Rotate the Accumulator, 
+	; if the flag was not set to 1 that means it was a 0 and the BC register  shouldnt be incremented
+	RRC	
+	JNC SKIP_INC
+	INX B
+SKIP_INC:
+	DCR E
+	JNZ COUNT_ONES
+	JMP STORE_CONTINUE
+
+COMP:
+	CPI 10H
+	JC STORE_CONTINUE_2 ;A < 10H
+	CPI 60H
+	JNC STORE_CONTINUE_2 ; A > 60H
+
+COMP_CONTINUE:
+	INR D
+	JMP STORE_CONTINUE_2 ; A > 60H
+	
+
+END_PRO:	
+	RST 1
+	END

@@ -1,0 +1,71 @@
+INIT:
+	LDA 2000H
+	MOV B,A ; B == Input
+
+	CALL SAVE_BITS
+	
+	MOV A,C
+	ORA D ; A0 + B0
+	MOV E,A ; X0 = E = A0+B0
+	
+	CALL NEW_B
+	CALL SAVE_BITS
+
+	MOV A,C
+	ORA D ; A1+B1
+	ANA E ; A = X1 = (A1+B1) * (A0+B0)
+	MOV L,A ; L = X1
+
+	CALL NEW_B		
+	CALL SAVE_BITS
+
+	MOV A,C
+	ANA D ; C*D
+	MOV H,A ; X2 = H = C*D
+
+	CALL NEW_B
+	CALL SAVE_BITS
+
+	MOV A,C
+	ANA D ; A = A3*B3
+	XRA H ; A = X3 = (A3*B3) xor (A2*B2)
+
+	;Put together the X{0,1,2,3} in the Accumulator
+
+	RAL ; A = 1111 xxX3x
+
+	ORA H
+	RAL ; xxxx xX3X2x
+
+	ORA L
+	RAL
+
+	ORA E ; xxxx X3X2X1X0
+
+	ANI 0FH ; 1111 X3X2X1X0
+	
+	CMA 
+	STA 3000H
+	HLT
+	JMP INIT
+
+;Take the 2 LSB's and Store them In C,D
+SAVE_BITS:
+	ANI 01H ; 0000 0001 - Take LSB
+	MOV C,A ; C == LSB
+	MOV A,B ; Restore A
+	ANI 02H ; 0000 0010 - 2nd LSB
+	RAR ; Put B0 in the LSB
+	MOV D,A ;D == 2nd LSB
+	RET
+
+NEW_B:
+	MOV A,B ; Restore A
+	RAR
+	RAR
+	MOV B,A ; Save new B
+	RET
+
+END_PROG:
+	RST 1
+	END

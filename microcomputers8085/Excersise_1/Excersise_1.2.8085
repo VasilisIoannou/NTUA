@@ -1,0 +1,47 @@
+START:	
+	IN 10H
+	LXI B,01F4H ;01F4H == 500 / Used for 500ms delay
+
+	MVI C,01H ; C will hold the current number of the Led / C = 00000001
+
+Main:
+	; Print C
+	MOV A,C
+	CMA
+	STA 3000H
+
+	LDA 2000H ; Load Input in A
+	CALL DELB ; Delay 500ms
+	
+	ANI 01H ; A AND 00000001
+
+	;If the result is 00H then Zero flag == 1 (MSB == 0)
+	;If the result is 01H then Zero flag == 0 (MSB == 1)
+
+	JZ Main	
+
+	ANI 80H ; A AND 10000000
+
+	;If the result is 00H then Zero flag == 1 (MSB == 0)
+	;If the result is 80H then Zero flag == 0 (MSB == 1)
+
+	JZ MSB_Zero
+	JNZ MSB_One
+
+MSB_Zero:
+	;Cycle C Left
+	MOV A,C
+	RLC
+	MOV C,A
+	
+	JMP Main
+
+MSB_One:	
+	;Cycle C Right
+	MOV A,C
+	RRC
+	MOV C,A
+	
+	JMP Main
+
+END
