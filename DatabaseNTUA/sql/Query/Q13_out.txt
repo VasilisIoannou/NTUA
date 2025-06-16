@@ -1,0 +1,8 @@
+artist_id	artist_stage_name	unique_continents
+140	Kesha	3
+131	Arlo Parks	3
+132	Alice Merton	3
+133	Twenty One Pilots	3
+135	Raleigh Ritchie	3
+136	Panic! At The Disco	3
+137	Khalid	3

@@ -1,0 +1,4 @@
+genre_1	genre_2	band_count
+EDM	Rock	12
+Jazz	Pop	8
+Country	Pop	6

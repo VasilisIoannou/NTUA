@@ -1,0 +1,27 @@
+artist_stage_name	festivals_performed
+Olivia Rodrigo	4
+Arlo Parks	4
+Khalid	3
+Billie Eilish	3
+Roddy Ricch	2
+Chlöe	2
+RANI	2
+AURORA	2
+Declan McKenna	2
+Tamino	2
+Isabela Merced	2
+Aurelie	2
+Joshua Bassett	2
+Lorde	2
+Lil Nas X	2
+Jonas Brothers	2
+Trippie Redd	2
+Rico Nasty	2
+Lil Yachty	2
+Shawn Mendes	2
+Lorde	2
+XXXTentacion	2
+Noah Kahan	2
+Camila Cabello	1
+Daya	1
+Lil Xan	1

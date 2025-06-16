@@ -1,0 +1,20 @@
+artist_id	artist_stage_name	festivals_participated
+145	Kylie Minogue	1
+146	Justin Bieber	1
+147	Shania Twain	1
+36	Lil Xan	1
+148	Slauson Malone 1	1
+37	SZA	1
+149	Hugh Masekela	1
+38	Bad Bunny	1
+150	John Coltrane	1
+39	Burna Boy	1
+40	Charli XCX	1
+41	Trevor Daniel	1
+42	P!nk	1
+43	DaBaby	1
+134	Victoria Monét	1
+141	Tirzah	1
+142	Nina Simone	1
+143	Wiz Khalifa	1
+144	Liam Payne	1
